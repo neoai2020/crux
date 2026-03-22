@@ -23,6 +23,7 @@ import WebsitePreview from "@/components/WebsitePreview";
 import ToneSelector from "@/components/ToneSelector";
 import LogoSelector from "@/components/LogoSelector";
 import ArrayEditor from "@/components/ArrayEditor";
+import ImageEditor from "@/components/ImageEditor";
 
 type Page = "prompt" | "design" | "content" | "done";
 
@@ -84,8 +85,9 @@ const EDITABLE_FIELDS: Record<
   {
     key: string;
     label: string;
-    type: "text" | "textarea" | "array";
-    arrayFields?: { key: string; label: string; type: "text" | "textarea" }[];
+    type: "text" | "textarea" | "array" | "image";
+    imageContext?: string;
+    arrayFields?: { key: string; label: string; type: "text" | "textarea" | "image" }[];
     arrayLabel?: string;
     maxItems?: number;
   }[]
@@ -97,6 +99,7 @@ const EDITABLE_FIELDS: Record<
     { key: "ctaText", label: "CTA Button", type: "text" },
     { key: "secondaryCtaText", label: "Secondary CTA", type: "text" },
     { key: "socialProof", label: "Social Proof Text", type: "text" },
+    { key: "heroImage", label: "Hero Image", type: "image", imageContext: "hero banner" },
   ],
   features: [
     { key: "sectionTitle", label: "Section Title", type: "text" },
@@ -118,6 +121,7 @@ const EDITABLE_FIELDS: Record<
     { key: "heading", label: "Heading", type: "text" },
     { key: "text", label: "About Text", type: "textarea" },
     { key: "highlight", label: "Highlight Text", type: "text" },
+    { key: "aboutImage", label: "About Image", type: "image", imageContext: "about section, team or workspace" },
   ],
   testimonials: [
     { key: "sectionTitle", label: "Section Title", type: "text" },
@@ -185,6 +189,12 @@ const EDITABLE_FIELDS: Record<
   gallery: [
     { key: "sectionTitle", label: "Section Title", type: "text" },
     { key: "subtitle", label: "Subtitle", type: "text" },
+    { key: "image0", label: "Image 1", type: "image", imageContext: "gallery photo" },
+    { key: "image1", label: "Image 2", type: "image", imageContext: "gallery photo" },
+    { key: "image2", label: "Image 3", type: "image", imageContext: "gallery photo" },
+    { key: "image3", label: "Image 4", type: "image", imageContext: "gallery photo" },
+    { key: "image4", label: "Image 5", type: "image", imageContext: "gallery photo" },
+    { key: "image5", label: "Image 6", type: "image", imageContext: "gallery photo" },
   ],
   stats: [
     {
@@ -228,6 +238,7 @@ const EDITABLE_FIELDS: Record<
         { key: "title", label: "Title", type: "text" },
         { key: "description", label: "Description", type: "textarea" },
         { key: "tag", label: "Tag", type: "text" },
+        { key: "image", label: "Image", type: "image" },
       ],
     },
   ],
@@ -244,6 +255,7 @@ const EDITABLE_FIELDS: Record<
         { key: "name", label: "Name", type: "text" },
         { key: "role", label: "Role", type: "text" },
         { key: "initials", label: "Initials", type: "text" },
+        { key: "photo", label: "Photo", type: "image" },
       ],
     },
   ],
@@ -292,16 +304,26 @@ function ContentEditorBlock({
   content,
   onUpdate,
   tone,
+  userId,
+  businessName,
+  description,
 }: {
   sectionType: SectionType;
   sectionKey: string;
   content: Record<string, unknown>;
   onUpdate: (key: string, field: string, value: unknown) => void;
   tone: ToneDefinition;
+  userId: string;
+  businessName: string;
+  description: string;
 }) {
   const [open, setOpen] = useState(true);
   const fields = EDITABLE_FIELDS[sectionType] || [];
   if (fields.length === 0) return null;
+
+  function buildPrompt(context?: string): string {
+    return `${context || sectionType} for ${businessName}. ${description}`;
+  }
 
   return (
     <div className="card">
@@ -334,6 +356,28 @@ function ContentEditorBlock({
                     tone={tone}
                     maxItems={field.maxItems}
                     itemLabel={field.arrayLabel}
+                    userId={userId}
+                    imagePromptBuilder={(itemData, fieldKey) =>
+                      `${fieldKey} for ${(itemData.title as string) || businessName}. ${description}`
+                    }
+                  />
+                </div>
+              );
+            }
+
+            if (field.type === "image") {
+              return (
+                <div key={field.key}>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">
+                    {field.label}
+                  </label>
+                  <ImageEditor
+                    value={(content[field.key] as string) || ""}
+                    onChange={(val) => onUpdate(sectionKey, field.key, val)}
+                    userId={userId}
+                    autoPrompt={buildPrompt(field.imageContext)}
+                    gradient={tone.gradient}
+                    radius={tone.radius}
                   />
                 </div>
               );
@@ -1097,6 +1141,9 @@ function WizardInner() {
                     content={c}
                     onUpdate={updateSectionContent}
                     tone={selectedTone}
+                    userId={user?.id || ""}
+                    businessName={form.businessName}
+                    description={form.description}
                   />
                 );
               })}

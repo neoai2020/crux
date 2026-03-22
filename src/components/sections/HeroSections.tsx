@@ -1,5 +1,46 @@
 import type { SectionProps } from "@/data/sections";
 
+function ImageOrGradient({
+  src,
+  gradient,
+  radius,
+  style,
+}: {
+  src?: string;
+  gradient: string;
+  radius: string;
+  style?: React.CSSProperties;
+}) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt=""
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: radius,
+          display: "block",
+          ...style,
+        }}
+      />
+    );
+  }
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: gradient,
+        borderRadius: radius,
+        ...style,
+      }}
+    />
+  );
+}
+
 export function HeroCentered({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
@@ -109,6 +150,7 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const heroImage = content.heroImage as string | undefined;
 
   return (
     <section
@@ -175,14 +217,9 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
             </button>
           </div>
         </div>
-        <div
-          style={{
-            background: tone.gradient,
-            borderRadius: tone.radius,
-            aspectRatio: "4/3",
-            width: "100%",
-          }}
-        />
+        <div style={{ aspectRatio: "4/3", width: "100%", overflow: "hidden", borderRadius: tone.radius }}>
+          <ImageOrGradient src={heroImage} gradient={tone.gradient} radius={tone.radius} />
+        </div>
       </div>
     </section>
   );
@@ -193,6 +230,7 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const heroImage = content.heroImage as string | undefined;
 
   return (
     <section
@@ -200,15 +238,9 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-        <div
-          className="order-2 md:order-1"
-          style={{
-            background: tone.gradient,
-            borderRadius: tone.radius,
-            aspectRatio: "4/3",
-            width: "100%",
-          }}
-        />
+        <div className="order-2 md:order-1" style={{ aspectRatio: "4/3", width: "100%", overflow: "hidden", borderRadius: tone.radius }}>
+          <ImageOrGradient src={heroImage} gradient={tone.gradient} radius={tone.radius} />
+        </div>
         <div className="order-1 md:order-2">
           <h1
             style={{

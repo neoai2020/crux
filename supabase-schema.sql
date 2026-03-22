@@ -101,3 +101,27 @@ create policy "Users can insert own generations"
 create policy "Users can update own generations"
   on public.generations for update
   using (auth.uid() = user_id);
+
+
+-- 4. Image generations table (tracks daily AI image usage per user, 5/day)
+create table if not exists public.image_generations (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  date date not null default current_date,
+  count integer not null default 1,
+  unique(user_id, date)
+);
+
+alter table public.image_generations enable row level security;
+
+create policy "Users can view own image generations"
+  on public.image_generations for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own image generations"
+  on public.image_generations for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own image generations"
+  on public.image_generations for update
+  using (auth.uid() = user_id);

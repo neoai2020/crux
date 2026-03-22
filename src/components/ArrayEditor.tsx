@@ -1,10 +1,11 @@
 "use client";
 import { ToneDefinition } from "@/data/tones";
+import ImageEditor from "./ImageEditor";
 
 interface FieldConfig {
   key: string;
   label: string;
-  type: "text" | "textarea";
+  type: "text" | "textarea" | "image";
 }
 
 interface ArrayEditorProps {
@@ -14,6 +15,8 @@ interface ArrayEditorProps {
   tone: ToneDefinition;
   maxItems?: number;
   itemLabel?: string;
+  userId?: string;
+  imagePromptBuilder?: (item: Record<string, unknown>, fieldKey: string) => string;
 }
 
 export default function ArrayEditor({
@@ -23,6 +26,8 @@ export default function ArrayEditor({
   tone,
   maxItems = 10,
   itemLabel = "Item",
+  userId,
+  imagePromptBuilder,
 }: ArrayEditorProps) {
   function updateItem(index: number, key: string, value: string) {
     const updated = [...items];
@@ -98,7 +103,22 @@ export default function ArrayEditor({
                 >
                   {field.label}
                 </label>
-                {field.type === "textarea" ? (
+                {field.type === "image" && userId ? (
+                  <ImageEditor
+                    value={(item[field.key] as string) || ""}
+                    onChange={(val) => updateItem(idx, field.key, val)}
+                    userId={userId}
+                    autoPrompt={
+                      imagePromptBuilder
+                        ? imagePromptBuilder(item, field.key)
+                        : `${field.label} image`
+                    }
+                    gradient={tone.gradient}
+                    radius={tone.radius}
+                    aspectRatio="16/9"
+                    height={120}
+                  />
+                ) : field.type === "textarea" ? (
                   <textarea
                     value={(item[field.key] as string) || ""}
                     onChange={(e) => updateItem(idx, field.key, e.target.value)}
