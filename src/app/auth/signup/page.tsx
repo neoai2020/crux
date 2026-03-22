@@ -26,11 +26,15 @@ export default function SignUpPage() {
       return;
     }
     setLoading(true);
-    const success = await signUp(name, email, password);
-    if (success) {
-      router.push("/dashboard");
-    } else {
-      setError("An account with this email already exists.");
+    try {
+      const success = await signUp(name, email, password);
+      if (success) {
+        router.push("/dashboard");
+      } else {
+        setError("An account with this email already exists.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
     setLoading(false);
   };

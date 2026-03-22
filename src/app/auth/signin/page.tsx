@@ -16,11 +16,15 @@ export default function SignInPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const success = await signIn(email, password);
-    if (success) {
-      router.push("/dashboard");
-    } else {
-      setError("Invalid email or password. Please try again.");
+    try {
+      const success = await signIn(email, password);
+      if (success) {
+        router.push("/dashboard");
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
     setLoading(false);
   };
