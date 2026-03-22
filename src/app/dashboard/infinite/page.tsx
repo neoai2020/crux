@@ -1,4 +1,5 @@
 "use client";
+import FeatureVideo from "@/components/FeatureVideo";
 
 export default function InfinitePage() {
   return (
@@ -12,6 +13,13 @@ export default function InfinitePage() {
       <p className="text-gray-400 mb-8">
         No limits. Unlimited generations, unlimited websites, unlimited growth.
       </p>
+
+      <div className="mb-6">
+        <FeatureVideo
+          title="Go Infinite"
+          subtitle="See what unlimited access looks like."
+        />
+      </div>
 
       <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6">
         <div className="text-center py-10">

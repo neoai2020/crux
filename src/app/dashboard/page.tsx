@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getWebsitesForUser, getRemainingGenerations, SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
+import FeatureVideo from "@/components/FeatureVideo";
 
 const EARNINGS_FEED = [
   { name: "Sarah M.", amount: "$2,450", type: "eCom Store", time: "2 min ago", avatar: "S" },
@@ -77,6 +78,12 @@ export default function DashboardPage() {
         </h1>
         <p className="text-gray-400 mt-1">Here&apos;s what&apos;s happening with your websites today.</p>
       </div>
+
+      {/* Feature Video */}
+      <FeatureVideo
+        title="Welcome to Crux"
+        subtitle="Watch this quick intro to start building websites that make money."
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

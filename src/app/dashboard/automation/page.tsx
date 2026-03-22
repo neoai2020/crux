@@ -1,4 +1,5 @@
 "use client";
+import FeatureVideo from "@/components/FeatureVideo";
 
 export default function AutomationPage() {
   return (
@@ -12,6 +13,13 @@ export default function AutomationPage() {
       <p className="text-gray-400 mb-8">
         Set it and forget it. Automate your marketing, content updates, and lead capture.
       </p>
+
+      <div className="mb-6">
+        <FeatureVideo
+          title="Automation in Action"
+          subtitle="Watch how automation puts your business on autopilot."
+        />
+      </div>
 
       <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6">
         <div className="text-center py-10">

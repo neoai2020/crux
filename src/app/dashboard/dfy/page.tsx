@@ -1,4 +1,5 @@
 "use client";
+import FeatureVideo from "@/components/FeatureVideo";
 
 export default function DFYPage() {
   return (
@@ -12,6 +13,13 @@ export default function DFYPage() {
       <p className="text-gray-400 mb-8">
         Sit back and relax. Our team builds, launches, and optimizes everything for you.
       </p>
+
+      <div className="mb-6">
+        <FeatureVideo
+          title="Done For You"
+          subtitle="Watch how we handle everything from start to finish."
+        />
+      </div>
 
       <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6">
         <div className="text-center py-10">

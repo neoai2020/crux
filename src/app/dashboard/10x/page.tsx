@@ -1,4 +1,5 @@
 "use client";
+import FeatureVideo from "@/components/FeatureVideo";
 
 export default function TenXPage() {
   return (
@@ -12,6 +13,13 @@ export default function TenXPage() {
       <p className="text-gray-400 mb-8">
         Multiply your output by 10. Premium tools to scale your business faster than ever.
       </p>
+
+      <div className="mb-6">
+        <FeatureVideo
+          title="10x Your Business"
+          subtitle="See how 10x tools can multiply your output overnight."
+        />
+      </div>
 
       <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6">
         <div className="text-center py-10">
