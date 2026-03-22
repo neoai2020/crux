@@ -27,7 +27,7 @@ export function TestimonialsCards({ tone, content }: SectionProps) {
         >
           {sectionTitle}
         </h2>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {items.map((item, i) => (
             <div
               key={i}
@@ -96,6 +96,7 @@ export function TestimonialsCards({ tone, content }: SectionProps) {
 }
 
 export function TestimonialsSpotlight({ tone, content }: SectionProps) {
+  const sectionTitle = (content.sectionTitle as string) || "Testimonials";
   const items = (content.items as TestimonialItem[]) || [];
   const item = items[0];
   if (!item) return null;
@@ -106,12 +107,25 @@ export function TestimonialsSpotlight({ tone, content }: SectionProps) {
       className="py-24 px-6"
     >
       <div className="max-w-3xl mx-auto text-center">
+        {sectionTitle && (
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 24,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+        )}
         <span
           style={{
             color: tone.primaryLight,
             fontSize: 72,
             lineHeight: 1,
-            fontFamily: "Georgia, serif",
+            fontFamily: tone.headingFont,
           }}
         >
           &ldquo;
@@ -168,16 +182,13 @@ export function TestimonialsMinimal({ tone, content }: SectionProps) {
         >
           {sectionTitle}
         </h2>
-        <div className="flex gap-6 overflow-x-auto pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {items.map((item, i) => (
             <div
               key={i}
-              className="shrink-0"
               style={{
                 borderLeft: `3px solid ${tone.primary}`,
                 paddingLeft: 20,
-                minWidth: 280,
-                maxWidth: 340,
               }}
             >
               <p

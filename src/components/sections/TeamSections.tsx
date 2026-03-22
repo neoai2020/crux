@@ -35,7 +35,7 @@ export function TeamGrid({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-4 gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           {members.map((member, i) => (
             <div key={i} className="flex flex-col items-center text-center">
               <div
@@ -76,6 +76,7 @@ export function TeamGrid({ tone, content }: SectionProps) {
 
 export function TeamCompact({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Our Team";
+  const subtitle = (content.subtitle as string) || "";
   const members = (content.members as TeamMember[]) || [];
 
   return (
@@ -90,12 +91,17 @@ export function TeamCompact({ tone, content }: SectionProps) {
             color: tone.text,
             fontWeight: 700,
             fontSize: 32,
-            marginBottom: 28,
+            marginBottom: subtitle ? 12 : 28,
           }}
         >
           {sectionTitle}
         </h2>
-        <div className="flex flex-wrap gap-8">
+        {subtitle && (
+          <p style={{ color: tone.muted, fontSize: 16, marginBottom: 28 }}>
+            {subtitle}
+          </p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {members.map((member, i) => (
             <div key={i} className="flex items-center gap-3">
               <div

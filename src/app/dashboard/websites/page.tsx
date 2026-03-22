@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -15,18 +15,25 @@ export default function WebsitesPage() {
   const [deleteTarget, setDeleteTarget] = useState<SavedWebsite | null>(null);
   const [previewTarget, setPreviewTarget] = useState<SavedWebsite | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      setWebsites(getWebsitesForUser(user.id));
-      setRemaining(getRemainingGenerations(user.id));
-    }
+  const loadData = useCallback(async () => {
+    if (!user) return;
+    const [sites, rem] = await Promise.all([
+      getWebsitesForUser(user.id),
+      getRemainingGenerations(user.id),
+    ]);
+    setWebsites(sites);
+    setRemaining(rem);
   }, [user]);
 
-  const confirmDelete = () => {
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const confirmDelete = async () => {
     if (!deleteTarget || !user) return;
-    deleteWebsite(deleteTarget.id, user.id);
-    setWebsites(getWebsitesForUser(user.id));
+    await deleteWebsite(deleteTarget.id, user.id);
     setDeleteTarget(null);
+    await loadData();
   };
 
   const handleEdit = (website: SavedWebsite) => {

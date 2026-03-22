@@ -10,7 +10,7 @@ export function AboutImageLeft({ tone, content }: SectionProps) {
       style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
       className="py-20 px-6"
     >
-      <div className="max-w-6xl mx-auto grid grid-cols-2 gap-14 items-center">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
         <div
           style={{
             background: tone.gradient,
@@ -71,7 +71,7 @@ export function AboutImageRight({ tone, content }: SectionProps) {
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
       className="py-20 px-6"
     >
-      <div className="max-w-6xl mx-auto grid grid-cols-2 gap-14 items-center">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
         <div>
           <h2
             style={{
@@ -161,7 +161,7 @@ export function AboutCentered({ tone, content }: SectionProps) {
               display: "inline-block",
               backgroundColor: tone.primary,
               color: "#fff",
-              borderRadius: 999,
+              borderRadius: tone.radius,
               padding: "8px 24px",
               fontSize: 14,
               fontWeight: 600,

@@ -31,7 +31,7 @@ export function GalleryGrid({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {Array.from({ length: itemCount }).map((_, i) => (
             <div
               key={i}
@@ -50,6 +50,7 @@ export function GalleryGrid({ tone, content }: SectionProps) {
 
 export function GalleryFeatured({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Gallery";
+  const subtitle = (content.subtitle as string) || "";
 
   return (
     <section
@@ -57,17 +58,22 @@ export function GalleryFeatured({ tone, content }: SectionProps) {
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-6xl mx-auto">
-        <h2
-          className="text-center mb-12"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
+        <div className="text-center mb-12">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+          )}
+        </div>
         <div
           className="h-64 w-full mb-6"
           style={{
@@ -75,7 +81,7 @@ export function GalleryFeatured({ tone, content }: SectionProps) {
             borderRadius: tone.radius,
           }}
         />
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}

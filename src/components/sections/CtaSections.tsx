@@ -5,6 +5,7 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
   const secondaryButtonText = (content.secondaryButtonText as string) || "Contact Us";
+  const disclaimer = (content.disclaimer as string) || "";
 
   return (
     <section
@@ -32,7 +33,7 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
             {description}
           </p>
         )}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             style={{
               backgroundColor: "#fff",
@@ -64,6 +65,11 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
             {secondaryButtonText}
           </button>
         </div>
+        {disclaimer && (
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginTop: 16 }}>
+            {disclaimer}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -73,6 +79,7 @@ export function CtaBoxed({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Ready to Get Started?";
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
+  const disclaimer = (content.disclaimer as string) || "";
 
   return (
     <section
@@ -119,6 +126,11 @@ export function CtaBoxed({ tone, content }: SectionProps) {
         >
           {buttonText}
         </button>
+        {disclaimer && (
+          <p style={{ color: tone.muted, fontSize: 13, marginTop: 12 }}>
+            {disclaimer}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -128,13 +140,14 @@ export function CtaSplit({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Ready to Get Started?";
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
+  const disclaimer = (content.disclaimer as string) || "";
 
   return (
     <section
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
       className="py-20 px-6"
     >
-      <div className="max-w-5xl mx-auto grid grid-cols-2 gap-12 items-center">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
           <h2
             style={{
@@ -153,7 +166,7 @@ export function CtaSplit({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-col items-start md:items-end gap-3">
           <button
             style={{
               background: tone.gradient,
@@ -169,9 +182,11 @@ export function CtaSplit({ tone, content }: SectionProps) {
           >
             {buttonText}
           </button>
-          <span style={{ color: tone.muted, fontSize: 13 }}>
-            No credit card required
-          </span>
+          {disclaimer && (
+            <span style={{ color: tone.muted, fontSize: 13 }}>
+              {disclaimer}
+            </span>
+          )}
         </div>
       </div>
     </section>

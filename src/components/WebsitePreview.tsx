@@ -11,6 +11,7 @@ interface WebsitePreviewProps {
   category: string;
   description?: string;
   sectionContents?: Record<string, Record<string, unknown>>;
+  logoData?: string;
   scale?: number;
   maxHeight?: string;
   showChrome?: boolean;
@@ -23,6 +24,7 @@ export default function WebsitePreview({
   category,
   description = "",
   sectionContents,
+  logoData,
   scale = 1,
   maxHeight = "600px",
   showChrome = true,
@@ -31,8 +33,11 @@ export default function WebsitePreview({
 
   function getContent(sectionType: SectionType, index: number): Record<string, unknown> {
     const key = `${sectionType}-${index}`;
-    if (sectionContents?.[key]) return sectionContents[key];
-    return generateDefaultContent(sectionType, businessName, description, category);
+    const base = sectionContents?.[key] || generateDefaultContent(sectionType, businessName, description, category);
+    if (logoData && (sectionType === "navbar" || sectionType === "footer")) {
+      return { ...base, logoData };
+    }
+    return base;
   }
 
   const inner = (

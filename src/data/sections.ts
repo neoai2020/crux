@@ -256,6 +256,7 @@ export function generateDefaultContent(
         subheadline: desc,
         ctaText: "Get Started Today",
         secondaryCtaText: "Learn More",
+        socialProof: "Trusted by 10,000+ customers",
       };
     case "features":
       return {
@@ -291,11 +292,13 @@ export function generateDefaultContent(
         description: `Join thousands who already trust ${businessName}. Take the first step today.`,
         buttonText: "Start Now",
         secondaryButtonText: "Contact Us",
+        disclaimer: "No credit card required",
       };
     case "pricing":
       return {
         sectionTitle: "Simple, Transparent Pricing",
         subtitle: "Choose the plan that fits your needs",
+        highlightLabel: "Popular",
         plans: [
           { name: "Starter", price: "$29", period: "/month", features: ["Core features", "Email support", "1 user", "Basic analytics"], ctaText: "Get Started", highlighted: false },
           { name: "Professional", price: "$79", period: "/month", features: ["All Starter features", "Priority support", "5 users", "Advanced analytics", "Custom integrations"], ctaText: "Go Pro", highlighted: true },
@@ -321,6 +324,7 @@ export function generateDefaultContent(
         email: `hello@${businessName.toLowerCase().replace(/\s+/g, "")}.com`,
         phone: "+1 (555) 123-4567",
         address: "123 Business Ave, Suite 100",
+        buttonText: "Send Message",
       };
     case "gallery":
       return {
@@ -398,16 +402,24 @@ export function generateDefaultContent(
       return {
         headline: "See It in Action",
         description: `Watch how ${businessName} can transform your workflow in just a few minutes.`,
+        ctaText: "Watch Now",
       };
     case "countdown":
       return {
         headline: "Limited Time Offer",
         description: "Don't miss out — this special deal ends soon!",
         ctaText: "Claim Your Spot",
+        timeBlocks: [
+          { value: "07", label: "Days" },
+          { value: "23", label: "Hours" },
+          { value: "45", label: "Min" },
+          { value: "12", label: "Sec" },
+        ],
       };
     case "footer":
       return {
         businessName,
+        tagline: `Building exceptional experiences that help businesses grow and succeed in the digital world.`,
         links: [
           { group: "Product", items: ["Features", "Pricing", "FAQ"] },
           { group: "Company", items: ["About", "Team", "Careers"] },

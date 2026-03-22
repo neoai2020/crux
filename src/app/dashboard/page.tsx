@@ -38,10 +38,19 @@ export default function DashboardPage() {
   const [remaining, setRemaining] = useState(5);
 
   useEffect(() => {
-    if (user) {
-      setSavedWebsites(getWebsitesForUser(user.id));
-      setRemaining(getRemainingGenerations(user.id));
-    }
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const [sites, rem] = await Promise.all([
+        getWebsitesForUser(user.id),
+        getRemainingGenerations(user.id),
+      ]);
+      if (!cancelled) {
+        setSavedWebsites(sites);
+        setRemaining(rem);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   useEffect(() => {

@@ -43,7 +43,6 @@ export function FaqAccordion({ tone, content }: SectionProps) {
                   backgroundColor: tone.surface,
                   borderRadius: tone.radius,
                   padding: "20px 24px",
-                  marginTop: i > 0 ? 0 : undefined,
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -90,6 +89,7 @@ export function FaqAccordion({ tone, content }: SectionProps) {
 
 export function FaqTwoColumn({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "FAQ";
+  const subtitle = (content.subtitle as string) || "";
   const items = (content.items as FaqItem[]) || [];
 
   return (
@@ -98,18 +98,23 @@ export function FaqTwoColumn({ tone, content }: SectionProps) {
       className="py-20 px-6"
     >
       <div className="max-w-5xl mx-auto">
-        <h2
-          className="text-center mb-14"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
-        <div className="grid grid-cols-2 gap-x-14 gap-y-10">
+        <div className="text-center mb-14">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 17 }}>{subtitle}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-10">
           {items.map((item, i) => (
             <div key={i}>
               <h3

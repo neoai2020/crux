@@ -12,6 +12,7 @@ interface PricingPlan {
 export function PricingCards({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Pricing";
   const subtitle = (content.subtitle as string) || "";
+  const highlightLabel = (content.highlightLabel as string) || "Popular";
   const plans = (content.plans as PricingPlan[]) || [];
 
   return (
@@ -36,11 +37,11 @@ export function PricingCards({ tone, content }: SectionProps) {
             <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
           )}
         </div>
-        <div className="flex justify-center gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, i) => (
             <div
               key={i}
-              className="flex flex-col flex-1"
+              className="flex flex-col"
               style={{
                 backgroundColor: tone.surface,
                 borderRadius: tone.radius,
@@ -48,7 +49,6 @@ export function PricingCards({ tone, content }: SectionProps) {
                 border: plan.highlighted
                   ? `2px solid ${tone.primary}`
                   : `1px solid ${tone.border}`,
-                maxWidth: 360,
                 position: "relative",
               }}
             >
@@ -67,7 +67,7 @@ export function PricingCards({ tone, content }: SectionProps) {
                     borderRadius: 999,
                   }}
                 >
-                  Popular
+                  {highlightLabel}
                 </span>
               )}
               <h3
@@ -132,6 +132,7 @@ export function PricingCards({ tone, content }: SectionProps) {
 
 export function PricingComparison({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Pricing";
+  const subtitle = (content.subtitle as string) || "";
   const plans = (content.plans as PricingPlan[]) || [];
 
   const allFeatures = Array.from(new Set(plans.flatMap((p) => p.features)));
@@ -142,17 +143,22 @@ export function PricingComparison({ tone, content }: SectionProps) {
       className="py-20 px-6"
     >
       <div className="max-w-5xl mx-auto">
-        <h2
-          className="text-center mb-14"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
+        <div className="text-center mb-14">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+          )}
+        </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -217,6 +223,7 @@ export function PricingComparison({ tone, content }: SectionProps) {
 
 export function PricingHighlight({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Pricing";
+  const subtitle = (content.subtitle as string) || "";
   const plans = (content.plans as PricingPlan[]) || [];
 
   const highlighted = plans.find((p) => p.highlighted) || plans[1] || plans[0];
@@ -228,26 +235,30 @@ export function PricingHighlight({ tone, content }: SectionProps) {
       className="py-20 px-6"
     >
       <div className="max-w-6xl mx-auto">
-        <h2
-          className="text-center mb-14"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
-        <div className="flex items-center justify-center gap-8">
+        <div className="text-center mb-14">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {others[0] && (
             <div
-              className="flex flex-col flex-1"
+              className="flex flex-col"
               style={{
                 backgroundColor: tone.surface,
                 borderRadius: tone.radius,
                 padding: 32,
-                maxWidth: 300,
                 border: `1px solid ${tone.border}`,
               }}
             >
@@ -284,12 +295,11 @@ export function PricingHighlight({ tone, content }: SectionProps) {
           )}
           {highlighted && (
             <div
-              className="flex flex-col flex-1"
+              className="flex flex-col"
               style={{
                 background: tone.gradient,
                 borderRadius: tone.radius,
                 padding: 40,
-                maxWidth: 360,
               }}
             >
               <h3 style={{ fontFamily: tone.headingFont, fontWeight: 700, fontSize: 22, color: "#fff", marginBottom: 6 }}>
@@ -325,12 +335,11 @@ export function PricingHighlight({ tone, content }: SectionProps) {
           )}
           {others[1] && (
             <div
-              className="flex flex-col flex-1"
+              className="flex flex-col"
               style={{
                 backgroundColor: tone.surface,
                 borderRadius: tone.radius,
                 padding: 32,
-                maxWidth: 300,
                 border: `1px solid ${tone.border}`,
               }}
             >

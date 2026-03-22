@@ -1,6 +1,11 @@
 import type { SectionProps } from "@/data/sections";
 
-const TIME_BLOCKS = [
+interface TimeBlock {
+  value: string;
+  label: string;
+}
+
+const DEFAULT_TIME_BLOCKS: TimeBlock[] = [
   { value: "07", label: "Days" },
   { value: "23", label: "Hours" },
   { value: "45", label: "Min" },
@@ -9,7 +14,9 @@ const TIME_BLOCKS = [
 
 export function CountdownBanner({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Limited Time Offer";
+  const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Claim Your Spot";
+  const timeBlocks = (content.timeBlocks as TimeBlock[]) || DEFAULT_TIME_BLOCKS;
 
   return (
     <section
@@ -23,13 +30,18 @@ export function CountdownBanner({ tone, content }: SectionProps) {
             fontWeight: 800,
             fontSize: 36,
             color: "#fff",
-            marginBottom: 28,
+            marginBottom: description ? 12 : 28,
           }}
         >
           {headline}
         </h2>
-        <div className="flex items-center justify-center gap-6 mb-10">
-          {TIME_BLOCKS.map((block) => (
+        {description && (
+          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 17, marginBottom: 28, lineHeight: 1.6 }}>
+            {description}
+          </p>
+        )}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10 max-w-md mx-auto">
+          {timeBlocks.map((block) => (
             <div key={block.label} className="flex flex-col items-center">
               <span
                 style={{
@@ -81,6 +93,7 @@ export function CountdownCard({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Limited Time Offer";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Claim Your Spot";
+  const timeBlocks = (content.timeBlocks as TimeBlock[]) || DEFAULT_TIME_BLOCKS;
 
   return (
     <section
@@ -107,16 +120,15 @@ export function CountdownCard({ tone, content }: SectionProps) {
         >
           {headline}
         </h2>
-        <div className="flex items-center justify-center gap-5 mb-6">
-          {TIME_BLOCKS.map((block) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-6 max-w-md mx-auto">
+          {timeBlocks.map((block) => (
             <div
               key={block.label}
               className="flex flex-col items-center"
               style={{
                 backgroundColor: tone.bg,
                 borderRadius: tone.radius,
-                padding: "16px 20px",
-                minWidth: 80,
+                padding: "16px 12px",
                 border: `1px solid ${tone.border}`,
               }}
             >

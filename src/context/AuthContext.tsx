@@ -1,7 +1,16 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
+import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -20,61 +29,106 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function mapSupabaseUser(
+  su: SupabaseUser,
+  profile?: { name?: string; plan?: string; created_at?: string }
+): User {
+  return {
+    id: su.id,
+    name:
+      profile?.name ||
+      su.user_metadata?.name ||
+      su.email?.split("@")[0] ||
+      "User",
+    email: su.email || "",
+    plan: profile?.plan || "Starter",
+    createdAt: profile?.created_at || su.created_at,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("crux_user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-    setLoading(false);
+  const fetchProfile = useCallback(async (su: SupabaseUser) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("name, plan, created_at")
+      .eq("id", su.id)
+      .single();
+    return data;
   }, []);
 
-  const signIn = async (email: string, _password: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem("crux_users") || "[]");
-    const found = users.find((u: User & { password: string }) => u.email === email);
-    if (found) {
-      const { password: _, ...userData } = found;
-      setUser(userData);
-      localStorage.setItem("crux_user", JSON.stringify(userData));
-      return true;
-    }
-    return false;
-  };
+  useEffect(() => {
+    let mounted = true;
 
-  const signUp = async (name: string, email: string, password: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem("crux_users") || "[]");
-    if (users.find((u: User) => u.email === email)) return false;
-    const newUser = {
-      id: crypto.randomUUID(),
-      name,
+    async function init() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user && mounted) {
+        const profile = await fetchProfile(session.user);
+        setUser(mapSupabaseUser(session.user, profile ?? undefined));
+      }
+      if (mounted) setLoading(false);
+    }
+
+    init();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const profile = await fetchProfile(session.user);
+        if (mounted) setUser(mapSupabaseUser(session.user, profile ?? undefined));
+      } else {
+        if (mounted) setUser(null);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [fetchProfile]);
+
+  const signIn = async (email: string, password: string): Promise<boolean> => {
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      plan: "Starter",
-      createdAt: new Date().toISOString(),
-    };
-    users.push(newUser);
-    localStorage.setItem("crux_users", JSON.stringify(users));
-    const { password: _, ...userData } = newUser;
-    setUser(userData);
-    localStorage.setItem("crux_user", JSON.stringify(userData));
-    return true;
+    });
+    return !error;
   };
 
-  const signOut = () => {
+  const signUp = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<boolean> => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    });
+    return !error;
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("crux_user");
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem("crux_users") || "[]");
-    return users.some((u: User) => u.email === email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/signin`,
+    });
+    return !error;
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, resetPassword }}>
+    <AuthContext.Provider
+      value={{ user, loading, signIn, signUp, signOut, resetPassword }}
+    >
       {children}
     </AuthContext.Provider>
   );

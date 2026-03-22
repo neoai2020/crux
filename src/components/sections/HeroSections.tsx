@@ -5,6 +5,7 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const socialProof = (content.socialProof as string) || "Trusted by 10,000+ customers";
 
   return (
     <section
@@ -40,7 +41,7 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
             {subheadline}
           </p>
         )}
-        <div className="flex items-center justify-center gap-4" style={{ marginTop: 36 }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
           <button
             style={{
               background: tone.gradient,
@@ -72,30 +73,32 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
             {secondaryCtaText}
           </button>
         </div>
-        <div
-          className="flex items-center justify-center gap-2"
-          style={{ marginTop: 40 }}
-        >
-          <div className="flex items-center -space-x-2">
-            {[tone.primary, tone.secondary, tone.accent, tone.primaryLight].map(
-              (color, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    backgroundColor: color,
-                    border: `2px solid ${tone.surface}`,
-                  }}
-                />
-              )
-            )}
+        {socialProof && (
+          <div
+            className="flex items-center justify-center gap-2"
+            style={{ marginTop: 40 }}
+          >
+            <div className="flex items-center -space-x-2">
+              {[tone.primary, tone.secondary, tone.accent, tone.primaryLight].map(
+                (color, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      backgroundColor: color,
+                      border: `2px solid ${tone.surface}`,
+                    }}
+                  />
+                )
+              )}
+            </div>
+            <span style={{ fontSize: 14, color: tone.muted, marginLeft: 8 }}>
+              {socialProof}
+            </span>
           </div>
-          <span style={{ fontSize: 14, color: tone.muted, marginLeft: 8 }}>
-            Trusted by 10,000+ customers
-          </span>
-        </div>
+        )}
       </div>
     </section>
   );
@@ -112,7 +115,7 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
       className="py-20 px-6"
       style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
         <div>
           <h1
             style={{
@@ -139,7 +142,7 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
               {subheadline}
             </p>
           )}
-          <div className="flex items-center gap-4" style={{ marginTop: 32 }}>
+          <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
             <button
               style={{
                 background: tone.gradient,
@@ -196,8 +199,9 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
       className="py-20 px-6"
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
         <div
+          className="order-2 md:order-1"
           style={{
             background: tone.gradient,
             borderRadius: tone.radius,
@@ -205,7 +209,7 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
             width: "100%",
           }}
         />
-        <div>
+        <div className="order-1 md:order-2">
           <h1
             style={{
               fontFamily: tone.headingFont,
@@ -231,7 +235,7 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
               {subheadline}
             </p>
           )}
-          <div className="flex items-center gap-4" style={{ marginTop: 32 }}>
+          <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
             <button
               style={{
                 background: tone.gradient,

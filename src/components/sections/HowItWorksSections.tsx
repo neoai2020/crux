@@ -35,26 +35,12 @@ export function HowItWorksSteps({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="flex items-start justify-center gap-0" style={{ position: "relative" }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {steps.map((step, i) => (
             <div
               key={i}
               className="flex flex-col items-center text-center"
-              style={{ flex: 1, position: "relative", padding: "0 16px" }}
             >
-              {i < steps.length - 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 32,
-                    left: "calc(50% + 32px)",
-                    right: "calc(-50% + 32px)",
-                    height: 2,
-                    backgroundColor: tone.border,
-                    zIndex: 0,
-                  }}
-                />
-              )}
               <div
                 className="flex items-center justify-center"
                 style={{
@@ -66,8 +52,6 @@ export function HowItWorksSteps({ tone, content }: SectionProps) {
                   fontFamily: tone.headingFont,
                   fontWeight: 800,
                   fontSize: 22,
-                  position: "relative",
-                  zIndex: 1,
                   flexShrink: 0,
                 }}
               >
@@ -98,6 +82,7 @@ export function HowItWorksSteps({ tone, content }: SectionProps) {
 
 export function HowItWorksTimeline({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "How It Works";
+  const subtitle = (content.subtitle as string) || "";
   const steps = (content.steps as StepItem[]) || [];
 
   return (
@@ -106,34 +91,27 @@ export function HowItWorksTimeline({ tone, content }: SectionProps) {
       style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-3xl mx-auto">
-        <h2
-          className="text-center mb-14"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
-        <div style={{ position: "relative", paddingLeft: 48 }}>
-          <div
+        <div className="text-center mb-14">
+          <h2
             style={{
-              position: "absolute",
-              left: 19,
-              top: 0,
-              bottom: 0,
-              width: 3,
-              backgroundColor: tone.primary,
-              borderRadius: 2,
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
             }}
-          />
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+          )}
+        </div>
+        <div className="flex flex-col gap-8">
           {steps.map((step, i) => (
             <div
               key={i}
               className="flex items-start gap-6"
-              style={{ marginBottom: i < steps.length - 1 ? 32 : 0, position: "relative" }}
             >
               <div
                 className="flex items-center justify-center flex-shrink-0"
@@ -146,10 +124,6 @@ export function HowItWorksTimeline({ tone, content }: SectionProps) {
                   fontFamily: tone.headingFont,
                   fontWeight: 700,
                   fontSize: 15,
-                  position: "absolute",
-                  left: -48,
-                  top: 16,
-                  zIndex: 1,
                 }}
               >
                 {step.number}

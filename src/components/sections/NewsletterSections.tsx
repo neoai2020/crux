@@ -2,6 +2,7 @@ import type { SectionProps } from "@/data/sections";
 
 export function NewsletterInline({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Stay Updated";
+  const description = (content.description as string) || "";
   const placeholder = (content.placeholder as string) || "Enter your email";
   const buttonText = (content.buttonText as string) || "Subscribe";
 
@@ -10,20 +11,26 @@ export function NewsletterInline({ tone, content }: SectionProps) {
       className="py-10 px-6"
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
     >
-      <div className="max-w-5xl mx-auto flex items-center justify-between gap-8 flex-wrap">
-        <h3
-          style={{
-            fontFamily: tone.headingFont,
-            fontWeight: 700,
-            fontSize: 22,
-            color: tone.text,
-            margin: 0,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {headline}
-        </h3>
-        <div className="flex items-center gap-3 flex-1" style={{ maxWidth: 440, minWidth: 280 }}>
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="shrink-0">
+          <h3
+            style={{
+              fontFamily: tone.headingFont,
+              fontWeight: 700,
+              fontSize: 22,
+              color: tone.text,
+              margin: 0,
+            }}
+          >
+            {headline}
+          </h3>
+          {description && (
+            <p style={{ color: tone.muted, fontSize: 14, marginTop: 4 }}>
+              {description}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-3 flex-1 w-full md:w-auto" style={{ maxWidth: 440 }}>
           <input
             type="email"
             placeholder={placeholder}
@@ -90,17 +97,18 @@ export function NewsletterSection({ tone, content }: SectionProps) {
           {headline}
         </h2>
         {description && (
-          <p style={{ color: tone.muted, fontSize: 16, lineHeight: 1.6, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
+          <p style={{ color: tone.muted, fontSize: 16, lineHeight: 1.6, marginBottom: 28, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
             {description}
           </p>
         )}
-        <div className="flex items-center gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
           <input
             type="email"
             placeholder={placeholder}
             style={{
               flex: 1,
               maxWidth: 320,
+              width: "100%",
               padding: "14px 18px",
               backgroundColor: tone.bg,
               border: `1px solid ${tone.border}`,

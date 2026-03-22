@@ -35,7 +35,7 @@ export function ContentGridCards({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item, i) => (
             <div
               key={i}
@@ -48,10 +48,7 @@ export function ContentGridCards({ tone, content }: SectionProps) {
             >
               <div
                 className="h-40 w-full"
-                style={{
-                  background: tone.gradient,
-                  borderRadius: `${tone.radius} ${tone.radius} 0 0`,
-                }}
+                style={{ background: tone.gradient }}
               />
               <div style={{ padding: 24 }}>
                 <h3
@@ -92,6 +89,7 @@ export function ContentGridCards({ tone, content }: SectionProps) {
 
 export function ContentGridList({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Featured";
+  const subtitle = (content.subtitle as string) || "";
   const items = (content.items as ContentItem[]) || [];
 
   return (
@@ -106,18 +104,23 @@ export function ContentGridList({ tone, content }: SectionProps) {
             color: tone.text,
             fontWeight: 700,
             fontSize: 36,
-            marginBottom: 32,
+            marginBottom: subtitle ? 12 : 32,
           }}
         >
           {sectionTitle}
         </h2>
+        {subtitle && (
+          <p style={{ color: tone.muted, fontSize: 16, marginBottom: 32 }}>
+            {subtitle}
+          </p>
+        )}
         <div className="flex flex-col">
           {items.map((item, i) => (
             <div key={i}>
               {i > 0 && (
                 <div style={{ height: 1, backgroundColor: tone.border }} />
               )}
-              <div className="flex items-center gap-6 py-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 py-6">
                 <div
                   className="flex-shrink-0"
                   style={{
@@ -166,6 +169,8 @@ export function ContentGridList({ tone, content }: SectionProps) {
 }
 
 export function ContentGridFeatured({ tone, content }: SectionProps) {
+  const sectionTitle = (content.sectionTitle as string) || "Featured";
+  const subtitle = (content.subtitle as string) || "";
   const items = (content.items as ContentItem[]) || [];
   const featured = items[0];
   const rest = items.slice(1);
@@ -176,6 +181,24 @@ export function ContentGridFeatured({ tone, content }: SectionProps) {
       style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-6xl mx-auto">
+        {sectionTitle && (
+          <div className="text-center mb-12">
+            <h2
+              style={{
+                fontFamily: tone.headingFont,
+                color: tone.text,
+                fontWeight: 700,
+                fontSize: 36,
+                marginBottom: 12,
+              }}
+            >
+              {sectionTitle}
+            </h2>
+            {subtitle && (
+              <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+            )}
+          </div>
+        )}
         {featured && (
           <div
             style={{
@@ -233,7 +256,7 @@ export function ContentGridFeatured({ tone, content }: SectionProps) {
             </div>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {rest.map((item, i) => (
             <div
               key={i}

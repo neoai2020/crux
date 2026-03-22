@@ -8,7 +8,7 @@ interface ToneSelectorProps {
 
 export default function ToneSelector({ selectedToneId, onSelect }: ToneSelectorProps) {
   return (
-    <div className="grid grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
       {TONES.map((tone) => {
         const isActive = tone.id === selectedToneId;
         return (

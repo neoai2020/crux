@@ -1,8 +1,15 @@
 import type { SectionProps } from "@/data/sections";
 import type { ToneDefinition } from "@/data/tones";
 
-function footerBg(tone: ToneDefinition): string {
-  return tone.id === "dark" ? tone.surface : "#111827";
+function footerColors(tone: ToneDefinition) {
+  const isDark = tone.id === "dark";
+  return {
+    bg: isDark ? tone.surface : tone.text,
+    heading: isDark ? tone.text : "#F9FAFB",
+    body: isDark ? tone.muted : "#9CA3AF",
+    dim: isDark ? tone.border : "#6B7280",
+    rule: isDark ? tone.border : "rgba(255,255,255,0.1)",
+  };
 }
 
 const SOCIAL_ICONS = [
@@ -13,20 +20,42 @@ const SOCIAL_ICONS = [
 
 function SocialIcon({ d, color }: { d: string; color: string }) {
   return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill={color}
-      style={{ opacity: 0.7 }}
-    >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={color} style={{ opacity: 0.7 }}>
       <path d={d} />
     </svg>
   );
 }
 
+function FooterLogo({ tone, logoData, businessName, size = 36 }: { tone: ToneDefinition; logoData?: string; businessName: string; size?: number }) {
+  if (logoData) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={logoData} alt={businessName} style={{ height: size, width: "auto", maxWidth: size * 3, objectFit: "contain" }} />
+    );
+  }
+  return (
+    <div
+      className="flex items-center justify-center shrink-0"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: tone.gradient,
+        color: "#fff",
+        fontFamily: tone.headingFont,
+        fontWeight: 700,
+        fontSize: size * 0.44,
+      }}
+    >
+      {businessName?.charAt(0) || "B"}
+    </div>
+  );
+}
+
 export function FooterColumns({ tone, content, businessName }: SectionProps) {
-  const bg = footerBg(tone);
+  const fc = footerColors(tone);
+  const tagline = (content.tagline as string) || "";
+  const logoData = content.logoData as string | undefined;
   const links = (content.links as { group: string; items: string[] }[]) || [];
   const copyright =
     (content.copyright as string) ||
@@ -35,42 +64,29 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
   return (
     <section
       className="py-16 px-6"
-      style={{ backgroundColor: bg, fontFamily: tone.bodyFont }}
+      style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
-              <div
-                className="flex items-center justify-center shrink-0"
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  background: tone.gradient,
-                  color: "#fff",
-                  fontFamily: tone.headingFont,
-                  fontWeight: 700,
-                  fontSize: 16,
-                }}
-              >
-                {businessName?.charAt(0) || "B"}
-              </div>
+              <FooterLogo tone={tone} logoData={logoData} businessName={businessName} size={36} />
               <span
                 style={{
                   fontFamily: tone.headingFont,
                   fontWeight: 700,
                   fontSize: 18,
-                  color: "#F9FAFB",
+                  color: fc.heading,
                 }}
               >
                 {businessName}
               </span>
             </div>
-            <p style={{ fontSize: 14, lineHeight: 1.7, color: "#9CA3AF", maxWidth: 240 }}>
-              Building exceptional experiences that help businesses grow and
-              succeed in the digital world.
-            </p>
+            {tagline && (
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: fc.body, maxWidth: 240 }}>
+                {tagline}
+              </p>
+            )}
           </div>
           {links.map((group, gi) => (
             <div key={gi}>
@@ -79,7 +95,7 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
                   fontFamily: tone.headingFont,
                   fontWeight: 600,
                   fontSize: 14,
-                  color: "#F9FAFB",
+                  color: fc.heading,
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
                   marginBottom: 16,
@@ -94,17 +110,10 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
                     <a
                       href="#"
                       style={{
-                        color: "#9CA3AF",
+                        color: fc.body,
                         fontSize: 14,
                         textDecoration: "none",
-                        transition: "color 0.2s",
                       }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "#F9FAFB")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "#9CA3AF")
-                      }
                     >
                       {item}
                     </a>
@@ -115,9 +124,9 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
           ))}
         </div>
         <div
-          className="flex items-center justify-between"
+          className="flex flex-col sm:flex-row items-center justify-between gap-4"
           style={{
-            borderTop: "1px solid #1F2937",
+            borderTop: `1px solid ${fc.rule}`,
             marginTop: 48,
             paddingTop: 24,
           }}
@@ -125,11 +134,11 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
           <div className="flex items-center gap-5">
             {SOCIAL_ICONS.map((icon, i) => (
               <a key={i} href="#" aria-label={icon.label}>
-                <SocialIcon d={icon.path} color="#9CA3AF" />
+                <SocialIcon d={icon.path} color={fc.body} />
               </a>
             ))}
           </div>
-          <span style={{ fontSize: 13, color: "#6B7280" }}>{copyright}</span>
+          <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
         </div>
       </div>
     </section>
@@ -137,7 +146,8 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
 }
 
 export function FooterMinimal({ tone, content, businessName }: SectionProps) {
-  const bg = footerBg(tone);
+  const fc = footerColors(tone);
+  const logoData = content.logoData as string | undefined;
   const links = (content.links as { group: string; items: string[] }[]) || [];
   const flatLinks = links.flatMap((g) => g.items).slice(0, 5);
   const copyright =
@@ -147,60 +157,39 @@ export function FooterMinimal({ tone, content, businessName }: SectionProps) {
   return (
     <section
       className="py-8 px-6"
-      style={{ backgroundColor: bg, fontFamily: tone.bodyFont }}
+      style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div
-              className="flex items-center justify-center shrink-0"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: tone.gradient,
-                color: "#fff",
-                fontFamily: tone.headingFont,
-                fontWeight: 700,
-                fontSize: 14,
-              }}
-            >
-              {businessName?.charAt(0) || "B"}
-            </div>
+            <FooterLogo tone={tone} logoData={logoData} businessName={businessName} size={32} />
             <span
               style={{
                 fontFamily: tone.headingFont,
                 fontWeight: 700,
                 fontSize: 16,
-                color: "#F9FAFB",
+                color: fc.heading,
               }}
             >
               {businessName}
             </span>
           </div>
-          <nav className="flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6">
             {flatLinks.map((link, i) => (
               <a
                 key={i}
                 href="#"
                 style={{
-                  color: "#9CA3AF",
+                  color: fc.body,
                   fontSize: 14,
                   textDecoration: "none",
-                  transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "#F9FAFB")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "#9CA3AF")
-                }
               >
                 {link}
               </a>
             ))}
           </nav>
-          <span style={{ fontSize: 13, color: "#6B7280" }}>{copyright}</span>
+          <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
         </div>
       </div>
     </section>
@@ -208,7 +197,9 @@ export function FooterMinimal({ tone, content, businessName }: SectionProps) {
 }
 
 export function FooterCentered({ tone, content, businessName }: SectionProps) {
-  const bg = footerBg(tone);
+  const fc = footerColors(tone);
+  const logoData = content.logoData as string | undefined;
+  const tagline = (content.tagline as string) || "";
   const links = (content.links as { group: string; items: string[] }[]) || [];
   const copyright =
     (content.copyright as string) ||
@@ -217,39 +208,30 @@ export function FooterCentered({ tone, content, businessName }: SectionProps) {
   return (
     <section
       className="py-16 px-6"
-      style={{ backgroundColor: bg, fontFamily: tone.bodyFont }}
+      style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
       <div className="max-w-4xl mx-auto text-center">
         <div
           className="flex items-center justify-center gap-3"
-          style={{ marginBottom: 32 }}
+          style={{ marginBottom: 16 }}
         >
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: "50%",
-              background: tone.gradient,
-              color: "#fff",
-              fontFamily: tone.headingFont,
-              fontWeight: 700,
-              fontSize: 20,
-            }}
-          >
-            {businessName?.charAt(0) || "B"}
-          </div>
+          <FooterLogo tone={tone} logoData={logoData} businessName={businessName} size={44} />
           <span
             style={{
               fontFamily: tone.headingFont,
               fontWeight: 700,
               fontSize: 22,
-              color: "#F9FAFB",
+              color: fc.heading,
             }}
           >
             {businessName}
           </span>
         </div>
+        {tagline && (
+          <p style={{ color: fc.body, fontSize: 14, lineHeight: 1.7, marginBottom: 24, maxWidth: 400, marginLeft: "auto", marginRight: "auto" }}>
+            {tagline}
+          </p>
+        )}
         <div
           className="flex flex-wrap justify-center gap-x-8 gap-y-4"
           style={{ marginBottom: 32 }}
@@ -260,17 +242,10 @@ export function FooterCentered({ tone, content, businessName }: SectionProps) {
                 key={`${group.group}-${ii}`}
                 href="#"
                 style={{
-                  color: "#9CA3AF",
+                  color: fc.body,
                   fontSize: 14,
                   textDecoration: "none",
-                  transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "#F9FAFB")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "#9CA3AF")
-                }
               >
                 {item}
               </a>
@@ -283,11 +258,11 @@ export function FooterCentered({ tone, content, businessName }: SectionProps) {
         >
           {SOCIAL_ICONS.map((icon, i) => (
             <a key={i} href="#" aria-label={icon.label}>
-              <SocialIcon d={icon.path} color="#9CA3AF" />
+              <SocialIcon d={icon.path} color={fc.body} />
             </a>
           ))}
         </div>
-        <span style={{ fontSize: 13, color: "#6B7280" }}>{copyright}</span>
+        <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
       </div>
     </section>
   );

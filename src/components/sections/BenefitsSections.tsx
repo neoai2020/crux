@@ -65,6 +65,7 @@ export function BenefitsIconList({ tone, content }: SectionProps) {
 
 export function BenefitsCards({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Benefits";
+  const subtitle = (content.subtitle as string) || "";
   const items = (content.items as BenefitItem[]) || [];
 
   return (
@@ -73,18 +74,23 @@ export function BenefitsCards({ tone, content }: SectionProps) {
       className="py-20 px-6"
     >
       <div className="max-w-5xl mx-auto">
-        <h2
-          className="text-center mb-14"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="text-center mb-14">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18 }}>{subtitle}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {items.map((item, i) => (
             <div
               key={i}

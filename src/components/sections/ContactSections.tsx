@@ -6,6 +6,7 @@ export function ContactSplit({ tone, content }: SectionProps) {
   const email = (content.email as string) || "";
   const phone = (content.phone as string) || "";
   const address = (content.address as string) || "";
+  const buttonText = (content.buttonText as string) || "Send Message";
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -24,7 +25,7 @@ export function ContactSplit({ tone, content }: SectionProps) {
       className="py-20 px-6"
       style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
     >
-      <div className="max-w-6xl mx-auto grid grid-cols-2 gap-16 items-start">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
         <div>
           <h2
             style={{
@@ -93,7 +94,7 @@ export function ContactSplit({ tone, content }: SectionProps) {
                 marginTop: 4,
               }}
             >
-              Send Message
+              {buttonText}
             </button>
           </div>
         </div>
@@ -108,6 +109,7 @@ export function ContactCentered({ tone, content }: SectionProps) {
   const email = (content.email as string) || "";
   const phone = (content.phone as string) || "";
   const address = (content.address as string) || "";
+  const buttonText = (content.buttonText as string) || "Send Message";
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -166,7 +168,7 @@ export function ContactCentered({ tone, content }: SectionProps) {
               marginTop: 4,
             }}
           >
-            Send Message
+            {buttonText}
           </button>
         </div>
         <div

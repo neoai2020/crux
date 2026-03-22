@@ -35,7 +35,7 @@ export function FeaturesIconGrid({ tone, content }: SectionProps) {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item, i) => (
             <div
               key={i}
@@ -81,6 +81,7 @@ export function FeaturesIconGrid({ tone, content }: SectionProps) {
 
 export function FeaturesAlternating({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Features";
+  const subtitle = (content.subtitle as string) || "";
   const items = ((content.items as FeatureItem[]) || []).slice(0, 3);
 
   return (
@@ -89,27 +90,33 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
       className="py-20 px-6"
     >
       <div className="max-w-6xl mx-auto">
-        <h2
-          className="text-center mb-16"
-          style={{
-            fontFamily: tone.headingFont,
-            color: tone.text,
-            fontWeight: 700,
-            fontSize: 36,
-          }}
-        >
-          {sectionTitle}
-        </h2>
+        <div className="text-center mb-16">
+          <h2
+            style={{
+              fontFamily: tone.headingFont,
+              color: tone.text,
+              fontWeight: 700,
+              fontSize: 36,
+              marginBottom: 12,
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p style={{ color: tone.muted, fontSize: 18, maxWidth: 600, margin: "0 auto" }}>
+              {subtitle}
+            </p>
+          )}
+        </div>
         <div className="flex flex-col gap-16">
           {items.map((item, i) => {
             const isEven = i % 2 === 1;
             return (
               <div
                 key={i}
-                className="grid grid-cols-2 gap-12 items-center"
-                style={{ direction: isEven ? "rtl" : "ltr" }}
+                className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center`}
               >
-                <div style={{ direction: "ltr" }}>
+                <div className={isEven ? "md:order-2" : ""}>
                   <span style={{ fontSize: 40, marginBottom: 12, display: "block" }}>
                     {item.icon}
                   </span>
@@ -129,11 +136,11 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
                   </p>
                 </div>
                 <div
+                  className={isEven ? "md:order-1" : ""}
                   style={{
                     background: tone.gradient,
                     borderRadius: tone.radius,
                     minHeight: 240,
-                    direction: "ltr",
                   }}
                 />
               </div>
@@ -147,6 +154,7 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
 
 export function FeaturesCompact({ tone, content }: SectionProps) {
   const sectionTitle = (content.sectionTitle as string) || "Features";
+  const subtitle = (content.subtitle as string) || "";
   const items = (content.items as FeatureItem[]) || [];
 
   return (
@@ -156,7 +164,7 @@ export function FeaturesCompact({ tone, content }: SectionProps) {
     >
       <div className="max-w-3xl mx-auto">
         <h2
-          className="mb-10"
+          className="mb-2"
           style={{
             fontFamily: tone.headingFont,
             color: tone.text,
@@ -166,6 +174,12 @@ export function FeaturesCompact({ tone, content }: SectionProps) {
         >
           {sectionTitle}
         </h2>
+        {subtitle && (
+          <p style={{ color: tone.muted, fontSize: 16, marginBottom: 24 }}>
+            {subtitle}
+          </p>
+        )}
+        {!subtitle && <div style={{ marginBottom: 24 }} />}
         <div className="flex flex-col">
           {items.map((item, i) => (
             <div key={i}>
