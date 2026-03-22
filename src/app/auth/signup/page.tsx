@@ -30,11 +30,11 @@ export default function SignUpPage() {
       const success = await signUp(name, email, password);
       if (success) {
         router.push("/dashboard");
-      } else {
-        setError("An account with this email already exists.");
+        return;
       }
+      setError("An account with this email already exists.");
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("Connection error. Please try again.");
     }
     setLoading(false);
   };
@@ -64,9 +64,14 @@ export default function SignUpPage() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name</label>
+              <label htmlFor="signup-name" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Full Name
+              </label>
               <input
+                id="signup-name"
+                name="name"
                 type="text"
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="input-field"
@@ -75,9 +80,14 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="signup-email" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Email
+              </label>
               <input
+                id="signup-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
@@ -86,9 +96,14 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <label htmlFor="signup-password" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Password
+              </label>
               <input
+                id="signup-password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-field"
@@ -97,9 +112,14 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm Password</label>
+              <label htmlFor="signup-confirm" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Confirm Password
+              </label>
               <input
+                id="signup-confirm"
+                name="confirm"
                 type="password"
+                autoComplete="new-password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className="input-field"

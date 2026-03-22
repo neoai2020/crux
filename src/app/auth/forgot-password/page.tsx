@@ -14,11 +14,15 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const exists = await resetPassword(email);
-    if (exists) {
-      setSent(true);
-    } else {
-      setError("No account found with this email address.");
+    try {
+      const success = await resetPassword(email);
+      if (success) {
+        setSent(true);
+      } else {
+        setError("Could not send reset link. Please try again.");
+      }
+    } catch {
+      setError("Connection error. Please try again.");
     }
     setLoading(false);
   };
@@ -61,9 +65,14 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address</label>
+                <label htmlFor="reset-email" className="block text-sm font-medium text-gray-300 mb-1.5">
+                  Email Address
+                </label>
                 <input
+                  id="reset-email"
+                  name="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field"

@@ -4,7 +4,6 @@ import {
   useContext,
   useState,
   useEffect,
-  useCallback,
   ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
@@ -29,10 +28,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function mapSupabaseUser(
-  su: SupabaseUser,
-  profile?: { name?: string; plan?: string; created_at?: string }
-): User {
+function toAppUser(su: SupabaseUser, profile?: Record<string, string>): User {
   return {
     id: su.id,
     name:
@@ -46,74 +42,77 @@ function mapSupabaseUser(
   };
 }
 
+async function fetchProfile(userId: string) {
+  try {
+    const { data } = await supabase
+      .from("profiles")
+      .select("name, plan, created_at")
+      .eq("id", userId)
+      .single();
+    return data as Record<string, string> | null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = useCallback(async (su: SupabaseUser) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("name, plan, created_at")
-      .eq("id", su.id)
-      .single();
-    return data;
-  }, []);
-
   useEffect(() => {
     let mounted = true;
 
-    async function init() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (session?.user && mounted) {
-          const profile = await fetchProfile(session.user);
-          setUser(mapSupabaseUser(session.user, profile ?? undefined));
-        }
-      } catch (err) {
-        console.error("Auth init error:", err);
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn("Auth init timed out after 8s");
+        setLoading(false);
       }
-      if (mounted) setLoading(false);
-    }
+    }, 8000);
 
-    init();
-
-    let subscription: { unsubscribe: () => void } | null = null;
-    try {
-      const { data } = supabase.auth.onAuthStateChange(
-        async (_event, session) => {
-          if (session?.user) {
-            try {
-              const profile = await fetchProfile(session.user);
-              if (mounted)
-                setUser(mapSupabaseUser(session.user, profile ?? undefined));
-            } catch {
-              if (mounted)
-                setUser(mapSupabaseUser(session.user));
-            }
-          } else {
-            if (mounted) setUser(null);
-          }
+    supabase.auth
+      .getSession()
+      .then(async ({ data: { session } }) => {
+        if (!mounted) return;
+        if (session?.user) {
+          const profile = await fetchProfile(session.user.id);
+          if (mounted) setUser(toAppUser(session.user, profile ?? undefined));
         }
-      );
-      subscription = data.subscription;
-    } catch (err) {
-      console.error("Auth listener error:", err);
-    }
+      })
+      .catch((err) => console.error("getSession failed:", err))
+      .finally(() => {
+        if (mounted) setLoading(false);
+        clearTimeout(timeout);
+      });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+      if (session?.user) {
+        const profile = await fetchProfile(session.user.id);
+        if (mounted) setUser(toAppUser(session.user, profile ?? undefined));
+      } else {
+        if (mounted) setUser(null);
+      }
+    });
 
     return () => {
       mounted = false;
-      subscription?.unsubscribe();
+      clearTimeout(timeout);
+      subscription.unsubscribe();
     };
-  }, [fetchProfile]);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return !error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return !error;
+    } catch {
+      return false;
+    }
   };
 
   const signUp = async (
@@ -121,24 +120,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string,
     password: string
   ): Promise<boolean> => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    });
-    return !error;
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name } },
+      });
+      return !error;
+    } catch {
+      return false;
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
     setUser(null);
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/signin`,
-    });
-    return !error;
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/signin`,
+      });
+      return !error;
+    } catch {
+      return false;
+    }
   };
 
   return (

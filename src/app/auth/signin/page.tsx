@@ -17,20 +17,14 @@ export default function SignInPage() {
     setError("");
     setLoading(true);
     try {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        setError("App configuration error: Supabase not connected. Contact support.");
-        setLoading(false);
-        return;
-      }
       const success = await signIn(email, password);
       if (success) {
         router.push("/dashboard");
-      } else {
-        setError("Invalid email or password. Please try again.");
+        return;
       }
-    } catch (err) {
-      console.error("Sign-in error:", err);
-      setError("Connection error. Please check your internet and try again.");
+      setError("Invalid email or password. Please try again.");
+    } catch {
+      setError("Connection error. Please try again.");
     }
     setLoading(false);
   };
@@ -60,9 +54,14 @@ export default function SignInPage() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="signin-email" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Email
+              </label>
               <input
+                id="signin-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
@@ -71,9 +70,14 @@ export default function SignInPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <label htmlFor="signin-password" className="block text-sm font-medium text-gray-300 mb-1.5">
+                Password
+              </label>
               <input
+                id="signin-password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-field"
@@ -82,8 +86,8 @@ export default function SignInPage() {
               />
             </div>
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-600 bg-gray-800 text-crux-500" />
+              <label htmlFor="remember-me" className="flex items-center gap-2 text-gray-400 cursor-pointer">
+                <input id="remember-me" name="remember" type="checkbox" className="rounded border-gray-600 bg-gray-800 text-crux-500" />
                 Remember me
               </label>
               <Link href="/auth/forgot-password" className="text-crux-400 hover:text-crux-300 transition">
