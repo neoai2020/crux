@@ -1,25 +1,11 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
-let _supabase: SupabaseClient | null = null;
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://kurxkrexeyeqjdrrfayc.supabase.co";
 
-function getSupabase(): SupabaseClient {
-  if (_supabase) return _supabase;
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1cnhrcmV4ZXllcWpkcnJmYXljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTg5OTQsImV4cCI6MjA4OTU5NDk5NH0.7VRBf37N1B8My9Dtec4xEn6x7Lp2wWMCpaT-HEbQwcE";
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
-    );
-  }
-
-  _supabase = createClient(url, key);
-  return _supabase;
-}
-
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    return Reflect.get(getSupabase(), prop);
-  },
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);

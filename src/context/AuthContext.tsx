@@ -63,32 +63,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function init() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user && mounted) {
-        const profile = await fetchProfile(session.user);
-        setUser(mapSupabaseUser(session.user, profile ?? undefined));
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.user && mounted) {
+          const profile = await fetchProfile(session.user);
+          setUser(mapSupabaseUser(session.user, profile ?? undefined));
+        }
+      } catch (err) {
+        console.error("Auth init error:", err);
       }
       if (mounted) setLoading(false);
     }
 
     init();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user);
-        if (mounted) setUser(mapSupabaseUser(session.user, profile ?? undefined));
-      } else {
-        if (mounted) setUser(null);
-      }
-    });
+    let subscription: { unsubscribe: () => void } | null = null;
+    try {
+      const { data } = supabase.auth.onAuthStateChange(
+        async (_event, session) => {
+          if (session?.user) {
+            try {
+              const profile = await fetchProfile(session.user);
+              if (mounted)
+                setUser(mapSupabaseUser(session.user, profile ?? undefined));
+            } catch {
+              if (mounted)
+                setUser(mapSupabaseUser(session.user));
+            }
+          } else {
+            if (mounted) setUser(null);
+          }
+        }
+      );
+      subscription = data.subscription;
+    } catch (err) {
+      console.error("Auth listener error:", err);
+    }
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [fetchProfile]);
 
