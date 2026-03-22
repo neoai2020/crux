@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { getWebsitesForUser, getRemainingGenerations, SavedWebsite } from "@/lib/websites";
+import { getToneById } from "@/data/tones";
 
 const EARNINGS_FEED = [
   { name: "Sarah M.", amount: "$2,450", type: "eCom Store", time: "2 min ago", avatar: "S" },
@@ -32,6 +34,15 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [feedItems, setFeedItems] = useState(EARNINGS_FEED.slice(0, 5));
   const [feedKey, setFeedKey] = useState(0);
+  const [savedWebsites, setSavedWebsites] = useState<SavedWebsite[]>([]);
+  const [remaining, setRemaining] = useState(5);
+
+  useEffect(() => {
+    if (user) {
+      setSavedWebsites(getWebsitesForUser(user.id));
+      setRemaining(getRemainingGenerations(user.id));
+    }
+  }, [user]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -106,29 +117,70 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-400">Learn to maximize revenue</p>
               </div>
             </Link>
-            <div className="card-hover flex items-center gap-4 group opacity-60">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xl">
+            <Link href="/dashboard/websites" className="card-hover flex items-center gap-4 group">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                 ⚙️
               </div>
               <div>
-                <h3 className="font-bold">Manage Sites</h3>
-                <p className="text-sm text-gray-400">View & edit your websites</p>
+                <h3 className="font-bold">My Websites</h3>
+                <p className="text-sm text-gray-400">
+                  {savedWebsites.length > 0 ? `${savedWebsites.length} site${savedWebsites.length > 1 ? "s" : ""} · ${remaining}/5 left` : "View & edit your websites"}
+                </p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Recent Websites */}
-          <h2 className="text-xl font-bold mt-6">Your Websites</h2>
-          <div className="card">
-            <div className="text-center py-8 text-gray-500">
-              <span className="text-4xl block mb-3">🌐</span>
-              <p className="font-medium">No websites yet</p>
-              <p className="text-sm mt-1">Launch the Web Wizard to create your first site!</p>
-              <Link href="/dashboard/wizard" className="btn-primary inline-block mt-4 text-sm">
-                Create Your First Website →
+          <div className="flex items-center justify-between mt-6">
+            <h2 className="text-xl font-bold">Your Websites</h2>
+            {savedWebsites.length > 0 && (
+              <Link href="/dashboard/websites" className="text-sm text-crux-400 hover:text-crux-300 transition">
+                View all →
               </Link>
-            </div>
+            )}
           </div>
+          {savedWebsites.length === 0 ? (
+            <div className="card">
+              <div className="text-center py-8 text-gray-500">
+                <span className="text-4xl block mb-3">🌐</span>
+                <p className="font-medium">No websites yet</p>
+                <p className="text-sm mt-1">Launch the Web Wizard to create your first site!</p>
+                <Link href="/dashboard/wizard" className="btn-primary inline-block mt-4 text-sm">
+                  Create Your First Website →
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {savedWebsites.slice(0, 3).map((site) => {
+                const siteTone = getToneById(site.toneId);
+                return (
+                  <Link key={site.id} href="/dashboard/websites" className="card-hover flex items-center gap-4 group">
+                    <div
+                      className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center relative overflow-hidden"
+                      style={{ background: siteTone.gradient }}
+                    >
+                      <span className="text-xs font-black text-white relative z-10">
+                        {site.businessName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm truncate">{site.businessName}</h3>
+                      <p className="text-xs text-gray-500">{site.categoryName} · crux.site/{site.slug}</p>
+                    </div>
+                    <span className="text-xs text-gray-600">
+                      {new Date(site.updatedAt).toLocaleDateString()}
+                    </span>
+                  </Link>
+                );
+              })}
+              {savedWebsites.length > 3 && (
+                <Link href="/dashboard/websites" className="block text-center text-sm text-crux-400 hover:text-crux-300 py-2 transition">
+                  +{savedWebsites.length - 3} more website{savedWebsites.length - 3 > 1 ? "s" : ""}
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Live Earnings Feed */}
