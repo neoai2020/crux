@@ -17,14 +17,20 @@ export default function SignInPage() {
     setError("");
     setLoading(true);
     try {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        setError("App configuration error: Supabase not connected. Contact support.");
+        setLoading(false);
+        return;
+      }
       const success = await signIn(email, password);
       if (success) {
         router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      console.error("Sign-in error:", err);
+      setError("Connection error. Please check your internet and try again.");
     }
     setLoading(false);
   };
