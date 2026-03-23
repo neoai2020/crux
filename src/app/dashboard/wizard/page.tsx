@@ -442,7 +442,8 @@ function WizardInner() {
   );
   const [remaining, setRemaining] = useState(5);
   const [limitReached, setLimitReached] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(true);
+  const [generatingName, setGeneratingName] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -587,6 +588,27 @@ function WizardInner() {
       setForm({ ...INITIAL_FORM, description: prompt.trim() });
       setPage("design");
     }
+  }
+
+  async function handleGenerateBusinessName() {
+    if (!form.description && !prompt) return;
+    setGeneratingName(true);
+    try {
+      const resp = await fetch("/api/analyze-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: form.description || prompt }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.businessName && data.businessName !== "My Business") {
+          setForm((f) => ({ ...f, businessName: data.businessName }));
+        }
+      }
+    } catch {
+      // ignore
+    }
+    setGeneratingName(false);
   }
 
   function handleCategorySelect(catId: string, catName: string) {
@@ -914,15 +936,25 @@ function WizardInner() {
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">
                     Business Name *
                   </label>
-                  <input
-                    type="text"
-                    value={form.businessName}
-                    onChange={(e) =>
-                      setForm({ ...form, businessName: e.target.value })
-                    }
-                    className="input-field"
-                    placeholder="e.g. Awesome Digital Co."
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={form.businessName}
+                      onChange={(e) =>
+                        setForm({ ...form, businessName: e.target.value })
+                      }
+                      className="input-field flex-1"
+                      placeholder="e.g. Awesome Digital Co."
+                    />
+                    <button
+                      type="button"
+                      onClick={handleGenerateBusinessName}
+                      disabled={generatingName || (!form.description && !prompt)}
+                      className="text-xs px-3 py-2 rounded-xl bg-crux-500/20 text-crux-300 hover:bg-crux-500/30 transition disabled:opacity-40 whitespace-nowrap shrink-0"
+                    >
+                      {generatingName ? "..." : "✨ Generate"}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">

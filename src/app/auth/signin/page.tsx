@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -9,8 +9,14 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/dashboard");
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,15 +24,14 @@ export default function SignInPage() {
     setLoading(true);
     try {
       const success = await signIn(email, password);
-      if (success) {
-        router.push("/dashboard");
-        return;
+      if (!success) {
+        setError("Invalid email or password. Please try again.");
+        setLoading(false);
       }
-      setError("Invalid email or password. Please try again.");
     } catch {
       setError("Connection error. Please try again.");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

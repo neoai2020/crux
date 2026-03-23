@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { ToneDefinition } from "@/data/tones";
 
 interface LogoSelectorProps {
@@ -46,24 +46,18 @@ function shiftHue(hex: string, degrees: number): string {
   return `#${[rr, gg, bb].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 
-/* ─── Logo style 1: Shield badge with initial ─── */
-function logoShield(name: string, t: ToneDefinition): string {
+function logoShield(name: string, t: ToneDefinition, uid: string): string {
   const ch = (name?.charAt(0) || "B").toUpperCase();
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <defs>
-    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${t.primary}"/>
-      <stop offset="100%" stop-color="${t.secondary}"/>
-    </linearGradient>
-  </defs>
-  <path d="M60 8 L104 28 L104 60 Q104 96 60 114 Q16 96 16 60 L16 28 Z" fill="url(#sg)"/>
+  <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="${t.primary}"/><stop offset="100%" stop-color="${t.secondary}"/>
+  </linearGradient></defs>
+  <path d="M60 8 L104 28 L104 60 Q104 96 60 114 Q16 96 16 60 L16 28 Z" fill="url(#${uid})"/>
   <path d="M60 18 L94 34 L94 60 Q94 88 60 104 Q26 88 26 60 L26 34 Z" fill="white" opacity="0.15"/>
-  <text x="60" y="66" text-anchor="middle" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="800" font-size="48" fill="white">${ch}</text>
+  <text x="60" y="66" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="800" font-size="48" fill="white">${ch}</text>
 </svg>`;
 }
 
-/* ─── Logo style 2: Overlapping circles with initial ─── */
 function logoCircles(name: string, t: ToneDefinition): string {
   const ch = (name?.charAt(0) || "B").toUpperCase();
   const c2 = shiftHue(t.primary, 40);
@@ -71,92 +65,67 @@ function logoCircles(name: string, t: ToneDefinition): string {
   <circle cx="48" cy="52" r="36" fill="${t.primary}" opacity="0.9"/>
   <circle cx="72" cy="52" r="36" fill="${c2}" opacity="0.7"/>
   <circle cx="60" cy="72" r="28" fill="${t.secondary}" opacity="0.6"/>
-  <text x="60" y="60" text-anchor="middle" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="800" font-size="36" fill="white">${ch}</text>
+  <text x="60" y="60" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="800" font-size="36" fill="white">${ch}</text>
 </svg>`;
 }
 
-/* ─── Logo style 3: Hexagon with accent ring ─── */
-function logoHexagon(name: string, t: ToneDefinition): string {
+function logoHexagon(name: string, t: ToneDefinition, uid: string): string {
   const ch = (name?.charAt(0) || "B").toUpperCase();
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <defs>
-    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${t.primary}"/>
-      <stop offset="100%" stop-color="${t.secondary}"/>
-    </linearGradient>
-  </defs>
-  <polygon points="60,6 108,30 108,78 60,102 12,78 12,30" fill="url(#hg)" stroke="${t.secondary}" stroke-width="3"/>
+  <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="${t.primary}"/><stop offset="100%" stop-color="${t.secondary}"/>
+  </linearGradient></defs>
+  <polygon points="60,6 108,30 108,78 60,102 12,78 12,30" fill="url(#${uid})" stroke="${t.secondary}" stroke-width="3"/>
   <polygon points="60,18 96,36 96,72 60,90 24,72 24,36" fill="none" stroke="white" stroke-width="1.5" opacity="0.3"/>
-  <text x="60" y="56" text-anchor="middle" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="800" font-size="40" fill="white">${ch}</text>
+  <text x="60" y="56" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="800" font-size="40" fill="white">${ch}</text>
 </svg>`;
 }
 
-/* ─── Logo style 4: Stacked bars wordmark ─── */
-function logoModernMark(name: string, t: ToneDefinition): string {
+function logoModernMark(name: string, t: ToneDefinition, uid: string): string {
   const text = name || "Brand";
   const w = Math.max(text.length * 20 + 80, 200);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 60" width="${w}" height="60">
-  <defs>
-    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${t.primary}"/>
-      <stop offset="100%" stop-color="${t.secondary}"/>
-    </linearGradient>
-  </defs>
-  <rect x="0" y="10" width="6" height="40" rx="3" fill="url(#mg)"/>
+  <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="${t.primary}"/><stop offset="100%" stop-color="${t.secondary}"/>
+  </linearGradient></defs>
+  <rect x="0" y="10" width="6" height="40" rx="3" fill="url(#${uid})"/>
   <rect x="10" y="18" width="4" height="24" rx="2" fill="${t.secondary}" opacity="0.5"/>
-  <text x="24" y="36" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="800" font-size="26" fill="${t.primary}">${text}</text>
+  <text x="24" y="36" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="800" font-size="26" fill="${t.primary}">${text}</text>
   <circle cx="${w - 14}" cy="36" r="5" fill="${t.secondary}"/>
 </svg>`;
 }
 
-/* ─── Logo style 5: Diamond with glow ─── */
-function logoDiamond(name: string, t: ToneDefinition): string {
+function logoDiamond(name: string, t: ToneDefinition, uid: string): string {
   const ch = (name?.charAt(0) || "B").toUpperCase();
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <defs>
-    <linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${t.primary}"/>
-      <stop offset="100%" stop-color="${t.secondary}"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-  </defs>
-  <rect x="25" y="25" width="70" height="70" rx="8" fill="url(#dg)" transform="rotate(45 60 60)" filter="url(#glow)"/>
+  <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="${t.primary}"/><stop offset="100%" stop-color="${t.secondary}"/>
+  </linearGradient></defs>
+  <rect x="25" y="25" width="70" height="70" rx="8" fill="url(#${uid})" transform="rotate(45 60 60)"/>
   <rect x="33" y="33" width="54" height="54" rx="6" fill="none" stroke="white" stroke-width="1.5" opacity="0.25" transform="rotate(45 60 60)"/>
-  <text x="60" y="64" text-anchor="middle" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="800" font-size="38" fill="white">${ch}</text>
+  <text x="60" y="64" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="800" font-size="38" fill="white">${ch}</text>
 </svg>`;
 }
 
-/* ─── Logo style 6: Lettermark with circle backdrop ─── */
-function logoLetterCircle(name: string, t: ToneDefinition): string {
+function logoLetterCircle(name: string, t: ToneDefinition, uid: string): string {
   const ch = (name?.charAt(0) || "B").toUpperCase();
   const c2 = shiftHue(t.primary, -30);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <defs>
-    <linearGradient id="lcg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${t.primary}"/>
-      <stop offset="100%" stop-color="${c2}"/>
-    </linearGradient>
-  </defs>
-  <circle cx="60" cy="60" r="54" fill="url(#lcg)"/>
+  <defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="${t.primary}"/><stop offset="100%" stop-color="${c2}"/>
+  </linearGradient></defs>
+  <circle cx="60" cy="60" r="54" fill="url(#${uid})"/>
   <circle cx="60" cy="60" r="44" fill="none" stroke="white" stroke-width="2" opacity="0.2"/>
   <circle cx="60" cy="60" r="34" fill="none" stroke="white" stroke-width="1" opacity="0.1"/>
-  <text x="60" y="64" text-anchor="middle" dominant-baseline="central"
-    font-family="system-ui,sans-serif" font-weight="900" font-size="50" fill="white" letter-spacing="-2">${ch}</text>
+  <text x="60" y="64" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif" font-weight="900" font-size="50" fill="white" letter-spacing="-2">${ch}</text>
 </svg>`;
 }
 
-type LogoGenerator = (name: string, tone: ToneDefinition) => string;
+type LogoFn = (name: string, tone: ToneDefinition, uid: string) => string;
 
-const LOGO_GENERATORS: { id: string; label: string; fn: LogoGenerator }[] = [
+const LOGO_GENERATORS: { id: string; label: string; fn: LogoFn }[] = [
   { id: "shield", label: "Shield", fn: logoShield },
-  { id: "circles", label: "Fusion", fn: logoCircles },
+  { id: "circles", label: "Fusion", fn: (n, t, _u) => logoCircles(n, t) },
   { id: "hexagon", label: "Hexagon", fn: logoHexagon },
   { id: "modern", label: "Modern", fn: logoModernMark },
   { id: "diamond", label: "Diamond", fn: logoDiamond },
@@ -167,19 +136,20 @@ export default function LogoSelector({ businessName, tone, selectedLogo, onSelec
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
 
-  const logos = LOGO_GENERATORS.map((g) => ({
-    ...g,
-    svg: g.fn(businessName, tone),
-  })).map((g) => ({
-    ...g,
-    url: svgToDataUrl(g.svg),
-  }));
+  const logos = useMemo(() => {
+    return LOGO_GENERATORS.map((g) => {
+      const uid = `${g.id}-${tone.id}`;
+      const svg = g.fn(businessName, tone, uid);
+      return { ...g, svg, url: svgToDataUrl(svg) };
+    });
+  }, [businessName, tone]);
 
   useEffect(() => {
-    if (!selectedLogo && logos.length > 0) {
+    if (uploadPreview && selectedLogo === uploadPreview) return;
+    if (logos.length > 0) {
       onSelect(logos[0].url);
     }
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [logos]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -237,12 +207,7 @@ export default function LogoSelector({ businessName, tone, selectedLogo, onSelec
         >
           <div
             className="flex items-center justify-center"
-            style={{
-              height: 64,
-              width: "100%",
-              border: `2px dashed ${tone.border}`,
-              borderRadius: tone.radius,
-            }}
+            style={{ height: 64, width: "100%", border: `2px dashed ${tone.border}`, borderRadius: tone.radius }}
           >
             {uploadPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -254,13 +219,7 @@ export default function LogoSelector({ businessName, tone, selectedLogo, onSelec
           <span style={{ fontSize: 11, color: tone.muted, fontWeight: 500 }}>
             Upload
           </span>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
+          <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
         </button>
       </div>
     </div>

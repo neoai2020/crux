@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-export default function SignUpPage() {
+export default function SignUpProPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -69,11 +69,11 @@ export default function SignUpPage() {
               </div>
             )}
             <div>
-              <label htmlFor="signup-name" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="signup-pro-name" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Full Name
               </label>
               <input
-                id="signup-name"
+                id="signup-pro-name"
                 name="name"
                 type="text"
                 autoComplete="name"
@@ -85,11 +85,11 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-email" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="signup-pro-email" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Email
               </label>
               <input
-                id="signup-email"
+                id="signup-pro-email"
                 name="email"
                 type="email"
                 autoComplete="email"
@@ -101,11 +101,11 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-password" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="signup-pro-password" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Password
               </label>
               <input
-                id="signup-password"
+                id="signup-pro-password"
                 name="password"
                 type="password"
                 autoComplete="new-password"
@@ -117,11 +117,11 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label htmlFor="signup-confirm" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="signup-pro-confirm" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Confirm Password
               </label>
               <input
-                id="signup-confirm"
+                id="signup-pro-confirm"
                 name="confirm"
                 type="password"
                 autoComplete="new-password"
