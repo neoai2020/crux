@@ -45,6 +45,27 @@ const SECTION_MAP: Record<string, Record<string, SectionComponent>> = {
   footer: { columns: FooterColumns, minimal: FooterMinimal, centered: FooterCentered },
 };
 
+const SECTION_ANCHOR_MAP: Record<string, string> = {
+  hero: "home",
+  features: "features",
+  about: "about",
+  testimonials: "testimonials",
+  cta: "cta",
+  pricing: "pricing",
+  faq: "faq",
+  contact: "contact",
+  gallery: "gallery",
+  stats: "stats",
+  howItWorks: "how-it-works",
+  contentGrid: "content",
+  team: "team",
+  logoBar: "partners",
+  newsletter: "newsletter",
+  benefits: "benefits",
+  video: "video",
+  countdown: "countdown",
+};
+
 interface SectionRendererProps extends SectionProps {
   sectionType: SectionType;
   variant: string;
@@ -55,5 +76,10 @@ export default function SectionRenderer({ sectionType, variant, tone, content, b
   if (!variants) return null;
   const Component = variants[variant] || Object.values(variants)[0];
   if (!Component) return null;
-  return <Component tone={tone} content={content} businessName={businessName} />;
+  const anchorId = SECTION_ANCHOR_MAP[sectionType];
+  return (
+    <div id={anchorId ? `section-${anchorId}` : undefined}>
+      <Component tone={tone} content={content} businessName={businessName} />
+    </div>
+  );
 }

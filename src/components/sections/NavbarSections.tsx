@@ -45,22 +45,24 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <NavLogo tone={tone} logoData={logoData} businessName={businessName} size={40} />
-            <span
-              style={{
-                fontFamily: tone.headingFont,
-                fontWeight: 700,
-                fontSize: 18,
-                color: tone.text,
-              }}
-            >
-              {businessName}
-            </span>
+            {!logoData && (
+              <span
+                style={{
+                  fontFamily: tone.headingFont,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  color: tone.text,
+                }}
+              >
+                {businessName}
+              </span>
+            )}
           </div>
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link, i) => (
               <a
                 key={i}
-                href="#"
+                href={`#section-${link.toLowerCase().replace(/\s+/g, "-")}`}
                 style={{
                   color: tone.muted,
                   fontSize: 14,
@@ -110,22 +112,24 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
         <div className="flex items-center justify-between" style={{ height: 64 }}>
           <div className="flex items-center gap-3">
             <NavLogo tone={tone} logoData={logoData} businessName={businessName} size={38} />
-            <span
-              style={{
-                fontFamily: tone.headingFont,
-                fontWeight: 700,
-                fontSize: 18,
-                color: tone.text,
-              }}
-            >
-              {businessName}
-            </span>
+            {!logoData && (
+              <span
+                style={{
+                  fontFamily: tone.headingFont,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  color: tone.text,
+                }}
+              >
+                {businessName}
+              </span>
+            )}
           </div>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link, i) => (
               <a
                 key={i}
-                href="#"
+                href={`#section-${link.toLowerCase().replace(/\s+/g, "-")}`}
                 style={{
                   color: tone.muted,
                   fontSize: 15,
@@ -174,16 +178,18 @@ export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
         <div className="flex items-center justify-between" style={{ height: 60 }}>
           <div className="flex items-center gap-3">
             <NavLogo tone={tone} logoData={logoData} businessName={businessName} size={36} />
-            <span
-              style={{
-                fontFamily: tone.headingFont,
-                fontWeight: 700,
-                fontSize: 17,
-                color: tone.text,
-              }}
-            >
-              {businessName}
-            </span>
+            {!logoData && (
+              <span
+                style={{
+                  fontFamily: tone.headingFont,
+                  fontWeight: 700,
+                  fontSize: 17,
+                  color: tone.text,
+                }}
+              >
+                {businessName}
+              </span>
+            )}
           </div>
           <button
             style={{

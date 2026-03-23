@@ -41,6 +41,34 @@ function ImageOrGradient({
   );
 }
 
+const ctaStyle = (tone: SectionProps["tone"]): React.CSSProperties => ({
+  background: tone.gradient,
+  color: "#fff",
+  borderRadius: tone.radius,
+  fontFamily: tone.bodyFont,
+  fontWeight: 600,
+  fontSize: 16,
+  border: "none",
+  padding: "14px 32px",
+  cursor: "pointer",
+  textDecoration: "none",
+  display: "inline-block",
+});
+
+const secondaryStyle = (tone: SectionProps["tone"]): React.CSSProperties => ({
+  background: "transparent",
+  color: tone.primary,
+  borderRadius: tone.radius,
+  fontFamily: tone.bodyFont,
+  fontWeight: 600,
+  fontSize: 16,
+  border: `2px solid ${tone.primary}`,
+  padding: "12px 30px",
+  cursor: "pointer",
+  textDecoration: "none",
+  display: "inline-block",
+});
+
 export function HeroCentered({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
@@ -83,36 +111,8 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
-          <button
-            style={{
-              background: tone.gradient,
-              color: "#fff",
-              borderRadius: tone.radius,
-              fontFamily: tone.bodyFont,
-              fontWeight: 600,
-              fontSize: 16,
-              border: "none",
-              padding: "14px 32px",
-              cursor: "pointer",
-            }}
-          >
-            {ctaText}
-          </button>
-          <button
-            style={{
-              background: "transparent",
-              color: tone.primary,
-              borderRadius: tone.radius,
-              fontFamily: tone.bodyFont,
-              fontWeight: 600,
-              fontSize: 16,
-              border: `2px solid ${tone.primary}`,
-              padding: "12px 30px",
-              cursor: "pointer",
-            }}
-          >
-            {secondaryCtaText}
-          </button>
+          <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+          <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
         </div>
         {socialProof && (
           <div
@@ -185,36 +185,8 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <button
-              style={{
-                background: tone.gradient,
-                color: "#fff",
-                borderRadius: tone.radius,
-                fontFamily: tone.bodyFont,
-                fontWeight: 600,
-                fontSize: 16,
-                border: "none",
-                padding: "14px 32px",
-                cursor: "pointer",
-              }}
-            >
-              {ctaText}
-            </button>
-            <button
-              style={{
-                background: "transparent",
-                color: tone.primary,
-                borderRadius: tone.radius,
-                fontFamily: tone.bodyFont,
-                fontWeight: 600,
-                fontSize: 16,
-                border: `2px solid ${tone.primary}`,
-                padding: "12px 30px",
-                cursor: "pointer",
-              }}
-            >
-              {secondaryCtaText}
-            </button>
+            <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+            <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
         <div style={{ aspectRatio: "4/3", width: "100%", overflow: "hidden", borderRadius: tone.radius }}>
@@ -268,36 +240,8 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <button
-              style={{
-                background: tone.gradient,
-                color: "#fff",
-                borderRadius: tone.radius,
-                fontFamily: tone.bodyFont,
-                fontWeight: 600,
-                fontSize: 16,
-                border: "none",
-                padding: "14px 32px",
-                cursor: "pointer",
-              }}
-            >
-              {ctaText}
-            </button>
-            <button
-              style={{
-                background: "transparent",
-                color: tone.primary,
-                borderRadius: tone.radius,
-                fontFamily: tone.bodyFont,
-                fontWeight: 600,
-                fontSize: 16,
-                border: `2px solid ${tone.primary}`,
-                padding: "12px 30px",
-                cursor: "pointer",
-              }}
-            >
-              {secondaryCtaText}
-            </button>
+            <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+            <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
       </div>
@@ -345,21 +289,7 @@ export function HeroMinimal({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div style={{ marginTop: 40 }}>
-          <button
-            style={{
-              background: tone.gradient,
-              color: "#fff",
-              borderRadius: tone.radius,
-              fontFamily: tone.bodyFont,
-              fontWeight: 600,
-              fontSize: 17,
-              border: "none",
-              padding: "16px 40px",
-              cursor: "pointer",
-            }}
-          >
-            {ctaText}
-          </button>
+          <a href="#section-contact" style={{ ...ctaStyle(tone), fontSize: 17, padding: "16px 40px" }}>{ctaText}</a>
         </div>
       </div>
     </section>

@@ -18,36 +18,42 @@ export async function POST(request: Request) {
 
     const imagePrompt = `${prompt}, professional high quality photo, clean modern`;
     const seed = Math.floor(Math.random() * 999999);
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}`;
 
-    let response: Response | null = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
+    const urls = [
+      `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
+      `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
+    ];
+
+    let imageBuffer: ArrayBuffer | null = null;
+    let contentType = "image/jpeg";
+
+    for (const url of urls) {
       try {
-        response = await fetch(url, {
+        const response = await fetch(url, {
           redirect: "follow",
-          signal: AbortSignal.timeout(45000),
+          signal: AbortSignal.timeout(50000),
         });
-        if (response.ok) break;
-      } catch {
-        if (attempt === 2) throw new Error("All attempts failed");
+        if (response.ok) {
+          const ct = response.headers.get("content-type") || "";
+          if (ct.startsWith("image/")) {
+            const buf = await response.arrayBuffer();
+            if (buf.byteLength > 1000) {
+              imageBuffer = buf;
+              contentType = ct;
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Image fetch attempt failed:", e);
       }
     }
 
-    if (!response || !response.ok) {
-      return NextResponse.json({ error: "Image generation failed" }, { status: 502 });
+    if (!imageBuffer) {
+      return NextResponse.json({ error: "Image generation timed out. Please try again." }, { status: 502 });
     }
 
-    const contentType = response.headers.get("content-type") || "";
-    if (!contentType.startsWith("image/")) {
-      return NextResponse.json({ error: "Invalid response from image service" }, { status: 502 });
-    }
-
-    const buffer = await response.arrayBuffer();
-    if (buffer.byteLength < 1000) {
-      return NextResponse.json({ error: "Image too small, generation may have failed" }, { status: 502 });
-    }
-
-    const base64 = Buffer.from(buffer).toString("base64");
+    const base64 = Buffer.from(imageBuffer).toString("base64");
     const dataUrl = `data:${contentType};base64,${base64}`;
 
     await recordImageGeneration(userId);
@@ -56,6 +62,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ image: dataUrl, remaining });
   } catch (err) {
     console.error("Image generation error:", err);
-    return NextResponse.json({ error: "Image generation timed out. Try again." }, { status: 500 });
+    return NextResponse.json({ error: "Image generation failed. Please try again." }, { status: 500 });
   }
 }

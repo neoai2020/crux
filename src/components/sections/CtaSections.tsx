@@ -34,7 +34,8 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
           </p>
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
+          <a
+            href="#section-contact"
             style={{
               backgroundColor: "#fff",
               color: tone.primary,
@@ -45,11 +46,14 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
               border: "none",
               padding: "14px 32px",
               cursor: "pointer",
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {buttonText}
-          </button>
-          <button
+          </a>
+          <a
+            href="#section-contact"
             style={{
               backgroundColor: "transparent",
               color: "#fff",
@@ -60,10 +64,12 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
               border: "2px solid rgba(255,255,255,0.6)",
               padding: "12px 32px",
               cursor: "pointer",
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {secondaryButtonText}
-          </button>
+          </a>
         </div>
         {disclaimer && (
           <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginTop: 16 }}>
@@ -111,7 +117,8 @@ export function CtaBoxed({ tone, content }: SectionProps) {
             {description}
           </p>
         )}
-        <button
+        <a
+          href="#section-contact"
           style={{
             background: tone.gradient,
             color: "#fff",
@@ -122,10 +129,12 @@ export function CtaBoxed({ tone, content }: SectionProps) {
             border: "none",
             padding: "14px 36px",
             cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-block",
           }}
         >
           {buttonText}
-        </button>
+        </a>
         {disclaimer && (
           <p style={{ color: tone.muted, fontSize: 13, marginTop: 12 }}>
             {disclaimer}
@@ -167,7 +176,8 @@ export function CtaSplit({ tone, content }: SectionProps) {
           )}
         </div>
         <div className="flex flex-col items-start md:items-end gap-3">
-          <button
+          <a
+            href="#section-contact"
             style={{
               background: tone.gradient,
               color: "#fff",
@@ -178,10 +188,12 @@ export function CtaSplit({ tone, content }: SectionProps) {
               border: "none",
               padding: "14px 36px",
               cursor: "pointer",
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {buttonText}
-          </button>
+          </a>
           {disclaimer && (
             <span style={{ color: tone.muted, fontSize: 13 }}>
               {disclaimer}

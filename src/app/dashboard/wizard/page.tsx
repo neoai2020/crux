@@ -601,7 +601,7 @@ function WizardInner() {
       });
       if (resp.ok) {
         const data = await resp.json();
-        if (data.businessName && data.businessName !== "My Business") {
+        if (data.businessName) {
           setForm((f) => ({ ...f, businessName: data.businessName }));
         }
       }

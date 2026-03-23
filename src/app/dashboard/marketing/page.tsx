@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { getWebsitesForUser, SavedWebsite } from "@/lib/websites";
 
 interface MarketingMessage {
   platform: string;
@@ -96,13 +98,30 @@ function generateMessages(businessName: string, websiteUrl: string, description:
 }
 
 export default function MarketingPage() {
-  const [businessName, setBusinessName] = useState("");
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [description, setDescription] = useState("");
+  const { user } = useAuth();
+  const [websites, setWebsites] = useState<SavedWebsite[]>([]);
+  const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [messages, setMessages] = useState<MarketingMessage[]>([]);
   const [generated, setGenerated] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [loadingSites, setLoadingSites] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const sites = await getWebsitesForUser(user.id);
+      if (!cancelled) {
+        setWebsites(sites);
+        if (sites.length > 0) setSelectedSiteId(sites[0].id);
+        setLoadingSites(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  const selectedSite = websites.find((w) => w.id === selectedSiteId);
 
   const togglePlatform = (id: string) => {
     setSelectedPlatforms((prev) =>
@@ -111,8 +130,9 @@ export default function MarketingPage() {
   };
 
   const handleGenerate = () => {
-    if (!businessName || selectedPlatforms.length === 0) return;
-    const result = generateMessages(businessName, websiteUrl, description, selectedPlatforms);
+    if (!selectedSite || selectedPlatforms.length === 0) return;
+    const url = `crux.site/${selectedSite.slug}`;
+    const result = generateMessages(selectedSite.businessName, url, selectedSite.description, selectedPlatforms);
     setMessages(result);
     setGenerated(true);
   };
@@ -126,75 +146,97 @@ export default function MarketingPage() {
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       <h1 className="text-2xl font-black mb-1">
-        <span className="gradient-text">Marketing Message Generator</span>
+        <span className="gradient-text">Traffic Magnet</span>
       </h1>
-      <p className="text-gray-400 mb-8">Generate ready-to-post messages for Reddit, forums, social media, and more.</p>
+      <p className="text-gray-400 mb-8">Generate ready-to-post marketing messages for your websites.</p>
 
       {!generated ? (
         <div className="card max-w-2xl space-y-5">
+          {/* Website selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Website / Business Name *</label>
-            <input
-              type="text"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              className="input-field"
-              placeholder="e.g. Awesome Digital Co."
-            />
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Select a Website *</label>
+            {loadingSites ? (
+              <div className="input-field flex items-center justify-center text-gray-500 text-sm py-3">Loading websites...</div>
+            ) : websites.length === 0 ? (
+              <div className="text-center py-6">
+                <p className="text-gray-400 text-sm mb-3">You haven&apos;t created any websites yet.</p>
+                <a href="/dashboard/wizard" className="btn-primary text-sm">Create Your First Website →</a>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {websites.map((site) => {
+                  const isActive = selectedSiteId === site.id;
+                  return (
+                    <button
+                      key={site.id}
+                      onClick={() => setSelectedSiteId(site.id)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
+                        isActive
+                          ? "border-crux-500/50 bg-crux-500/10"
+                          : "border-gray-700/50 hover:border-gray-600"
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-white text-sm font-bold shrink-0">
+                        {site.businessName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-medium truncate ${isActive ? "text-white" : "text-gray-300"}`}>
+                          {site.businessName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">crux.site/{site.slug}</p>
+                      </div>
+                      {isActive && <span className="ml-auto text-crux-400 text-xs shrink-0">Selected</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Website URL</label>
-            <input
-              type="text"
-              value={websiteUrl}
-              onChange={(e) => setWebsiteUrl(e.target.value)}
-              className="input-field"
-              placeholder="crux.site/your-site"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Description of your product / service</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="input-field min-h-[80px] resize-none"
-              placeholder="Briefly describe what your website offers..."
-              rows={3}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">Select Platforms *</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {PLATFORMS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => togglePlatform(p.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
-                    selectedPlatforms.includes(p.id)
-                      ? "border-crux-500/50 bg-crux-500/10 text-white"
-                      : "border-gray-700/50 text-gray-400 hover:border-gray-600"
-                  }`}
-                >
-                  <span className="text-lg">{p.icon}</span>
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          <button
-            onClick={handleGenerate}
-            disabled={!businessName || selectedPlatforms.length === 0}
-            className="btn-primary w-full text-lg disabled:opacity-50"
-          >
-            Generate Messages →
-          </button>
+
+          {selectedSite && (
+            <>
+              <div className="bg-gray-800/30 rounded-xl p-3 text-sm">
+                <p className="text-gray-300"><span className="text-gray-500">Business:</span> {selectedSite.businessName}</p>
+                <p className="text-gray-300 mt-1"><span className="text-gray-500">Description:</span> {selectedSite.description}</p>
+                <p className="text-gray-300 mt-1"><span className="text-gray-500">URL:</span> crux.site/{selectedSite.slug}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-3">Select Platforms *</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {PLATFORMS.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => togglePlatform(p.id)}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
+                        selectedPlatforms.includes(p.id)
+                          ? "border-crux-500/50 bg-crux-500/10 text-white"
+                          : "border-gray-700/50 text-gray-400 hover:border-gray-600"
+                      }`}
+                    >
+                      <span className="text-lg">{p.icon}</span>
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleGenerate}
+                disabled={selectedPlatforms.length === 0}
+                className="btn-primary w-full text-lg disabled:opacity-50"
+              >
+                Generate Messages →
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <p className="text-gray-400">
               Generated <span className="text-white font-medium">{messages.length} messages</span> for{" "}
-              <span className="text-white font-medium">{businessName}</span>
+              <span className="text-white font-medium">{selectedSite?.businessName}</span>
             </p>
             <button onClick={() => setGenerated(false)} className="btn-secondary text-sm">
               ← Edit & Regenerate

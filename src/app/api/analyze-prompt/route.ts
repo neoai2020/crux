@@ -129,11 +129,16 @@ function fallbackAnalysis(prompt: string): NextResponse {
 
   const words = prompt.split(/\s+/).filter((w) => w.length > 2);
   const capitalized = words.filter((w) => /^[A-Z]/.test(w) && !/^(I|I'm|I've|My|The|A|An|We|Our)$/.test(w));
-  const businessName = capitalized.length >= 2
-    ? capitalized.slice(0, 3).join(" ")
-    : capitalized.length === 1
-      ? capitalized[0]
-      : "My Business";
+  let businessName = "My Business";
+  if (capitalized.length >= 2) {
+    businessName = capitalized.slice(0, 3).join(" ");
+  } else if (capitalized.length === 1) {
+    businessName = capitalized[0];
+  } else {
+    const nouns = words.filter((w) => !["run", "sell", "provide", "offer", "make", "create", "build", "have", "the", "and", "for", "with", "from", "that", "this", "our", "you", "your"].includes(w.toLowerCase()));
+    const coreWords = nouns.slice(0, 2).map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    if (coreWords.length > 0) businessName = coreWords.join(" ");
+  }
 
   return NextResponse.json({
     businessName,
