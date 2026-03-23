@@ -108,17 +108,30 @@ export default function MarketingPage() {
   const [loadingSites, setLoadingSites] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoadingSites(false);
+      return;
+    }
     let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) setLoadingSites(false);
+    }, 6000);
     (async () => {
-      const sites = await getWebsitesForUser(user.id);
+      try {
+        const sites = await getWebsitesForUser(user.id);
+        if (!cancelled) {
+          setWebsites(sites);
+          if (sites.length > 0) setSelectedSiteId(sites[0].id);
+        }
+      } catch {
+        // ignore
+      }
       if (!cancelled) {
-        setWebsites(sites);
-        if (sites.length > 0) setSelectedSiteId(sites[0].id);
         setLoadingSites(false);
+        clearTimeout(timeout);
       }
     })();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; clearTimeout(timeout); };
   }, [user]);
 
   const selectedSite = websites.find((w) => w.id === selectedSiteId);
