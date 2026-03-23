@@ -24,14 +24,15 @@ export default function SignInPage() {
     setLoading(true);
     try {
       const success = await signIn(email, password);
-      if (!success) {
-        setError("Invalid email or password. Please try again.");
-        setLoading(false);
+      if (success) {
+        router.replace("/dashboard");
+        return;
       }
+      setError("Invalid email or password. Please try again.");
     } catch {
       setError("Connection error. Please try again.");
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

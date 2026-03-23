@@ -48,7 +48,7 @@ async function fetchProfile(userId: string) {
       .from("profiles")
       .select("name, plan, created_at")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
     return data as Record<string, string> | null;
   } catch {
     return null;
@@ -101,15 +101,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      return !error;
+      if (error || !data.user) return false;
+      const profile = await fetchProfile(data.user.id).catch(() => null);
+      setUser(toAppUser(data.user, profile ?? undefined));
+      return true;
     } catch {
       return false;
     }
@@ -121,12 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string
   ): Promise<boolean> => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { name } },
       });
-      return !error;
+      if (error || !data.user) return false;
+      setUser(toAppUser(data.user));
+      return true;
     } catch {
       return false;
     }
