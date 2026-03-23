@@ -42,13 +42,24 @@ function toAppUser(su: SupabaseUser, profile?: Record<string, string>): User {
   };
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 async function fetchProfile(userId: string) {
   try {
-    const { data } = await supabase
-      .from("profiles")
-      .select("name, plan, created_at")
-      .eq("id", userId)
-      .maybeSingle();
+    const { data } = await withTimeout(
+      supabase
+        .from("profiles")
+        .select("name, plan, created_at")
+        .eq("id", userId)
+        .maybeSingle(),
+      4000,
+      { data: null, error: null, count: null, status: 0, statusText: "" }
+    );
     return data as Record<string, string> | null;
   } catch {
     return null;
@@ -64,21 +75,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        console.warn("Auth init timed out after 8s");
         setLoading(false);
       }
-    }, 8000);
+    }, 6000);
 
     supabase.auth
       .getSession()
       .then(async ({ data: { session } }) => {
         if (!mounted) return;
         if (session?.user) {
+          setUser(toAppUser(session.user));
           const profile = await fetchProfile(session.user.id);
-          if (mounted) setUser(toAppUser(session.user, profile ?? undefined));
+          if (mounted && profile) setUser(toAppUser(session.user, profile));
         }
       })
-      .catch((err) => console.error("getSession failed:", err))
+      .catch(() => {})
       .finally(() => {
         if (mounted) setLoading(false);
         clearTimeout(timeout);
@@ -89,8 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
+        setUser(toAppUser(session.user));
         const profile = await fetchProfile(session.user.id);
-        if (mounted) setUser(toAppUser(session.user, profile ?? undefined));
+        if (mounted && profile) setUser(toAppUser(session.user, profile));
       } else {
         if (mounted) setUser(null);
       }
@@ -110,8 +122,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       if (error || !data.user) return false;
-      const profile = await fetchProfile(data.user.id).catch(() => null);
-      setUser(toAppUser(data.user, profile ?? undefined));
+      setUser(toAppUser(data.user));
+      fetchProfile(data.user.id).then((profile) => {
+        if (profile) setUser(toAppUser(data.user, profile));
+      }).catch(() => {});
       return true;
     } catch {
       return false;
