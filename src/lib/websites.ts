@@ -19,6 +19,8 @@ export interface SavedWebsite {
   sectionContents: Record<string, Record<string, unknown>>;
   slug: string;
   language?: string;
+  original_dfy_id?: number;
+  status?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +44,8 @@ function toSnake(w: Omit<SavedWebsite, "id" | "slug" | "createdAt" | "updatedAt"
     sections: w.sections,
     section_contents: w.sectionContents,
     language: w.language,
+    original_dfy_id: (w as any).original_dfy_id,
+    status: (w as any).status,
     slug: w.businessName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -69,6 +73,8 @@ function toCamel(row: any): SavedWebsite {
     sectionContents: row.section_contents,
     slug: row.slug,
     language: row.language,
+    original_dfy_id: row.original_dfy_id,
+    status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -120,6 +126,8 @@ export async function updateWebsite(
       | "sections"
       | "sectionContents"
       | "language"
+      | "original_dfy_id"
+      | "status"
     >
   >
 ): Promise<SavedWebsite | null> {
@@ -145,6 +153,8 @@ export async function updateWebsite(
   if (updates.sections !== undefined) patch.sections = updates.sections;
   if (updates.sectionContents !== undefined) patch.section_contents = updates.sectionContents;
   if (updates.language !== undefined) patch.language = updates.language;
+  if ((updates as any).original_dfy_id !== undefined) patch.original_dfy_id = (updates as any).original_dfy_id;
+  if ((updates as any).status !== undefined) patch.status = (updates as any).status;
 
   const { data, error } = await supabase
     .from("websites")

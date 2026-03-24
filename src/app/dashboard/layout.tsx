@@ -4,20 +4,34 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 
+import { 
+  BarChart3, 
+  Wand2, 
+  Globe, 
+  Zap, 
+  GraduationCap, 
+  MessageCircle, 
+  Rocket, 
+  Infinity, 
+  Hammer,
+  LayoutDashboard,
+  LogOut
+} from "lucide-react";
+
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: "📊" },
-  { href: "/dashboard/wizard", label: "Web Wizard", icon: "🧙" },
-  { href: "/dashboard/websites", label: "My Websites", icon: "🌐" },
-  { href: "/dashboard/marketing", label: "Traffic Magnet", icon: "📣" },
-  { href: "/dashboard/training", label: "Training", icon: "🎓" },
-  { href: "/dashboard/support", label: "Support", icon: "💬" },
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+  { href: "/dashboard/wizard", label: "Web Wizard", icon: <Wand2 size={18} /> },
+  { href: "/dashboard/websites", label: "My Websites", icon: <Globe size={18} /> },
+  { href: "/dashboard/marketing", label: "Traffic Magnet", icon: <Zap size={18} /> },
+  { href: "/dashboard/training", label: "Training", icon: <GraduationCap size={18} /> },
+  { href: "/dashboard/support", label: "Support", icon: <MessageCircle size={18} /> },
 ];
 
 const PREMIUM_ITEMS = [
-  { href: "/dashboard/10x", label: "10x", icon: "🚀" },
-  { href: "/dashboard/automation", label: "Automation", icon: "⚡" },
-  { href: "/dashboard/infinite", label: "Infinite", icon: "♾️" },
-  { href: "/dashboard/dfy", label: "DFY", icon: "🔧" },
+  { href: "/dashboard/10x", label: "10x", icon: <Rocket size={18} /> },
+  { href: "/dashboard/automation", label: "Automation", icon: <Zap size={18} /> },
+  { href: "/dashboard/infinite", label: "Infinite", icon: <Infinity size={18} /> },
+  { href: "/dashboard/dfy", label: "DFY", icon: <Hammer size={18} /> },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -59,13 +73,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                   isActive
                     ? "bg-crux-500/15 text-crux-300 border border-crux-500/20"
                     : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className={`transition-transform group-hover:scale-110 ${isActive ? "text-crux-400" : "text-gray-500 group-hover:text-crux-400"}`}>
+                  {item.icon}
+                </span>
                 {item.label}
               </Link>
             );
@@ -81,13 +97,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                     isActive
-                      ? "bg-crux-500/15 text-crux-300 border border-crux-500/20"
+                      ? "bg-gradient-to-r from-crux-500/20 to-accent-pink/5 text-white border border-crux-500/30"
                       : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                   }`}
                 >
-                  <span className="text-lg">{item.icon}</span>
+                  <span className={`transition-all duration-300 ${isActive ? "text-accent-pink scale-110 drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]" : "text-gray-500 group-hover:text-accent-pink group-hover:scale-110"}`}>
+                    {item.icon}
+                  </span>
                   {item.label}
                 </Link>
               );
@@ -107,8 +125,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <button
             onClick={signOut}
-            className="w-full text-left text-sm text-gray-500 hover:text-red-400 transition px-2 py-1"
+            className="w-full text-left text-sm text-gray-500 hover:text-red-400 transition-all flex items-center gap-2 px-2 py-1 group"
           >
+            <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
             Sign Out
           </button>
         </div>

@@ -1,5 +1,18 @@
 "use client";
 import { useState } from "react";
+import { 
+  Rocket, 
+  Palette, 
+  ShoppingCart, 
+  Zap, 
+  Target, 
+  DollarSign, 
+  Video, 
+  FileText, 
+  HelpCircle,
+  ChevronDown,
+  CheckCircle2
+} from "lucide-react";
 
 interface TrainingModule {
   id: string;
@@ -7,7 +20,7 @@ interface TrainingModule {
   description: string;
   duration: string;
   lessons: Lesson[];
-  icon: string;
+  icon: React.ReactNode;
   color: string;
 }
 
@@ -23,7 +36,7 @@ const MODULES: TrainingModule[] = [
     title: "Getting Started with Crux",
     description: "Learn the basics of creating your first website with Crux's AI-powered wizard.",
     duration: "25 min",
-    icon: "🚀",
+    icon: <Rocket size={20} />,
     color: "from-crux-500 to-crux-400",
     lessons: [
       { title: "Welcome to Crux - Platform Overview", duration: "5 min", type: "video" },
@@ -38,7 +51,7 @@ const MODULES: TrainingModule[] = [
     title: "Mastering Templates",
     description: "Deep dive into template customization, content optimization, and design best practices.",
     duration: "35 min",
-    icon: "🎨",
+    icon: <Palette size={20} />,
     color: "from-accent-pink to-accent-orange",
     lessons: [
       { title: "Understanding Template Structure", duration: "6 min", type: "video" },
@@ -54,7 +67,7 @@ const MODULES: TrainingModule[] = [
     title: "eCom & Dropshipping Success",
     description: "Build profitable online stores with proven strategies for product selection and pricing.",
     duration: "45 min",
-    icon: "🛒",
+    icon: <ShoppingCart size={20} />,
     color: "from-accent-green to-accent-cyan",
     lessons: [
       { title: "Choosing Winning Products", duration: "8 min", type: "video" },
@@ -70,7 +83,7 @@ const MODULES: TrainingModule[] = [
     title: "Marketing & Traffic Generation",
     description: "Learn to drive traffic using Reddit, forums, social media, and content marketing.",
     duration: "50 min",
-    icon: "📣",
+    icon: <Zap size={20} />,
     color: "from-accent-orange to-yellow-400",
     lessons: [
       { title: "Marketing Fundamentals", duration: "6 min", type: "video" },
@@ -87,7 +100,7 @@ const MODULES: TrainingModule[] = [
     title: "Sales Funnels That Convert",
     description: "Build high-converting sales funnels with urgency, social proof, and strategic CTAs.",
     duration: "40 min",
-    icon: "🎯",
+    icon: <Target size={20} />,
     color: "from-red-500 to-pink-500",
     lessons: [
       { title: "Sales Funnel Psychology", duration: "8 min", type: "video" },
@@ -103,7 +116,7 @@ const MODULES: TrainingModule[] = [
     title: "Scaling to $10K/Month",
     description: "Advanced strategies for scaling your online business to consistent five-figure months.",
     duration: "55 min",
-    icon: "💰",
+    icon: <DollarSign size={20} />,
     color: "from-yellow-500 to-amber-500",
     lessons: [
       { title: "The $10K Roadmap", duration: "10 min", type: "video" },
@@ -136,117 +149,125 @@ export default function TrainingPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in">
-      <h1 className="text-2xl font-black mb-1">
-        <span className="gradient-text">Training Hub</span>
-      </h1>
-      <p className="text-gray-400 mb-8">
-        Step-by-step training to help you build, launch, and scale profitable websites.
+    <div className="max-w-5xl mx-auto animate-fade-in pb-20">
+      <div className="flex items-center gap-3 mb-2">
+        <h1 className="text-3xl font-black">
+          <span className="gradient-text uppercase tracking-tight">Training Hub</span>
+        </h1>
+      </div>
+      <p className="text-gray-400 mb-8 border-l-2 border-crux-500 pl-4 py-1 italic">
+        Master the art of online business with our expert-led modules. From first site to five-figure months.
       </p>
 
       {/* Progress Overview */}
-      <div className="card mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-bold">Your Progress</h2>
-            <p className="text-sm text-gray-400">
-              {completedLessons.size} of {MODULES.reduce((acc, m) => acc + m.lessons.length, 0)} lessons completed
-            </p>
+      <div className="card mb-10 overflow-hidden relative border-crux-500/20 bg-gray-900/60">
+        <div className="absolute inset-0 bg-grid opacity-5" />
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">Your Progress</h2>
+              <p className="text-sm text-gray-400 mt-1">
+                You have finished <span className="text-white font-bold">{completedLessons.size}</span> out of {MODULES.reduce((acc, m) => acc + m.lessons.length, 0)} lessons
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-4xl font-black text-crux-400">
+                {Math.round(
+                  (completedLessons.size / MODULES.reduce((acc, m) => acc + m.lessons.length, 0)) * 100
+                )}%
+              </p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-black gradient-text">
-              {Math.round(
-                (completedLessons.size / MODULES.reduce((acc, m) => acc + m.lessons.length, 0)) * 100
-              )}%
-            </p>
+          <div className="h-3 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-crux-500 via-accent-pink to-accent-orange rounded-full transition-all duration-1000 ease-out"
+              style={{
+                width: `${(completedLessons.size / MODULES.reduce((acc, m) => acc + m.lessons.length, 0)) * 100}%`,
+              }}
+            />
           </div>
-        </div>
-        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-crux-500 to-accent-pink rounded-full transition-all duration-500"
-            style={{
-              width: `${(completedLessons.size / MODULES.reduce((acc, m) => acc + m.lessons.length, 0)) * 100}%`,
-            }}
-          />
         </div>
       </div>
 
       {/* Modules */}
-      <div className="space-y-4">
+      <div className="grid gap-4">
         {MODULES.map((mod) => {
           const isOpen = activeModule === mod.id;
           const progress = getModuleProgress(mod);
 
           return (
-            <div key={mod.id} className="card overflow-hidden">
+            <div key={mod.id} className={`card p-0 overflow-hidden transition-all duration-300 border-gray-800/50 hover:border-gray-700 ${isOpen ? "ring-1 ring-crux-500/30 shadow-2xl shadow-crux-500/10" : ""}`}>
               <button
                 onClick={() => setActiveModule(isOpen ? null : mod.id)}
-                className="w-full flex items-center gap-4 text-left"
+                className={`w-full flex items-center gap-5 p-6 text-left group transition-colors ${isOpen ? "bg-black/40" : "hover:bg-gray-800/30"}`}
               >
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${mod.color} flex items-center justify-center text-xl shrink-0`}
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${mod.color} flex items-center justify-center text-white shrink-0 shadow-lg shadow-black/40 group-hover:scale-110 transition-all duration-500`}
                 >
                   {mod.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-bold truncate">{mod.title}</h3>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight group-hover:text-crux-300 transition-colors">{mod.title}</h3>
                     {progress === 100 && (
-                      <span className="text-xs bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full shrink-0">
-                        Complete ✓
+                      <span className="text-[10px] font-black bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30 uppercase tracking-tighter shadow-sm shadow-green-500/10">
+                        Mastery Achieved ✓
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-400 truncate">{mod.description}</p>
-                  <div className="flex items-center gap-4 mt-2">
-                    <span className="text-xs text-gray-500">{mod.lessons.length} lessons</span>
-                    <span className="text-xs text-gray-500">{mod.duration}</span>
-                    <div className="flex-1 max-w-[120px] h-1 bg-gray-800 rounded-full overflow-hidden">
+                  <p className="text-sm text-gray-500 line-clamp-1">{mod.description}</p>
+                  <div className="flex items-center gap-5 mt-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <FileText size={12} className="text-gray-600" />
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{mod.lessons.length} LESSONS</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Rocket size={12} className="text-gray-600" />
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{mod.duration}</span>
+                    </div>
+                    <div className="flex-1 max-w-[150px] h-1.5 bg-gray-800 rounded-full overflow-hidden shadow-inner">
                       <div
-                        className={`h-full bg-gradient-to-r ${mod.color} rounded-full transition-all duration-500`}
+                        className={`h-full bg-gradient-to-r ${mod.color} rounded-full transition-all duration-700 ease-out`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500">{progress}%</span>
                   </div>
                 </div>
-                <span className={`text-gray-500 transition-transform ${isOpen ? "rotate-180" : ""}`}>
-                  ▼
-                </span>
+                <ChevronDown size={24} className={`text-gray-600 transition-transform duration-500 ease-in-out ${isOpen ? "rotate-180 text-crux-400" : ""}`} />
               </button>
 
               {isOpen && (
-                <div className="mt-4 pt-4 border-t border-gray-800/50 space-y-2 animate-fade-in">
+                <div className="bg-black/20 p-6 pt-2 border-t border-gray-800/50 space-y-2 animate-slide-down">
                   {mod.lessons.map((lesson, idx) => {
                     const key = `${mod.id}:${lesson.title}`;
                     const isCompleted = completedLessons.has(key);
                     return (
                       <div
                         key={idx}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
-                          isCompleted ? "bg-green-500/5" : "hover:bg-gray-800/50"
+                        className={`group/lesson flex items-center gap-4 px-5 py-4 rounded-xl transition-all cursor-pointer border ${
+                          isCompleted ? "bg-green-500/5 border-green-500/20" : "bg-gray-800/20 border-transparent hover:border-gray-700 hover:bg-gray-800/40"
                         }`}
                         onClick={() => toggleLesson(mod.id, lesson.title)}
                       >
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                            isCompleted ? "border-green-500 bg-green-500/20 text-green-400" : "border-gray-700"
+                          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
+                            isCompleted ? "border-green-500 bg-green-500/20 text-green-400 scale-110 shadow-lg shadow-green-500/10" : "border-gray-700 group-hover/lesson:border-crux-500 group-hover/lesson:bg-crux-500/5"
                           }`}
                         >
-                          {isCompleted && <span className="text-xs">✓</span>}
+                          {isCompleted ? <CheckCircle2 size={14} /> : <div className="w-1 h-1 rounded-full bg-gray-700" />}
                         </div>
                         <div className="flex-1">
-                          <p className={`text-sm font-medium ${isCompleted ? "text-gray-400 line-through" : ""}`}>
+                          <p className={`text-sm font-bold tracking-tight transition-all ${isCompleted ? "text-gray-500 line-through opacity-60" : "text-gray-200 group-hover/lesson:text-white"}`}>
                             {lesson.title}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs text-gray-500">
-                            {lesson.type === "video" && "🎬"}
-                            {lesson.type === "article" && "📄"}
-                            {lesson.type === "quiz" && "❓"}
-                          </span>
-                          <span className="text-xs text-gray-500">{lesson.duration}</span>
+                        <div className="flex items-center gap-4 shrink-0 px-3 py-1 bg-black/30 rounded-lg border border-gray-800 group-hover/lesson:border-gray-700 transition-colors">
+                          <div className="text-gray-600 group-hover/lesson:text-gray-400 transition-colors">
+                            {lesson.type === "video" && <Video size={14} />}
+                            {lesson.type === "article" && <FileText size={14} />}
+                            {lesson.type === "quiz" && <HelpCircle size={14} />}
+                          </div>
+                          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{lesson.duration}</span>
                         </div>
                       </div>
                     );

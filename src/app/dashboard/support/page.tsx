@@ -1,4 +1,5 @@
 "use client";
+import { Mail, BookOpen, MessageCircle, ChevronRight } from "lucide-react";
 
 export default function SupportPage() {
   return (
@@ -13,8 +14,8 @@ export default function SupportPage() {
       <div className="grid gap-5">
         <div className="card hover:border-crux-500/30 transition-all">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-xl shrink-0">
-              📧
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-white shrink-0 shadow-lg">
+              <Mail size={24} />
             </div>
             <div>
               <h3 className="font-bold mb-1">Email Support</h3>
@@ -33,8 +34,8 @@ export default function SupportPage() {
 
         <div className="card hover:border-crux-500/30 transition-all">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-green to-accent-cyan flex items-center justify-center text-xl shrink-0">
-              📚
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-green to-accent-cyan flex items-center justify-center text-white shrink-0 shadow-lg">
+              <BookOpen size={24} />
             </div>
             <div>
               <h3 className="font-bold mb-1">Knowledge Base</h3>
@@ -48,8 +49,8 @@ export default function SupportPage() {
 
         <div className="card hover:border-crux-500/30 transition-all">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-orange to-yellow-400 flex items-center justify-center text-xl shrink-0">
-              💬
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-orange to-yellow-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+              <MessageCircle size={24} />
             </div>
             <div>
               <h3 className="font-bold mb-1">Live Chat</h3>

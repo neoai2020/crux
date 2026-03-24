@@ -2,6 +2,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { 
+  Globe, 
+  DollarSign, 
+  Users, 
+  TrendingUp, 
+  Wand2, 
+  Zap, 
+  GraduationCap, 
+  Settings,
+  Plus
+} from "lucide-react";
 import { getWebsitesForUser, getRemainingGenerations, SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
 import FeatureVideo from "@/components/FeatureVideo";
@@ -25,10 +36,10 @@ const EARNINGS_FEED = [
 ];
 
 const STATS = [
-  { label: "Sites Created", value: "12,847", change: "+24%", icon: "🌐", color: "from-crux-500 to-crux-400" },
-  { label: "Total Revenue", value: "$2.4M", change: "+18%", icon: "💰", color: "from-accent-green to-accent-cyan" },
-  { label: "Active Users", value: "3,291", change: "+32%", icon: "👥", color: "from-accent-pink to-accent-orange" },
-  { label: "Avg. Earnings", value: "$1,840", change: "+15%", icon: "📈", color: "from-accent-orange to-yellow-400" },
+  { label: "Sites Created", value: "12,847", change: "+24%", icon: <Globe size={24} />, color: "from-crux-500 to-crux-400" },
+  { label: "Total Revenue", value: "$2.4M", change: "+18%", icon: <DollarSign size={24} />, color: "from-accent-green to-accent-cyan" },
+  { label: "Active Users", value: "3,291", change: "+32%", icon: <Users size={24} />, color: "from-accent-pink to-accent-orange" },
+  { label: "Avg. Earnings", value: "$1,840", change: "+15%", icon: <TrendingUp size={24} />, color: "from-accent-orange to-yellow-400" },
 ];
 
 export default function DashboardPage() {
@@ -88,15 +99,18 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {STATS.map((stat) => (
-          <div key={stat.label} className="card group hover:border-crux-500/30 transition-all">
-            <div className="flex items-start justify-between mb-3">
-              <span className="text-2xl">{stat.icon}</span>
-              <span className="text-xs font-medium text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
+          <div key={stat.label} className="card group hover:border-crux-500/30 transition-all relative overflow-hidden">
+            <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-[0.03] -mr-8 -mt-8 rounded-full`} />
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} bg-opacity-10 text-white shadow-lg`}>
+                {stat.icon}
+              </div>
+              <span className="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
                 {stat.change}
               </span>
             </div>
-            <p className="text-2xl font-black">{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-3xl font-black text-white mb-1">{stat.value}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -106,39 +120,43 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-bold">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            <Link href="/dashboard/wizard" className="card-hover flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                🧙
+            <Link href="/dashboard/wizard" className="card-hover flex items-center gap-4 group p-5 border border-gray-800/50 hover:border-crux-500/30 bg-gray-900/40 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-crux-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center shadow-lg shadow-crux-500/20 group-hover:scale-110 transition-all duration-500 relative z-10">
+                <Wand2 size={24} className="text-white" />
               </div>
-              <div>
-                <h3 className="font-bold">Create New Website</h3>
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg text-white">Create New Website</h3>
                 <p className="text-sm text-gray-400">Launch the Web Wizard</p>
               </div>
             </Link>
-            <Link href="/dashboard/marketing" className="card-hover flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-green to-accent-cyan flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                📣
+            <Link href="/dashboard/marketing" className="card-hover flex items-center gap-4 group p-5 border border-gray-800/50 hover:border-accent-green/30 bg-gray-900/40 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-green to-accent-cyan flex items-center justify-center shadow-lg shadow-accent-green/20 group-hover:scale-110 transition-all duration-500 relative z-10">
+                <Zap size={24} className="text-white" />
               </div>
-              <div>
-                <h3 className="font-bold">Generate Marketing</h3>
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg text-white">Generate Marketing</h3>
                 <p className="text-sm text-gray-400">Create posts & messages</p>
               </div>
             </Link>
-            <Link href="/dashboard/training" className="card-hover flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-orange to-yellow-400 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                🎓
+            <Link href="/dashboard/training" className="card-hover flex items-center gap-4 group p-5 border border-gray-800/50 hover:border-accent-orange/30 bg-gray-900/40 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-orange to-yellow-400 flex items-center justify-center shadow-lg shadow-accent-orange/20 group-hover:scale-110 transition-all duration-500 relative z-10">
+                <GraduationCap size={24} className="text-white" />
               </div>
-              <div>
-                <h3 className="font-bold">Training Hub</h3>
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg text-white">Training Hub</h3>
                 <p className="text-sm text-gray-400">Learn to maximize revenue</p>
               </div>
             </Link>
-            <Link href="/dashboard/websites" className="card-hover flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                ⚙️
+            <Link href="/dashboard/websites" className="card-hover flex items-center gap-4 group p-5 border border-gray-800/50 hover:border-blue-500/30 bg-gray-900/40 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-all duration-500 relative z-10">
+                <Settings size={24} className="text-white" />
               </div>
-              <div>
-                <h3 className="font-bold">My Websites</h3>
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg text-white">My Websites</h3>
                 <p className="text-sm text-gray-400">
                   {savedWebsites.length > 0 ? `${savedWebsites.length} site${savedWebsites.length > 1 ? "s" : ""} · ${remaining}/5 left` : "View & edit your websites"}
                 </p>
@@ -156,14 +174,19 @@ export default function DashboardPage() {
             )}
           </div>
           {savedWebsites.length === 0 ? (
-            <div className="card">
-              <div className="text-center py-8 text-gray-500">
-                <span className="text-4xl block mb-3">🌐</span>
-                <p className="font-medium">No websites yet</p>
-                <p className="text-sm mt-1">Launch the Web Wizard to create your first site!</p>
-                <Link href="/dashboard/wizard" className="btn-primary inline-block mt-4 text-sm">
-                  Create Your First Website →
-                </Link>
+            <div className="card bg-gray-900/40 border-gray-800/50">
+              <div className="text-center py-10 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-crux-500/5 to-transparent" />
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-4 border border-gray-700 shadow-xl">
+                    <Globe size={32} className="text-gray-500" />
+                  </div>
+                  <p className="font-bold text-lg text-white">No websites yet</p>
+                  <p className="text-sm text-gray-400 mt-1 mb-6">Launch the Web Wizard to create your first site!</p>
+                  <Link href="/dashboard/wizard" className="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm font-black uppercase tracking-widest">
+                    <Plus size={16} /> Create Your First Website
+                  </Link>
+                </div>
               </div>
             </div>
           ) : (

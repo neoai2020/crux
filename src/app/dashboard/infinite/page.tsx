@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { Infinity, Loader2, Lock } from "lucide-react";
 import { getWebsitesForUser, updateWebsite, SavedWebsite } from "@/lib/websites";
 
 export default function InfinitePage() {
@@ -71,7 +72,9 @@ export default function InfinitePage() {
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="flex items-center gap-3 mb-2">
-        <span className="text-3xl">♾️</span>
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center shadow-lg shadow-crux-500/20">
+          <Infinity size={22} className="text-white" />
+        </div>
         <h1 className="text-3xl font-black">
           <span className="gradient-text">Infinite</span>
         </h1>
@@ -115,9 +118,12 @@ export default function InfinitePage() {
         </div>
       )}
 
-      <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6 mt-12">
-        <div className="text-center py-10">
-          <span className="text-6xl block mb-4">🔒</span>
+      <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6 mt-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="text-center py-10 relative z-10">
+          <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-4 border border-gray-700 shadow-xl">
+            <Lock size={32} className="text-crux-400" />
+          </div>
           <h2 className="text-2xl font-bold mb-2">Premium Feature</h2>
           <p className="text-gray-400 max-w-md mx-auto mb-6">
             Infinite plan removes all daily limits. Generate as many websites as you want, whenever you want.
