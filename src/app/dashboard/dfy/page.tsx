@@ -26,7 +26,7 @@ interface DFYSite {
   name: string;
   niche: string;
   description: string;
-  type: "E-commerce" | "Service" | "Portfolio" | "Landing Page";
+  type: "E-commerce" | "Service" | "Portfolio" | "Landing Page" | "Blog" | "Education" | "Health/Medical" | "Personal Branding" | "Corporate";
   image: string;
 }
 
@@ -65,19 +65,43 @@ const DFY_SITES: DFYSite[] = [
   },
   {
     id: 5,
-    name: "Green Sprout",
-    niche: "Organic Groceries",
-    description: "Eco-friendly online store for sustainable products and healthy living.",
-    type: "E-commerce",
-    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80",
+    name: "Pure Health",
+    niche: "Health & Medical",
+    description: "Professional medical template with appointment scheduling and service lists.",
+    type: "Health/Medical",
+    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80",
   },
   {
     id: 6,
-    name: "Tech Nova",
-    niche: "SaaS Platform",
-    description: "Modern software-as-a-service landing page with feature grids and pricing.",
-    type: "Landing Page",
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
+    name: "Mindful Living",
+    niche: "Lifestyle Blog",
+    description: "Stunning blog layout with categorized articles and newsletter integration.",
+    type: "Blog",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80",
+  },
+  {
+    id: 7,
+    name: "Global Edu",
+    niche: "Education Platform",
+    description: "LMS-style website for online courses, schools, or tutoring services.",
+    type: "Education",
+    image: "https://images.unsplash.com/photo-1523050335456-c38447d0d960?w=800&q=80",
+  },
+  {
+    id: 8,
+    name: "Creative Pulse",
+    niche: "Personal Brand",
+    description: "Sleek personal branding site for speakers, influencers, and consultants.",
+    type: "Personal Branding",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80",
+  },
+  {
+    id: 9,
+    name: "Apex Corp",
+    niche: "Corporate Business",
+    description: "High-level corporate portal with multi-page support and investor relations.",
+    type: "Corporate",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
   },
 ];
 
@@ -86,6 +110,11 @@ const TYPE_COLORS = {
   "Service": "bg-accent-green/10 text-accent-green border-accent-green/20",
   "Portfolio": "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/20",
   "Landing Page": "bg-accent-orange/10 text-accent-orange border-accent-orange/20",
+  "Blog": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  "Education": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  "Health/Medical": "bg-red-500/10 text-red-400 border-red-500/20",
+  "Personal Branding": "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+  "Corporate": "bg-gray-500/10 text-gray-400 border-gray-500/20",
 };
 
 export default function DFYPage() {
@@ -160,34 +189,36 @@ export default function DFYPage() {
     ? DFY_SITES 
     : DFY_SITES.filter(s => s.type === activeType);
 
-  const types = ["All", "E-commerce", "Service", "Portfolio", "Landing Page"];
+  const types = ["All", "E-commerce", "Service", "Portfolio", "Landing Page", "Blog", "Education", "Health/Medical", "Personal Branding", "Corporate"];
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl font-black mb-2">
-            <span className="gradient-text uppercase tracking-tight">Done-For-You Library</span>
-          </h1>
-          <p className="text-gray-400 max-w-xl border-l-2 border-accent-pink pl-4 py-1">
-            Skip the setup! Claim a professionally designed website template instantly. One click and it's yours.
-          </p>
+      <div className="flex flex-col mb-10">
+        <h1 className="text-4xl font-black mb-3">
+          <span className="gradient-text uppercase tracking-tight">Done-For-You Library</span>
+        </h1>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="border-l-2 border-accent-pink pl-4 py-1">
+            <p className="text-gray-300 font-bold">180 websites already generated across the 9 website types + 200 posts per website.</p>
+            <p className="text-gray-500 text-sm mt-1">Claim your professionally designed assets with one click.</p>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {types.map(t => (
-            <button
-              key={t}
-              onClick={() => setActiveType(t)}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all border ${
-                activeType === t 
-                  ? "bg-accent-pink text-white border-accent-pink shadow-lg shadow-accent-pink/20" 
-                  : "bg-gray-900/40 text-gray-500 border-gray-800 hover:border-gray-700"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+      </div>
+
+      <div className="flex items-center gap-2 mb-10 pb-4 overflow-x-auto no-scrollbar mask-fade-right">
+        {types.map(t => (
+          <button
+            key={t}
+            onClick={() => setActiveType(t)}
+            className={`whitespace-nowrap px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${
+              activeType === t 
+                ? "bg-accent-pink text-white border-accent-pink shadow-xl shadow-accent-pink/20 scale-105" 
+                : "bg-gray-900/60 text-gray-500 border-gray-800/80 hover:border-gray-700 hover:bg-gray-800/60"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
