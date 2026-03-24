@@ -1,9 +1,10 @@
 "use client";
-import FeatureVideo from "@/components/FeatureVideo";
+
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { getWebsitesForUser, updateWebsite, SavedWebsite } from "@/lib/websites";
 
 export default function InfinitePage() {
-<<<<<<< Updated upstream
-=======
   const { user } = useAuth();
   const [websites, setWebsites] = useState<SavedWebsite[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,13 +40,12 @@ export default function InfinitePage() {
 
         await updateWebsite(website.id, user.id, {
           sectionContents: translatedContent,
-          language: targetLang,
         });
 
         setWebsites((prev) =>
           prev.map((s) =>
             s.id === website.id
-              ? { ...s, sectionContents: translatedContent, language: targetLang }
+              ? { ...s, sectionContents: translatedContent }
               : s
           )
         );
@@ -67,7 +67,6 @@ export default function InfinitePage() {
     );
   }
 
->>>>>>> Stashed changes
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="flex items-center gap-3 mb-2">
@@ -80,14 +79,6 @@ export default function InfinitePage() {
         No limits. Unlimited generations, unlimited websites, unlimited growth.
       </p>
 
-<<<<<<< Updated upstream
-      <div className="mb-6">
-        <FeatureVideo
-          title="Go Infinite"
-          subtitle="See what unlimited access looks like."
-        />
-      </div>
-=======
       {websites.length === 0 ? (
         <div className="card text-center py-20">
           <p className="text-gray-400">You haven&apos;t created any websites yet.</p>
@@ -105,8 +96,7 @@ export default function InfinitePage() {
               <div>
                 <h3 className="text-xl font-bold mb-1">{site.businessName}</h3>
                 <p className="text-sm text-gray-400 mb-2">
-                  {site.categoryName} &bull; Current:{" "}
-                  <span className="text-crux-400 font-bold">{site.language || "English"}</span>
+                  {site.categoryName}
                 </p>
                 <div className="flex gap-2">
                   <a
@@ -119,9 +109,12 @@ export default function InfinitePage() {
                   </a>
                 </div>
               </div>
->>>>>>> Stashed changes
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6">
+      <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-6 mt-12">
         <div className="text-center py-10">
           <span className="text-6xl block mb-4">🔒</span>
           <h2 className="text-2xl font-bold mb-2">Premium Feature</h2>

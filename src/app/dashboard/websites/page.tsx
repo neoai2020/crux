@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getWebsitesForUser, deleteWebsite, getRemainingGenerations, SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
 import WebsitePreview from "@/components/WebsitePreview";
+import { ExternalLink } from "lucide-react";
 
 export default function WebsitesPage() {
   const { user } = useAuth();
@@ -165,9 +166,6 @@ export default function WebsitesPage() {
                     </p>
 
                     <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-<<<<<<< Updated upstream
-                      <span>🔗 crux.site/{website.slug}</span>
-=======
                       <a
                         href={`/site/${website.slug}?id=${website.id}`}
                         target="_blank"
@@ -176,7 +174,6 @@ export default function WebsitesPage() {
                       >
                         <ExternalLink size={14} /> Open Live Site ↗
                       </a>
->>>>>>> Stashed changes
                       <span>Created {new Date(website.createdAt).toLocaleDateString()}</span>
                       {website.updatedAt !== website.createdAt && (
                         <span>Updated {new Date(website.updatedAt).toLocaleDateString()}</span>
