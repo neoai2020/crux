@@ -1,171 +1,346 @@
 "use client";
 import { useState } from "react";
-import { Rocket, Monitor, BarChart3, Layout, Globe, Zap, TrendingUp, Target, Layers, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import {
+  Zap,
+  Share2,
+  Target,
+  BarChart3,
+  Link2,
+  Sparkles,
+  Copy,
+  CheckCircle2,
+  Info,
+  Users,
+  Clock,
+  MessageSquare,
+} from "lucide-react";
 
-const TOOLS = [
+/* ─── 10 angle templates ─── */
+const ANGLES = [
+  { label: "Curiosity Hook", tone: "curiosity" },
+  { label: "Storytelling", tone: "story" },
+  { label: "Problem-Solution", tone: "problem" },
+  { label: "Social Proof", tone: "proof" },
+  { label: "Direct CTA", tone: "cta" },
+  { label: "Question Opener", tone: "question" },
+  { label: "Controversial Take", tone: "controversial" },
+  { label: "Personal Journey", tone: "personal" },
+  { label: "Listicle / Tips", tone: "listicle" },
+  { label: "Urgency / FOMO", tone: "urgency" },
+];
+
+function generatePosts(linkName: string, promoLink: string): string[] {
+  const name = linkName || "this product";
+  const link = promoLink || "https://example.com";
+
+  return [
+    // 1 - Curiosity Hook
+    `🤔 What if I told you there's a way to completely change how you approach ${name}?\n\nMost people have no idea this exists — but once you see it, you can't unsee it.\n\nI stumbled across this and my results have been night and day different.\n\n👉 ${link}\n\nDrop a "🔥" if you want me to break it down in the comments!`,
+
+    // 2 - Storytelling
+    `📖 6 months ago, I was stuck in the same place most of you are right now.\n\nI'd tried everything — nothing seemed to move the needle. Then I found ${name} and decided to give it one more shot.\n\nFast forward to today? The difference is unreal.\n\nHere's what I used: ${link}\n\nSometimes one decision changes everything. This was mine.`,
+
+    // 3 - Problem-Solution
+    `❌ Tired of wasting time on things that don't work?\n\nI was too. Spent months going in circles until I found a system that actually delivers.\n\n✅ ${name} solved the exact problem I was struggling with — and it can work for you too.\n\nCheck it out here: ${link}\n\nYour future self will thank you. 💪`,
+
+    // 4 - Social Proof
+    `🏆 Over 10,000+ people have already discovered ${name} — and the results speak for themselves.\n\nI'm not the only one saying this. The reviews, the testimonials, the transformations… they're all real.\n\nIf you've been on the fence, now's the time.\n\n🔗 ${link}\n\nJoin the movement. 🚀`,
+
+    // 5 - Direct CTA
+    `⚡ Stop scrolling and pay attention.\n\nIf you've been looking for ${name}, this is it.\n\nNo fluff. No gimmicks. Just results.\n\n👉 ${link}\n\nClick the link, see for yourself, and thank me later. 🙌`,
+
+    // 6 - Question Opener
+    `💭 Quick question for this group:\n\nHave you ever felt like you're doing everything right but still not seeing results?\n\nI felt the exact same way — until I discovered ${name}.\n\nIt changed my approach completely, and I think it could help a lot of you too.\n\nHere's the link if you're curious: ${link}\n\nWho else has experienced this? Let's talk about it 👇`,
+
+    // 7 - Controversial Take
+    `🔥 Unpopular opinion: Most of the advice you're getting about this topic is outdated.\n\nI know that's a bold claim, but hear me out.\n\nAfter testing dozens of approaches, ${name} was the ONLY thing that actually moved the needle for me.\n\nSee what I mean: ${link}\n\nAgree or disagree? Let me know below 👇`,
+
+    // 8 - Personal Journey
+    `🙋 Real talk for a second…\n\nA year ago, I almost gave up. Nothing was working. I felt like I was the only one struggling.\n\nThen someone recommended ${name} to me, and honestly? It was a turning point.\n\nI'm sharing this because I know some of you are in that same place right now.\n\n${link}\n\nIf this helps even one person, it's worth posting. ❤️`,
+
+    // 9 - Listicle / Tips
+    `📋 3 things I wish I knew sooner:\n\n1️⃣ You don't need to do everything manually\n2️⃣ The right tool makes ALL the difference\n3️⃣ ${name} exists and it's a game-changer\n\nSeriously — if you haven't checked this out yet, you're leaving results on the table.\n\n🔗 ${link}\n\nSave this post for later. You'll need it. 📌`,
+
+    // 10 - Urgency / FOMO
+    `⏰ This won't be available forever…\n\nI just got access to ${name} and I'm genuinely impressed. The results are better than expected.\n\nBut here's the thing — opportunities like this don't stick around long.\n\n🔗 ${link}\n\nDon't wait until everyone's already using it. Get in now. 🚀\n\nWho's in? Drop a ✋ below!`,
+  ];
+}
+
+/* ─── pro tips data ─── */
+const WHERE_TO_SHARE = [
   {
-    icon: Monitor,
-    title: "Bulk Website Generation",
-    desc: "Generate up to 50 websites in a single batch with AI-powered content.",
-    color: "crux",
-    stats: { label: "Sites Generated", value: "0", max: "50" },
-    features: ["AI-generated unique content per site", "Auto-assign niches and templates", "Batch export and publish", "Smart keyword targeting per site"],
+    title: "Niche Facebook Groups",
+    desc: "Find groups with 10K–100K members related to your product. Avoid spammy mega-groups.",
   },
   {
-    icon: BarChart3,
-    title: "Advanced Analytics",
-    desc: "Deep insights into traffic, conversions, and revenue across all your sites.",
-    color: "pink",
-    stats: { label: "Total Views", value: "0", max: "∞" },
-    features: ["Real-time visitor tracking", "Conversion rate optimization", "Revenue per site breakdown", "Traffic source analytics"],
+    title: "Your Profile & Stories",
+    desc: "Post on your personal profile too. Facebook's algorithm favors personal accounts.",
   },
   {
-    icon: Layout,
-    title: "Priority Templates",
-    desc: "Access exclusive high-converting template designs built for maximum ROI.",
-    color: "green",
-    stats: { label: "Templates Available", value: "25", max: "25" },
-    features: ["Conversion-optimized layouts", "Industry-specific designs", "A/B tested for performance", "Mobile-first responsive"],
+    title: "Facebook Pages You Manage",
+    desc: "If you have a page, post there and boost the best-performing posts.",
   },
   {
-    icon: Globe,
-    title: "Custom Domains",
-    desc: "Connect your own domain to any generated website for a professional look.",
-    color: "cyan",
-    stats: { label: "Domains Connected", value: "0", max: "∞" },
-    features: ["One-click domain connection", "Free SSL certificates", "DNS auto-configuration", "Subdomain support"],
+    title: "Comment Sections",
+    desc: "Reply to relevant viral posts with your take and a subtle link. High-traffic comments = free visibility.",
   },
 ];
 
-const COLOR_MAP: Record<string, { bg: string; text: string; border: string; glow: string }> = {
-  crux: { bg: "bg-crux-500/10", text: "text-crux-400", border: "border-crux-500/30", glow: "shadow-crux-500/20" },
-  pink: { bg: "bg-accent-pink/10", text: "text-accent-pink", border: "border-accent-pink/30", glow: "shadow-accent-pink/20" },
-  green: { bg: "bg-accent-green/10", text: "text-accent-green", border: "border-accent-green/30", glow: "shadow-accent-green/20" },
-  cyan: { bg: "bg-accent-cyan/10", text: "text-accent-cyan", border: "border-accent-cyan/30", glow: "shadow-accent-cyan/20" },
-};
+const WHEN_HOW = [
+  {
+    title: "Best times",
+    desc: "9–11 AM and 7–9 PM in your audience's timezone. Tuesday–Thursday perform best.",
+  },
+  {
+    title: "Space them out",
+    desc: "Post 1–2 per day across different groups. Never spam the same group twice in a day.",
+  },
+  {
+    title: "Engage immediately",
+    desc: "Reply to every comment within the first hour. Facebook rewards fast engagement with more reach.",
+  },
+  {
+    title: "Use all 10 angles",
+    desc: "Different posts resonate with different people. The curiosity angle might flop where storytelling goes viral.",
+  },
+];
 
 export default function TenXPage() {
-  const [activeTool, setActiveTool] = useState(0);
-  const tool = TOOLS[activeTool];
-  const colors = COLOR_MAP[tool.color];
+  const [linkName, setLinkName] = useState("");
+  const [promoLink, setPromoLink] = useState("");
+  const [posts, setPosts] = useState<string[]>([]);
+  const [generated, setGenerated] = useState(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  const handleGenerate = () => {
+    const result = generatePosts(linkName, promoLink);
+    setPosts(result);
+    setGenerated(true);
+  };
+
+  const handleCopy = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
-      {/* header */}
-      <div className="flex items-center gap-3 mb-2">
+      {/* ── header ── */}
+      <div className="flex items-center gap-3 mb-1">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center shadow-lg shadow-crux-500/20">
-          <Rocket size={20} className="text-white" />
+          <Zap size={20} className="text-white" />
         </div>
-        <h1 className="text-3xl font-black">
-          <span className="gradient-text">10x</span>
-        </h1>
+        <div>
+          <h1 className="text-3xl font-black">
+            <span className="gradient-text">10X Facebook Post Generator</span>
+          </h1>
+          <span className="text-[10px] font-bold tracking-widest uppercase bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-md">
+            10X Mode Active
+          </span>
+        </div>
       </div>
-      <p className="text-gray-400 mb-8">
-        Multiply your output by 10. Powerful tools to scale your business faster than ever.
+      <p className="text-gray-400 mb-8 mt-3">
+        Generate 10 unique, high-converting Facebook posts from a single link
+        — each with a different angle to maximize reach and clicks.
       </p>
 
-      {/* stats overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      {/* ── 3 feature highlights ── */}
+      <div className="grid sm:grid-cols-3 gap-4 mb-8">
         {[
-          { icon: TrendingUp, label: "Growth Rate", value: "10x", color: "text-crux-400" },
-          { icon: Target, label: "Active Tools", value: "4", color: "text-accent-pink" },
-          { icon: Layers, label: "Sites Capacity", value: "50", color: "text-accent-green" },
-          { icon: Sparkles, label: "AI Powered", value: "100%", color: "text-accent-cyan" },
-        ].map((stat, i) => (
-          <div key={i} className="card border-gray-800/50 text-center">
-            <stat.icon size={18} className={`${stat.color} mx-auto mb-2`} />
-            <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
-            <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">{stat.label}</div>
+          { icon: Share2, title: "10 Unique Posts", desc: "10 different hooks & angles per link" },
+          { icon: Target, title: "High-Converting Copy", desc: "Optimized for clicks & engagement" },
+          { icon: BarChart3, title: "Ready to Post", desc: "Copy-paste directly into Facebook" },
+        ].map((f, i) => (
+          <div key={i} className="card border-gray-800/50 flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-crux-500/10 flex items-center justify-center text-crux-400 flex-shrink-0">
+              <f.icon size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-sm">{f.title}</h3>
+              <p className="text-xs text-gray-400">{f.desc}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* tool selector tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {TOOLS.map((t, i) => {
-          const c = COLOR_MAP[t.color];
-          const active = i === activeTool;
-          return (
-            <button
-              key={i}
-              onClick={() => setActiveTool(i)}
-              className={`p-4 rounded-xl border transition-all text-left ${
-                active
-                  ? `${c.bg} ${c.border} border shadow-lg ${c.glow}`
-                  : "bg-gray-900/40 border-gray-800/50 hover:border-gray-700"
-              }`}
-            >
-              <t.icon size={20} className={active ? c.text : "text-gray-500"} />
-              <div className={`text-sm font-bold mt-2 ${active ? "text-white" : "text-gray-400"}`}>
-                {t.title}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* active tool detail */}
-      <div className={`card ${colors.border} border bg-gradient-to-br from-gray-900/80 to-gray-900/40 relative overflow-hidden mb-6`}>
+      {/* ── generator form ── */}
+      <div className="card border-crux-500/20 bg-gradient-to-br from-crux-500/5 to-transparent mb-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-10" />
         <div className="relative z-10">
-          <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-crux-500/20 flex items-center justify-center">
+                <Sparkles size={16} className="text-crux-400" />
+              </div>
+              Generate 10 Facebook Posts
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4 mb-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`w-12 h-12 rounded-xl ${colors.bg} flex items-center justify-center`}>
-                  <tool.icon size={24} className={colors.text} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">{tool.title}</h2>
-                  <p className="text-sm text-gray-400">{tool.desc}</p>
-                </div>
-              </div>
+              <label className="block text-xs font-bold tracking-widest text-gray-400 uppercase mb-2">
+                Link Name
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. My Fitness eBook, Water Filter System, etc."
+                value={linkName}
+                onChange={(e) => setLinkName(e.target.value)}
+                className="input-field"
+              />
             </div>
-            <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl px-4 py-2 text-right">
-              <span className="text-[10px] uppercase tracking-widest text-gray-500">{tool.stats.label}</span>
-              <div className="text-lg font-bold text-white">
-                {tool.stats.value} <span className="text-gray-500 text-sm">/ {tool.stats.max}</span>
+            <div>
+              <label className="block text-xs font-bold tracking-widest text-gray-400 uppercase mb-2">
+                Promotional Link
+              </label>
+              <div className="relative">
+                <Link2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="https://example.com/product?ref=your-id"
+                  value={promoLink}
+                  onChange={(e) => setPromoLink(e.target.value)}
+                  className="input-field pl-10"
+                />
               </div>
             </div>
           </div>
 
-          {/* features list */}
-          <div className="grid sm:grid-cols-2 gap-3 mb-6">
-            {tool.features.map((f, i) => (
-              <div key={i} className="flex items-center gap-3 bg-gray-800/30 rounded-xl px-4 py-3">
-                <CheckCircle2 size={16} className={colors.text} />
-                <span className="text-sm text-gray-300">{f}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* action button */}
-          <button className="btn-primary flex items-center gap-2">
-            Launch {tool.title} <ArrowRight size={16} />
+          <button
+            onClick={handleGenerate}
+            className="btn-primary w-full text-sm tracking-widest uppercase flex items-center justify-center gap-2 py-4"
+          >
+            <Sparkles size={16} />
+            Generate 10 Intelligent Posts
           </button>
         </div>
       </div>
 
-      {/* quick access grid */}
-      <h3 className="text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-4">
-        All 10x Tools
-      </h3>
-      <div className="grid sm:grid-cols-2 gap-4">
-        {TOOLS.map((t, i) => {
-          const c = COLOR_MAP[t.color];
-          return (
+      {/* ── generated posts ── */}
+      {generated && (
+        <div className="space-y-4 mb-8 animate-fade-in">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-bold text-white">
+              Your 10 Posts
+              <span className="text-sm text-gray-400 font-normal ml-2">
+                for &ldquo;{linkName || "your product"}&rdquo;
+              </span>
+            </h2>
             <button
-              key={i}
-              onClick={() => setActiveTool(i)}
-              className="card border-gray-800/50 hover:border-crux-500/30 transition-all bg-gray-900/40 p-5 group text-left"
+              onClick={() => setGenerated(false)}
+              className="btn-secondary text-xs"
             >
-              <div className={`w-10 h-10 rounded-lg ${c.bg} flex items-center justify-center mb-4 ${c.text} group-hover:scale-110 transition-transform`}>
-                <t.icon size={20} />
-              </div>
-              <h3 className="font-bold mb-1 text-white">{t.title}</h3>
-              <p className="text-sm text-gray-400">{t.desc}</p>
+              Regenerate
             </button>
-          );
-        })}
+          </div>
+
+          {posts.map((post, idx) => (
+            <div
+              key={idx}
+              className="card border-gray-800/50 hover:border-crux-500/20 transition-all animate-slide-up"
+              style={{ animationDelay: `${idx * 60}ms` }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-[11px] font-black text-white">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-sm font-bold text-crux-300">
+                    {ANGLES[idx].label}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleCopy(post, idx)}
+                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all ${
+                    copiedIdx === idx
+                      ? "bg-accent-green/10 text-accent-green"
+                      : "bg-gray-800 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  {copiedIdx === idx ? (
+                    <>
+                      <CheckCircle2 size={12} /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} /> Copy
+                    </>
+                  )}
+                </button>
+              </div>
+              <pre className="text-sm text-gray-300 whitespace-pre-wrap font-sans leading-relaxed bg-gray-800/30 rounded-xl p-4">
+                {post}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── pro tips ── */}
+      <div className="card border-gray-800/50 mb-6">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-crux-500/10 flex items-center justify-center">
+            <Info size={16} className="text-crux-400" />
+          </div>
+          <h2 className="text-xl font-bold text-white">
+            Pro Tips: How to Go Viral on Facebook
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* where to share */}
+          <div>
+            <h3 className="text-xs font-bold tracking-[0.2em] text-crux-400 uppercase mb-4 flex items-center gap-2">
+              <Users size={14} />
+              Where to Share
+            </h3>
+            <div className="space-y-4">
+              {WHERE_TO_SHARE.map((tip, i) => (
+                <div key={i} className="border-l-2 border-gray-700/50 pl-4">
+                  <h4 className="font-bold text-white text-sm">{tip.title}</h4>
+                  <p className="text-sm text-gray-400 mt-0.5">{tip.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* when & how to post */}
+          <div>
+            <h3 className="text-xs font-bold tracking-[0.2em] text-accent-pink uppercase mb-4 flex items-center gap-2">
+              <Clock size={14} />
+              When & How to Post
+            </h3>
+            <div className="space-y-4">
+              {WHEN_HOW.map((tip, i) => (
+                <div key={i} className="border-l-2 border-gray-700/50 pl-4">
+                  <h4 className="font-bold text-white text-sm">{tip.title}</h4>
+                  <p className="text-sm text-gray-400 mt-0.5">{tip.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── golden rule banner ── */}
+      <div className="card border-crux-500/30 bg-gradient-to-br from-crux-500/10 to-accent-pink/5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-crux-500/20 flex items-center justify-center flex-shrink-0">
+            <MessageSquare size={24} className="text-crux-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold tracking-[0.15em] uppercase text-white mb-2">
+              The Golden Rule of Facebook Groups
+            </h3>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              Contribute value to the group FIRST. Comment on other people&apos;s posts, answer questions, and be helpful for a few days before sharing your own link posts. Group admins are more likely to approve your posts, and members are more likely to engage with someone they recognize. A warm audience converts{" "}
+              <span className="gradient-text font-bold italic">5–10x better</span>{" "}
+              than cold posting.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
