@@ -40,12 +40,13 @@ export default function InfinitePage() {
 
         await updateWebsite(website.id, user.id, {
           sectionContents: translatedContent,
+          language: targetLang,
         });
 
         setWebsites((prev) =>
           prev.map((s) =>
             s.id === website.id
-              ? { ...s, sectionContents: translatedContent }
+              ? { ...s, sectionContents: translatedContent, language: targetLang }
               : s
           )
         );
