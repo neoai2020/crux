@@ -3,6 +3,8 @@ import { canGenerateImage, recordImageGeneration, getRemainingImageGenerations }
 
 export const maxDuration = 60;
 
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
+
 export async function POST(request: Request) {
   try {
     const { prompt, userId } = await request.json();
@@ -17,44 +19,74 @@ export async function POST(request: Request) {
     }
 
     const imagePrompt = `${prompt}, professional high quality photo, clean modern`;
-    const seed = Math.floor(Math.random() * 999999);
 
-    const urls = [
-      `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
-      `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
-    ];
+    // Try RapidAPI (Google Nano) first, then Pollinations as fallback
+    let dataUrl: string | null = null;
 
-    let imageBuffer: ArrayBuffer | null = null;
-    let contentType = "image/jpeg";
+    // --- Method 1: RapidAPI Google Nano ---
+    try {
+      const body = new URLSearchParams({
+        prompt: imagePrompt,
+        negative_prompt: "blurry, bad quality, distorted, ugly, watermark, text",
+        width: "640",
+        height: "480",
+      });
 
-    for (const url of urls) {
-      try {
-        const response = await fetch(url, {
-          redirect: "follow",
-          signal: AbortSignal.timeout(50000),
-        });
-        if (response.ok) {
-          const ct = response.headers.get("content-type") || "";
-          if (ct.startsWith("image/")) {
-            const buf = await response.arrayBuffer();
-            if (buf.byteLength > 1000) {
-              imageBuffer = buf;
-              contentType = ct;
-              break;
+      const rapidRes = await fetch("https://google-nano-banana4.p.rapidapi.com/index.php", {
+        method: "POST",
+        headers: {
+          "x-rapidapi-key": RAPIDAPI_KEY,
+          "x-rapidapi-host": "google-nano-banana4.p.rapidapi.com",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: body.toString(),
+        signal: AbortSignal.timeout(50000),
+      });
+
+      if (rapidRes.ok) {
+        const json = await rapidRes.json();
+        if (json.status === "success" && json.image_base64) {
+          dataUrl = `data:image/png;base64,${json.image_base64}`;
+        }
+      }
+    } catch (e) {
+      console.error("RapidAPI image generation failed:", e);
+    }
+
+    // --- Method 2: Pollinations fallback ---
+    if (!dataUrl) {
+      const seed = Math.floor(Math.random() * 999999);
+      const urls = [
+        `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
+      ];
+
+      for (const url of urls) {
+        try {
+          const response = await fetch(url, {
+            redirect: "follow",
+            signal: AbortSignal.timeout(50000),
+          });
+          if (response.ok) {
+            const ct = response.headers.get("content-type") || "";
+            if (ct.startsWith("image/")) {
+              const buf = await response.arrayBuffer();
+              if (buf.byteLength > 1000) {
+                const base64 = Buffer.from(buf).toString("base64");
+                dataUrl = `data:${ct};base64,${base64}`;
+                break;
+              }
             }
           }
+        } catch (e) {
+          console.error("Pollinations fallback failed:", e);
         }
-      } catch (e) {
-        console.error("Image fetch attempt failed:", e);
       }
     }
 
-    if (!imageBuffer) {
+    if (!dataUrl) {
       return NextResponse.json({ error: "Image generation timed out. Please try again." }, { status: 502 });
     }
-
-    const base64 = Buffer.from(imageBuffer).toString("base64");
-    const dataUrl = `data:${contentType};base64,${base64}`;
 
     await recordImageGeneration(userId);
     const remaining = await getRemainingImageGenerations(userId);
