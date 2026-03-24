@@ -3,13 +3,15 @@ import { Mail, BookOpen, MessageCircle, ChevronRight } from "lucide-react";
 
 export default function SupportPage() {
   return (
-    <div className="max-w-3xl mx-auto animate-fade-in">
-      <h1 className="text-3xl font-black mb-2">
-        <span className="gradient-text">Support</span>
-      </h1>
-      <p className="text-gray-400 mb-8">
-        Need help? Our team is here to assist you.
-      </p>
+    <div className="max-w-3xl mx-auto animate-fade-in flex flex-col items-center">
+      <div className="w-full text-center mb-8">
+        <h1 className="text-3xl font-black mb-2">
+          <span className="gradient-text">Support</span>
+        </h1>
+        <p className="text-gray-400">
+          Need help? Our team is here to assist you.
+        </p>
+      </div>
 
       <div className="grid gap-5">
         <div className="card hover:border-crux-500/30 transition-all">

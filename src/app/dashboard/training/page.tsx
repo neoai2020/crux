@@ -149,15 +149,15 @@ export default function TrainingPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in pb-20">
-      <div className="flex items-center gap-3 mb-2">
-        <h1 className="text-3xl font-black">
+    <div className="max-w-5xl mx-auto animate-fade-in pb-20 flex flex-col items-center">
+      <div className="w-full text-center mb-8">
+        <h1 className="text-3xl font-black mb-2">
           <span className="gradient-text uppercase tracking-tight">Training Hub</span>
         </h1>
+        <p className="text-gray-400 italic">
+          Master the art of online business with our expert-led modules. From first site to five-figure months.
+        </p>
       </div>
-      <p className="text-gray-400 mb-8 border-l-2 border-crux-500 pl-4 py-1 italic">
-        Master the art of online business with our expert-led modules. From first site to five-figure months.
-      </p>
 
       {/* Progress Overview */}
       <div className="card mb-10 overflow-hidden relative border-crux-500/20 bg-gray-900/60">

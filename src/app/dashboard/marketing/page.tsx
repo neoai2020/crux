@@ -157,14 +157,16 @@ export default function MarketingPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in">
-      <h1 className="text-2xl font-black mb-1">
-        <span className="gradient-text">Traffic Magnet</span>
-      </h1>
-      <p className="text-gray-400 mb-8">Generate ready-to-post marketing messages for your websites.</p>
+    <div className="max-w-5xl mx-auto animate-fade-in flex flex-col items-center">
+      <div className="w-full text-center mb-8">
+        <h1 className="text-2xl font-black mb-1">
+          <span className="gradient-text">Traffic Magnet</span>
+        </h1>
+        <p className="text-gray-400">Generate ready-to-post marketing messages for your websites.</p>
+      </div>
 
       {!generated ? (
-        <div className="card max-w-2xl space-y-5">
+        <div className="card max-w-2xl w-full space-y-5">
           {/* Website selector */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">Select a Website *</label>
