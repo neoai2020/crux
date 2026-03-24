@@ -30,6 +30,64 @@ interface DFYSite {
 
 const SITE_TYPES = ["E-commerce", "Service", "Portfolio", "Landing Page", "Blog", "Education", "Health/Medical", "Personal Branding", "Corporate"] as const;
 
+// Real image pools per type for professional-looking cards
+const TYPE_IMAGES: Record<string, string[]> = {
+  "E-commerce": [
+    "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
+    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&q=80",
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+  ],
+  "Service": [
+    "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
+    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80",
+    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
+  ],
+  "Portfolio": [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
+    "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&q=80",
+    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&q=80",
+  ],
+  "Landing Page": [
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80",
+    "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80",
+    "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80",
+  ],
+  "Blog": [
+    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80",
+    "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80",
+    "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=600&q=80",
+    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=80",
+  ],
+  "Education": [
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80",
+    "https://images.unsplash.com/photo-1523050335456-c38447d0d960?w=600&q=80",
+    "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80",
+    "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80",
+  ],
+  "Health/Medical": [
+    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&q=80",
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80",
+    "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=600&q=80",
+    "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=600&q=80",
+  ],
+  "Personal Branding": [
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&q=80",
+    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80",
+    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
+  ],
+  "Corporate": [
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
+    "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=600&q=80",
+    "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&q=80",
+  ],
+};
+
 // Generate 180 real-feeling sites (20 per type)
 const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
   const type = SITE_TYPES[i % SITE_TYPES.length];
@@ -40,6 +98,7 @@ const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
   ];
   const prefixes = ["Elite", "Pro", "Smart", "Next", "Ultra", "Max", "Cloud", "Fusion", "Alpha"];
   const name = `${prefixes[i % prefixes.length]} ${names[i % names.length]} ${type.split(" ")[0]} ${id}`;
+  const imgs = TYPE_IMAGES[type];
   
   return {
     id,
@@ -47,7 +106,7 @@ const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
     niche: `${type} Solutions`,
     description: `A professionally generated ${type} site with 200 high-quality SEO-optimized posts and premium design. Perfect for scaling your business instantly.`,
     type,
-    image: `https://images.unsplash.com/photo-${1500000000000 + (i * 123456) % 1000000000000}?w=800&q=80`,
+    image: imgs[i % imgs.length],
     postsCount: 200
   };
 });
