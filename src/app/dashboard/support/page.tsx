@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Mail, BookOpen, ExternalLink, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import FaqSection from "@/components/FaqSection";
 
 export default function SupportPage() {
   const { user } = useAuth();
@@ -139,6 +140,14 @@ export default function SupportPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="w-full mt-10">
+        <h2 className="text-xl font-black mb-5">
+          <span className="gradient-text uppercase tracking-tight">Frequently Asked Questions</span>
+        </h2>
+        <FaqSection compact maxCategories={4} />
       </div>
     </div>
   );
