@@ -290,8 +290,6 @@ export default function AutomationPage() {
   );
   const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
 
-  if (!hasAccess) return <PremiumGate feature="automation" />;
-
   const filteredSources = useMemo(() => {
     let list = ALL_SOURCES;
     if (activeNiche !== "All") list = list.filter((s) => s.niche === activeNiche);
@@ -307,6 +305,16 @@ export default function AutomationPage() {
     return list;
   }, [activeNiche, search]);
 
+  const nicheCounts = useMemo(() => {
+    const map: Record<string, number> = { All: ALL_SOURCES.length };
+    ALL_SOURCES.forEach((s) => {
+      map[s.niche] = (map[s.niche] || 0) + 1;
+    });
+    return map;
+  }, []);
+
+  if (!hasAccess) return <PremiumGate feature="automation" />;
+
   const totalSources = ALL_SOURCES.length;
   const completedCount = completedIds.size;
   const pct = Math.round((completedCount / totalSources) * 100);
@@ -319,14 +327,6 @@ export default function AutomationPage() {
       return next;
     });
   };
-
-  const nicheCounts = useMemo(() => {
-    const map: Record<string, number> = { All: ALL_SOURCES.length };
-    ALL_SOURCES.forEach((s) => {
-      map[s.niche] = (map[s.niche] || 0) + 1;
-    });
-    return map;
-  }, []);
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
