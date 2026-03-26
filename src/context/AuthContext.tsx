@@ -29,10 +29,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function extractFeatures(su: SupabaseUser): string[] {
+  const meta = su.user_metadata;
+  if (meta && Array.isArray(meta.features)) {
+    return meta.features;
+  }
+  return [];
+}
+
 function toAppUser(
   su: SupabaseUser,
   profile?: Record<string, string>,
-  features?: string[]
+  featureOverride?: string[]
 ): User {
   return {
     id: su.id,
@@ -43,7 +51,7 @@ function toAppUser(
       "User",
     email: su.email || "",
     plan: profile?.plan || "Starter",
-    features: features || [],
+    features: featureOverride ?? extractFeatures(su),
     createdAt: profile?.created_at || su.created_at,
   };
 }
@@ -71,68 +79,33 @@ async function fetchProfile(userId: string) {
   }
 }
 
-const FEATURES_CACHE_KEY = "crux_features";
-
-function getCachedFeatures(userId: string): string[] {
+/**
+ * One-time background sync: ensures features stored in the feature_access DB
+ * table are written to user_metadata. After this runs once, the user's auth
+ * session carries the features permanently — no further API calls needed.
+ */
+async function syncFeaturesOnce(userId: string, currentFeatures: string[]): Promise<string[]> {
   try {
-    const raw = localStorage.getItem(FEATURES_CACHE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (parsed.userId === userId && Array.isArray(parsed.features)) {
-      return parsed.features;
-    }
-    return [];
+    const res = await fetch(`/api/user-features?userId=${userId}`);
+    if (!res.ok) return currentFeatures;
+    const data = await res.json();
+    const dbFeatures: string[] = data.features || [];
+    return [...new Set([...currentFeatures, ...dbFeatures])];
   } catch {
-    return [];
-  }
-}
-
-function setCachedFeatures(userId: string, features: string[]) {
-  try {
-    localStorage.setItem(
-      FEATURES_CACHE_KEY,
-      JSON.stringify({ userId, features })
-    );
-  } catch {
-    // localStorage unavailable
-  }
-}
-
-function clearCachedFeatures() {
-  try {
-    localStorage.removeItem(FEATURES_CACHE_KEY);
-  } catch {}
-}
-
-async function fetchFeatures(userId: string): Promise<string[]> {
-  try {
-    const query = async () => {
-      const res = await fetch(`/api/user-features?userId=${userId}`);
-      if (!res.ok) return [];
-      const data = await res.json();
-      return (data.features as string[]) || [];
-    };
-    const features = await withTimeout(query(), 5000, []);
-    if (features.length > 0) {
-      setCachedFeatures(userId, features);
-    }
-    return features;
-  } catch {
-    return [];
+    return currentFeatures;
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [synced, setSynced] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
     const timeout = setTimeout(() => {
-      if (mounted && loading) {
-        setLoading(false);
-      }
+      if (mounted && loading) setLoading(false);
     }, 6000);
 
     supabase.auth
@@ -140,16 +113,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(async ({ data: { session } }) => {
         if (!mounted) return;
         if (session?.user) {
-          const cached = getCachedFeatures(session.user.id);
-          setUser(toAppUser(session.user, undefined, cached));
+          const metaFeatures = extractFeatures(session.user);
+          setUser(toAppUser(session.user, undefined, metaFeatures));
 
-          const [profile, freshFeatures] = await Promise.all([
+          const [profile, merged] = await Promise.all([
             fetchProfile(session.user.id),
-            fetchFeatures(session.user.id),
+            synced ? Promise.resolve(metaFeatures) : syncFeaturesOnce(session.user.id, metaFeatures),
           ]);
+
           if (mounted) {
-            const merged = [...new Set([...cached, ...freshFeatures])];
-            if (merged.length > 0) setCachedFeatures(session.user.id, merged);
+            setSynced(true);
             setUser(toAppUser(session.user, profile || undefined, merged));
           }
         }
@@ -165,20 +138,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
-        const cached = getCachedFeatures(session.user.id);
-        setUser(toAppUser(session.user, undefined, cached));
+        const metaFeatures = extractFeatures(session.user);
+        setUser(toAppUser(session.user, undefined, metaFeatures));
 
-        const [profile, freshFeatures] = await Promise.all([
-          fetchProfile(session.user.id),
-          fetchFeatures(session.user.id),
-        ]);
-        if (mounted) {
-          const merged = [...new Set([...cached, ...freshFeatures])];
-          if (merged.length > 0) setCachedFeatures(session.user.id, merged);
-          setUser(toAppUser(session.user, profile || undefined, merged));
-        }
+        const profile = await fetchProfile(session.user.id);
+        if (mounted) setUser(toAppUser(session.user, profile || undefined, metaFeatures));
       } else {
-        clearCachedFeatures();
         if (mounted) setUser(null);
       }
     });
@@ -197,16 +162,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       if (error || !data.user) return false;
-      const cached = getCachedFeatures(data.user.id);
-      setUser(toAppUser(data.user, undefined, cached));
+
+      const metaFeatures = extractFeatures(data.user);
+      setUser(toAppUser(data.user, undefined, metaFeatures));
+
       Promise.all([
         fetchProfile(data.user.id),
-        fetchFeatures(data.user.id),
-      ]).then(([profile, freshFeatures]) => {
-        const merged = [...new Set([...cached, ...freshFeatures])];
-        if (merged.length > 0) setCachedFeatures(data.user.id, merged);
+        syncFeaturesOnce(data.user.id, metaFeatures),
+      ]).then(([profile, merged]) => {
+        setSynced(true);
         setUser(toAppUser(data.user, profile || undefined, merged));
       }).catch(() => {});
+
       return true;
     } catch {
       return false;
@@ -238,8 +205,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-    clearCachedFeatures();
     setUser(null);
+    setSynced(false);
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {

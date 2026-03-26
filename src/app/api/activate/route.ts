@@ -44,22 +44,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error: upsertErr } = await supabaseAdmin
+    // Write to feature_access table for record keeping
+    await supabaseAdmin
       .from("feature_access")
       .upsert(
         { user_id: match.id, feature },
         { onConflict: "user_id,feature" }
       );
 
-    if (upsertErr) {
-      console.error("Feature access upsert error:", upsertErr);
+    // Read current features from user_metadata, add the new one, deduplicate
+    const existingFeatures: string[] =
+      Array.isArray(match.user_metadata?.features)
+        ? match.user_metadata.features
+        : [];
+
+    const updatedFeatures = [...new Set([...existingFeatures, feature])];
+
+    // Persist features directly on the auth user's metadata
+    const { error: updateErr } = await supabaseAdmin.auth.admin.updateUserById(
+      match.id,
+      { user_metadata: { ...match.user_metadata, features: updatedFeatures } }
+    );
+
+    if (updateErr) {
+      console.error("Failed to update user_metadata:", updateErr);
       return NextResponse.json(
         { error: "Failed to grant access. Please try again." },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, features: updatedFeatures });
   } catch (err) {
     console.error("Activate error:", err);
     return NextResponse.json(
