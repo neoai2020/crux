@@ -73,7 +73,7 @@ export default function MarketingPage() {
     );
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (isRegenerate = false) => {
     if (!selectedSite || selectedPlatforms.length === 0 || !user) return;
     if (remaining !== null && remaining <= 0) {
       setError("You've reached your daily limit of 15 generations. Resets tomorrow!");
@@ -82,6 +82,7 @@ export default function MarketingPage() {
 
     setGenerating(true);
     setError("");
+    if (isRegenerate) setMessages([]);
 
     try {
       const res = await fetch("/api/generate-marketing", {
@@ -111,7 +112,7 @@ export default function MarketingPage() {
       }
 
       const data = await res.json();
-      setMessages(data.messages);
+      setMessages(data.messages || []);
       if (data.remaining !== undefined) setRemaining(data.remaining);
       setGenerated(true);
     } catch {
@@ -120,7 +121,7 @@ export default function MarketingPage() {
     setGenerating(false);
   };
 
-  const handleRegenerate = async () => {
+  const handleBackToSettings = () => {
     setGenerated(false);
     setMessages([]);
   };
@@ -228,7 +229,7 @@ export default function MarketingPage() {
               </div>
 
               <button
-                onClick={handleGenerate}
+                onClick={() => handleGenerate(false)}
                 disabled={selectedPlatforms.length === 0 || generating || (remaining !== null && remaining <= 0)}
                 className="btn-primary w-full text-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
@@ -264,7 +265,7 @@ export default function MarketingPage() {
                 <span className="text-xs text-gray-500">{remaining}/15 left today</span>
               )}
               <button
-                onClick={handleGenerate}
+                onClick={() => handleGenerate(true)}
                 disabled={generating || (remaining !== null && remaining <= 0)}
                 className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50"
               >
@@ -277,11 +278,18 @@ export default function MarketingPage() {
                   "🔄 Regenerate"
                 )}
               </button>
-              <button onClick={handleRegenerate} className="btn-secondary text-sm">
+              <button onClick={handleBackToSettings} className="btn-secondary text-sm">
                 ← Edit Settings
               </button>
             </div>
           </div>
+
+          {generating && messages.length === 0 && (
+            <div className="card text-center py-16">
+              <div className="w-10 h-10 border-3 border-crux-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-400 font-medium">Generating fresh messages...</p>
+            </div>
+          )}
 
           {messages.map((msg, idx) => (
             <div key={idx} className="card animate-slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
