@@ -4,6 +4,34 @@ interface TestimonialItem {
   quote: string;
   name: string;
   role: string;
+  avatar?: string;
+}
+
+function TestimonialAvatar({ item, tone, size }: { item: TestimonialItem; tone: SectionProps["tone"]; size: number }) {
+  if (item.avatar) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={item.avatar} alt={item.name} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", display: "block" }} />
+    );
+  }
+  return (
+    <div
+      className="flex items-center justify-center shrink-0"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: tone.gradient,
+        color: "#fff",
+        fontFamily: tone.headingFont,
+        fontWeight: 700,
+        fontSize: size * 0.38,
+        boxShadow: `0 4px 12px ${tone.primary}30`,
+      }}
+    >
+      {item.name.charAt(0)}
+    </div>
+  );
 }
 
 export function TestimonialsCards({ tone, content }: SectionProps) {
@@ -77,22 +105,7 @@ export function TestimonialsCards({ tone, content }: SectionProps) {
                 &ldquo;{item.quote}&rdquo;
               </p>
               <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center justify-center shrink-0"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "50%",
-                    background: tone.gradient,
-                    color: "#fff",
-                    fontFamily: tone.headingFont,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    boxShadow: `0 4px 12px ${tone.primary}30`,
-                  }}
-                >
-                  {item.name.charAt(0)}
-                </div>
+                <TestimonialAvatar item={item} tone={tone} size={42} />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 15, color: tone.text, fontFamily: tone.headingFont }}>
                     {item.name}
@@ -169,22 +182,7 @@ export function TestimonialsSpotlight({ tone, content }: SectionProps) {
           <div
             className="flex items-center justify-center gap-3"
           >
-            <div
-              className="flex items-center justify-center shrink-0"
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                background: tone.gradient,
-                color: "#fff",
-                fontFamily: tone.headingFont,
-                fontWeight: 700,
-                fontSize: 18,
-                boxShadow: `0 4px 12px ${tone.primary}30`,
-              }}
-            >
-              {item.name.charAt(0)}
-            </div>
+            <TestimonialAvatar item={item} tone={tone} size={48} />
             <div style={{ textAlign: "left" }}>
               <div style={{ fontWeight: 700, fontSize: 18, color: tone.text, fontFamily: tone.headingFont }}>
                 {item.name}
@@ -244,11 +242,16 @@ export function TestimonialsMinimal({ tone, content }: SectionProps) {
               >
                 &ldquo;{item.quote}&rdquo;
               </p>
-              <div style={{ fontWeight: 700, fontSize: 14, color: tone.text, fontFamily: tone.headingFont }}>
-                {item.name}
-              </div>
-              <div style={{ color: tone.muted, fontSize: 12, marginTop: 2 }}>
-                {item.role}
+              <div className="flex items-center gap-2 mt-2">
+                <TestimonialAvatar item={item} tone={tone} size={28} />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: tone.text, fontFamily: tone.headingFont, lineHeight: 1.2 }}>
+                    {item.name}
+                  </div>
+                  <div style={{ color: tone.muted, fontSize: 12 }}>
+                    {item.role}
+                  </div>
+                </div>
               </div>
             </div>
           ))}

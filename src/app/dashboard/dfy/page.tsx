@@ -6,6 +6,7 @@ import { getWebsitesForUser, SavedWebsite } from "@/lib/websites";
 import { BlueprintSection } from "@/data/blueprints";
 import { SectionType, generateDefaultContent } from "@/data/sections";
 import { getToneById, TONES, ToneDefinition } from "@/data/tones";
+import { getFeatureImages, getTeamPhotos, getContentImages, getGalleryImages } from "@/data/images";
 import WebsitePreview from "@/components/WebsitePreview";
 import {
   CheckCircle2,
@@ -476,6 +477,7 @@ function buildRichContents(
   sections: BlueprintSection[]
 ): Record<string, Record<string, unknown>> {
   const result: Record<string, Record<string, unknown>> = {};
+  const seed = site.id * 17 + site.name.length;
 
   sections.forEach((sec, idx) => {
     const key = `${sec.type}-${idx}`;
@@ -485,6 +487,7 @@ function buildRichContents(
       base.headline = site.name;
       base.subheadline = site.description;
       base.heroImage = site.heroImage;
+      base.socialProof = `Trusted by ${(seed % 50 + 5) * 1000}+ customers`;
     }
 
     if (sec.type === "about") {
@@ -492,12 +495,37 @@ function buildRichContents(
     }
 
     if (sec.type === "features") {
-      base.items = FEATURE_SETS[site.featureSetIdx];
+      const featureImgs = getFeatureImages(6, seed);
+      const featureSet = FEATURE_SETS[site.featureSetIdx];
+      base.items = featureSet.map((f, fi) => ({ ...f, image: featureImgs[fi % featureImgs.length] }));
       base.subtitle = `Everything you need from ${site.name}`;
     }
 
     if (sec.type === "testimonials") {
-      base.items = TESTIMONIAL_SETS[site.testimonialSetIdx];
+      const avatars = getTeamPhotos(3, seed + 200);
+      const testimonialSet = TESTIMONIAL_SETS[site.testimonialSetIdx];
+      base.items = testimonialSet.map((t, ti) => ({ ...t, avatar: avatars[ti % avatars.length] }));
+    }
+
+    if (sec.type === "contentGrid") {
+      const contentImgs = getContentImages(6, seed + 50);
+      const items = base.items as { title: string; description: string; tag: string; image?: string }[];
+      if (items) {
+        base.items = items.map((item, ci) => ({ ...item, image: item.image || contentImgs[ci % contentImgs.length] }));
+      }
+    }
+
+    if (sec.type === "gallery") {
+      const galleryImgs = getGalleryImages(6, seed + 100);
+      galleryImgs.forEach((url, gi) => { base[`image${gi}`] = base[`image${gi}`] || url; });
+    }
+
+    if (sec.type === "team") {
+      const teamPhotos = getTeamPhotos(4, seed + 150);
+      const members = base.members as { name: string; role: string; initials: string; photo?: string }[];
+      if (members) {
+        base.members = members.map((m, mi) => ({ ...m, photo: m.photo || teamPhotos[mi % teamPhotos.length] }));
+      }
     }
 
     result[key] = base;

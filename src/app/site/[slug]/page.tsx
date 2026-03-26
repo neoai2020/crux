@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
+import { SectionType, generateDefaultContent } from "@/data/sections";
 import SectionRenderer from "@/components/SectionRenderer";
 
 function toCamel(row: any): SavedWebsite {
@@ -90,16 +91,22 @@ export default function SitePage() {
         }
       `}} />
       <div className="min-h-screen">
-        {(website.sections || []).map((section, idx) => (
-          <SectionRenderer
-            key={`${section.type}-${section.variant}-${idx}`}
-            sectionType={section.type}
-            variant={section.variant}
-            tone={tone}
-            content={((website.sectionContents || {})[`${section.type}-${idx}`] || {}) as any}
-            businessName={website.businessName}
-          />
-        ))}
+        {(website.sections || []).map((section, idx) => {
+          const stored = (website.sectionContents || {})[`${section.type}-${idx}`];
+          const content = (stored && Object.keys(stored).length > 0)
+            ? stored
+            : generateDefaultContent(section.type as SectionType, website.businessName, website.description, website.category);
+          return (
+            <SectionRenderer
+              key={`${section.type}-${section.variant}-${idx}`}
+              sectionType={section.type}
+              variant={section.variant}
+              tone={tone}
+              content={content as Record<string, unknown>}
+              businessName={website.businessName}
+            />
+          );
+        })}
       </div>
     </div>
   );

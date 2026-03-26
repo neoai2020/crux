@@ -1,4 +1,5 @@
 import { ToneDefinition } from "./tones";
+import { getHeroImage, getAboutImage, getGalleryImages, getContentImages, getTeamPhotos, getFeatureImages } from "./images";
 
 export type SectionType =
   | "navbar"
@@ -241,6 +242,12 @@ function label(category: string, section: string, fallback: string): string {
   return CATEGORY_LABELS[category]?.[section] || fallback;
 }
 
+function nameHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 export function generateDefaultContent(
   sectionType: SectionType,
   businessName: string,
@@ -248,6 +255,7 @@ export function generateDefaultContent(
   category: string
 ): Record<string, unknown> {
   const desc = description || `Premium ${category} solutions for your needs`;
+  const seed = nameHash(businessName + category);
   switch (sectionType) {
     case "navbar":
       return { businessName, navLinks: ["Home", "Features", "About", "Pricing", "Contact"], ctaText: "Get Started" };
@@ -258,35 +266,41 @@ export function generateDefaultContent(
         ctaText: "Get Started Today",
         secondaryCtaText: "Learn More",
         socialProof: "Trusted by 10,000+ customers",
+        heroImage: getHeroImage(category, seed),
       };
-    case "features":
+    case "features": {
+      const featImgs = getFeatureImages(6, seed);
       return {
         sectionTitle: label(category, "features", "Features"),
         subtitle: `Everything you need from ${businessName}`,
         items: [
-          { icon: "⚡", title: "Lightning Fast", description: "Optimized for speed and performance at every level." },
-          { icon: "🛡️", title: "Secure & Reliable", description: "Enterprise-grade security to protect what matters." },
-          { icon: "🎨", title: "Beautiful Design", description: "Stunning visuals that capture attention instantly." },
-          { icon: "📱", title: "Mobile Ready", description: "Perfect experience on every screen size." },
-          { icon: "🔧", title: "Easy Setup", description: "Get started in minutes with zero complexity." },
-          { icon: "📈", title: "Growth Focused", description: "Built to scale with your ambitions." },
+          { icon: "⚡", title: "Lightning Fast", description: "Optimized for speed and performance at every level.", image: featImgs[0] },
+          { icon: "🛡️", title: "Secure & Reliable", description: "Enterprise-grade security to protect what matters.", image: featImgs[1] },
+          { icon: "🎨", title: "Beautiful Design", description: "Stunning visuals that capture attention instantly.", image: featImgs[2] },
+          { icon: "📱", title: "Mobile Ready", description: "Perfect experience on every screen size.", image: featImgs[3] },
+          { icon: "🔧", title: "Easy Setup", description: "Get started in minutes with zero complexity.", image: featImgs[4] },
+          { icon: "📈", title: "Growth Focused", description: "Built to scale with your ambitions.", image: featImgs[5] },
         ],
       };
+    }
     case "about":
       return {
         heading: `About ${businessName}`,
         text: `${businessName} was founded with a simple mission: to deliver exceptional ${category} solutions that make a real difference. We combine innovation with reliability to help our clients succeed. Our team brings years of experience and a passion for excellence to everything we do.`,
         highlight: "Trusted by thousands of satisfied customers worldwide.",
+        aboutImage: getAboutImage(seed),
       };
-    case "testimonials":
+    case "testimonials": {
+      const avatars = getTeamPhotos(3, seed + 100);
       return {
         sectionTitle: "What Our Customers Say",
         items: [
-          { quote: `${businessName} completely transformed our business. The results exceeded all expectations.`, name: "Sarah Mitchell", role: "CEO, TechVentures" },
-          { quote: "Outstanding quality and service. I couldn't recommend them more highly to anyone.", name: "James Cooper", role: "Founder, GrowthLab" },
-          { quote: "The best decision we made this year. Professional, fast, and incredibly effective.", name: "Emily Zhang", role: "Director, BrightPath" },
+          { quote: `${businessName} completely transformed our business. The results exceeded all expectations.`, name: "Sarah Mitchell", role: "CEO, TechVentures", avatar: avatars[0] },
+          { quote: "Outstanding quality and service. I couldn't recommend them more highly to anyone.", name: "James Cooper", role: "Founder, GrowthLab", avatar: avatars[1] },
+          { quote: "The best decision we made this year. Professional, fast, and incredibly effective.", name: "Emily Zhang", role: "Director, BrightPath", avatar: avatars[2] },
         ],
       };
+    }
     case "cta":
       return {
         headline: "Ready to Get Started?",
@@ -327,12 +341,16 @@ export function generateDefaultContent(
         address: "123 Business Ave, Suite 100",
         buttonText: "Send Message",
       };
-    case "gallery":
-      return {
+    case "gallery": {
+      const galleryImgs = getGalleryImages(6, seed);
+      const galleryContent: Record<string, unknown> = {
         sectionTitle: label(category, "contentGrid", "Our Work"),
         subtitle: "A showcase of what we do best",
         itemCount: 6,
       };
+      galleryImgs.forEach((url, i) => { galleryContent[`image${i}`] = url; });
+      return galleryContent;
+    }
     case "stats":
       return {
         items: [
@@ -352,30 +370,34 @@ export function generateDefaultContent(
           { number: "03", title: "Launch", description: "Go live and start seeing results immediately." },
         ],
       };
-    case "contentGrid":
+    case "contentGrid": {
+      const contentImgs = getContentImages(6, seed);
       return {
         sectionTitle: label(category, "contentGrid", "Featured"),
         subtitle: `Explore what ${businessName} has to offer`,
         items: [
-          { title: "Getting Started Guide", description: "Everything you need to know to hit the ground running.", tag: "Guide" },
-          { title: "Best Practices", description: "Proven strategies from our most successful users.", tag: "Tips" },
-          { title: "Success Story", description: "How one customer 10x'd their results in 90 days.", tag: "Case Study" },
-          { title: "Product Update", description: "Exciting new features just launched this month.", tag: "News" },
-          { title: "Expert Interview", description: "Industry leaders share their insights and predictions.", tag: "Interview" },
-          { title: "Deep Dive Tutorial", description: "Master advanced techniques with this step-by-step guide.", tag: "Tutorial" },
+          { title: "Getting Started Guide", description: "Everything you need to know to hit the ground running.", tag: "Guide", image: contentImgs[0] },
+          { title: "Best Practices", description: "Proven strategies from our most successful users.", tag: "Tips", image: contentImgs[1] },
+          { title: "Success Story", description: "How one customer 10x'd their results in 90 days.", tag: "Case Study", image: contentImgs[2] },
+          { title: "Product Update", description: "Exciting new features just launched this month.", tag: "News", image: contentImgs[3] },
+          { title: "Expert Interview", description: "Industry leaders share their insights and predictions.", tag: "Interview", image: contentImgs[4] },
+          { title: "Deep Dive Tutorial", description: "Master advanced techniques with this step-by-step guide.", tag: "Tutorial", image: contentImgs[5] },
         ],
       };
-    case "team":
+    }
+    case "team": {
+      const teamPhotos = getTeamPhotos(4, seed);
       return {
         sectionTitle: "Meet the Team",
         subtitle: `The people behind ${businessName}`,
         members: [
-          { name: "Alex Johnson", role: "CEO & Founder", initials: "AJ" },
-          { name: "Maria Garcia", role: "Head of Design", initials: "MG" },
-          { name: "David Kim", role: "Lead Developer", initials: "DK" },
-          { name: "Sarah Thompson", role: "Marketing Director", initials: "ST" },
+          { name: "Alex Johnson", role: "CEO & Founder", initials: "AJ", photo: teamPhotos[0] },
+          { name: "Maria Garcia", role: "Head of Design", initials: "MG", photo: teamPhotos[1] },
+          { name: "David Kim", role: "Lead Developer", initials: "DK", photo: teamPhotos[2] },
+          { name: "Sarah Thompson", role: "Marketing Director", initials: "ST", photo: teamPhotos[3] },
         ],
       };
+    }
     case "logoBar":
       return {
         title: "Trusted by Industry Leaders",

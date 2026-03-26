@@ -4,6 +4,7 @@ interface FeatureItem {
   icon: string;
   title: string;
   description: string;
+  image?: string;
 }
 
 export function FeaturesIconGrid({ tone, content }: SectionProps) {
@@ -158,12 +159,19 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
                 <div
                   className={isEven ? "md:order-1" : ""}
                   style={{
-                    background: tone.gradient,
                     borderRadius: tone.radius,
-                    minHeight: 240,
+                    minHeight: 280,
+                    overflow: "hidden",
                     boxShadow: `0 16px 40px -8px ${tone.primary}20`,
                   }}
-                />
+                >
+                  {item.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.image} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: 280 }} />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", minHeight: 280, background: tone.gradient }} />
+                  )}
+                </div>
               </div>
             );
           })}
