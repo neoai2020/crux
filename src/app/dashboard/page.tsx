@@ -92,8 +92,9 @@ export default function DashboardPage() {
 
       {/* Feature Video */}
       <FeatureVideo
-        title="Welcome to Crux"
+        title="Getting Started with Crux"
         subtitle="Watch this quick intro to start building websites that make money."
+        vimeoId="1177422137"
       />
 
       {/* Stats */}

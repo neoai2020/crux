@@ -28,6 +28,7 @@ interface Lesson {
   title: string;
   duration: string;
   type: "video" | "article" | "quiz";
+  vimeoId?: string;
 }
 
 const MODULES: TrainingModule[] = [
@@ -39,7 +40,7 @@ const MODULES: TrainingModule[] = [
     icon: <Rocket size={20} />,
     color: "from-crux-500 to-crux-400",
     lessons: [
-      { title: "Welcome to Crux - Platform Overview", duration: "5 min", type: "video" },
+      { title: "Welcome to Crux - Platform Overview", duration: "5 min", type: "video", vimeoId: "1177422137" },
       { title: "Choosing the Right Website Type", duration: "4 min", type: "video" },
       { title: "Setting Up Your Business Profile", duration: "6 min", type: "article" },
       { title: "Your First Website in 5 Minutes", duration: "5 min", type: "video" },
@@ -132,9 +133,13 @@ const MODULES: TrainingModule[] = [
 export default function TrainingPage() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
-  const toggleLesson = (moduleId: string, lessonTitle: string) => {
-    const key = `${moduleId}:${lessonTitle}`;
+  const handleLessonClick = (moduleId: string, lesson: Lesson) => {
+    if (lesson.vimeoId) {
+      setPlayingVideo((prev) => (prev === lesson.vimeoId ? null : lesson.vimeoId!));
+    }
+    const key = `${moduleId}:${lesson.title}`;
     setCompletedLessons((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -241,34 +246,49 @@ export default function TrainingPage() {
                   {mod.lessons.map((lesson, idx) => {
                     const key = `${mod.id}:${lesson.title}`;
                     const isCompleted = completedLessons.has(key);
+                    const isVideoPlaying = lesson.vimeoId && playingVideo === lesson.vimeoId;
                     return (
-                      <div
-                        key={idx}
-                        className={`group/lesson flex items-center gap-4 px-5 py-4 rounded-xl transition-all cursor-pointer border ${
-                          isCompleted ? "bg-green-500/5 border-green-500/20" : "bg-gray-800/20 border-transparent hover:border-gray-700 hover:bg-gray-800/40"
-                        }`}
-                        onClick={() => toggleLesson(mod.id, lesson.title)}
-                      >
+                      <div key={idx} className="space-y-0">
                         <div
-                          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
-                            isCompleted ? "border-green-500 bg-green-500/20 text-green-400 scale-110 shadow-lg shadow-green-500/10" : "border-gray-700 group-hover/lesson:border-crux-500 group-hover/lesson:bg-crux-500/5"
+                          className={`group/lesson flex items-center gap-4 px-5 py-4 rounded-xl transition-all cursor-pointer border ${
+                            isCompleted ? "bg-green-500/5 border-green-500/20" : "bg-gray-800/20 border-transparent hover:border-gray-700 hover:bg-gray-800/40"
                           }`}
+                          onClick={() => handleLessonClick(mod.id, lesson)}
                         >
-                          {isCompleted ? <CheckCircle2 size={14} /> : <div className="w-1 h-1 rounded-full bg-gray-700" />}
-                        </div>
-                        <div className="flex-1">
-                          <p className={`text-sm font-bold tracking-tight transition-all ${isCompleted ? "text-gray-500 line-through opacity-60" : "text-gray-200 group-hover/lesson:text-white"}`}>
-                            {lesson.title}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4 shrink-0 px-3 py-1 bg-black/30 rounded-lg border border-gray-800 group-hover/lesson:border-gray-700 transition-colors">
-                          <div className="text-gray-600 group-hover/lesson:text-gray-400 transition-colors">
-                            {lesson.type === "video" && <Video size={14} />}
-                            {lesson.type === "article" && <FileText size={14} />}
-                            {lesson.type === "quiz" && <HelpCircle size={14} />}
+                          <div
+                            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
+                              isCompleted ? "border-green-500 bg-green-500/20 text-green-400 scale-110 shadow-lg shadow-green-500/10" : "border-gray-700 group-hover/lesson:border-crux-500 group-hover/lesson:bg-crux-500/5"
+                            }`}
+                          >
+                            {isCompleted ? <CheckCircle2 size={14} /> : <div className="w-1 h-1 rounded-full bg-gray-700" />}
                           </div>
-                          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{lesson.duration}</span>
+                          <div className="flex-1">
+                            <p className={`text-sm font-bold tracking-tight transition-all ${isCompleted ? "text-gray-500 line-through opacity-60" : "text-gray-200 group-hover/lesson:text-white"}`}>
+                              {lesson.title}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4 shrink-0 px-3 py-1 bg-black/30 rounded-lg border border-gray-800 group-hover/lesson:border-gray-700 transition-colors">
+                            <div className="text-gray-600 group-hover/lesson:text-gray-400 transition-colors">
+                              {lesson.type === "video" && <Video size={14} />}
+                              {lesson.type === "article" && <FileText size={14} />}
+                              {lesson.type === "quiz" && <HelpCircle size={14} />}
+                            </div>
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{lesson.duration}</span>
+                          </div>
                         </div>
+                        {isVideoPlaying && (
+                          <div className="mx-5 mt-2 mb-3 rounded-xl overflow-hidden border border-gray-800 bg-black">
+                            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                              <iframe
+                                src={`https://player.vimeo.com/video/${lesson.vimeoId}?autoplay=1&muted=0&title=0&byline=0&portrait=0&dnt=1`}
+                                className="absolute inset-0 w-full h-full"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowFullScreen
+                                style={{ border: 0 }}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
