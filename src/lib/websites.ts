@@ -75,21 +75,14 @@ function toCamel(row: any): SavedWebsite {
 }
 
 export async function getWebsitesForUser(userId: string): Promise<SavedWebsite[]> {
-  try {
-    const res = await fetch(`/api/user-websites?userId=${userId}`);
-    if (!res.ok) return [];
-    const { websites } = await res.json();
-    if (!websites || !Array.isArray(websites)) return [];
-    return websites.map(toCamel);
-  } catch {
-    const { data, error } = await supabase
-      .from("websites")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
-    if (error || !data) return [];
-    return data.map(toCamel);
-  }
+  const { data, error } = await supabase
+    .from("websites")
+    .select("*")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false });
+
+  if (error || !data) return [];
+  return data.map(toCamel);
 }
 
 export async function saveWebsite(
