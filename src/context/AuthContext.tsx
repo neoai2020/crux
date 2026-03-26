@@ -74,13 +74,12 @@ async function fetchProfile(userId: string) {
 async function fetchFeatures(userId: string): Promise<string[]> {
   try {
     const query = async () => {
-      const { data } = await supabase
-        .from("feature_access")
-        .select("feature")
-        .eq("user_id", userId);
-      return (data || []).map((r: { feature: string }) => r.feature);
+      const res = await fetch(`/api/user-features?userId=${userId}`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return (data.features as string[]) || [];
     };
-    return await withTimeout(query(), 4000, []);
+    return await withTimeout(query(), 5000, []);
   } catch {
     return [];
   }
