@@ -318,7 +318,7 @@ const SITE_TYPES = [
   "Education", "Health/Medical", "Personal Branding", "Corporate",
 ] as const;
 
-const DFY_SECTIONS: Record<string, BlueprintSection[]> = {
+const DFY_SECTIONS_BASE: Record<string, BlueprintSection[]> = {
   "E-commerce": [
     { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "split" },
     { type: "features", variant: "iconGrid" }, { type: "contentGrid", variant: "cards" },
@@ -377,13 +377,38 @@ const DFY_SECTIONS: Record<string, BlueprintSection[]> = {
   ],
 };
 
+const VARIANT_POOL: Record<string, string[]> = {
+  hero: ["centered", "split", "splitReverse", "minimal", "fullBleed"],
+  features: ["iconGrid", "alternating", "compact"],
+  testimonials: ["cards", "spotlight", "minimal"],
+  cta: ["gradientBanner", "boxed", "split"],
+  about: ["imageLeft", "imageRight", "centered"],
+  stats: ["counters", "cards"],
+  footer: ["columns", "minimal", "centered"],
+  navbar: ["leftAligned", "centered", "minimal"],
+};
+
+function getSectionsForSite(type: string, siteIndex: number): BlueprintSection[] {
+  const base = DFY_SECTIONS_BASE[type] || DFY_SECTIONS_BASE["Service"];
+  return base.map((sec) => {
+    const pool = VARIANT_POOL[sec.type];
+    if (!pool || pool.length <= 1) return sec;
+    const rotatedVariant = pool[(siteIndex + pool.indexOf(sec.variant)) % pool.length];
+    return { ...sec, variant: rotatedVariant };
+  });
+}
+
 const TYPE_CATEGORY: Record<string, string> = {
   "E-commerce": "ecommerce", Service: "functional", Portfolio: "agency",
   "Landing Page": "landing", Blog: "blog", Education: "course",
   "Health/Medical": "functional", "Personal Branding": "agency", Corporate: "functional",
 };
 
-const TONE_CYCLE = ["bold", "clean", "warm", "dark", "elegant"];
+const TONE_CYCLE = [
+  "bold", "clean", "warm", "dark", "elegant",
+  "neon", "ocean", "sunset", "midnight", "forest",
+  "rose", "slate", "royal", "arctic", "ember",
+];
 
 const TYPE_COLORS: Record<string, string> = {
   "E-commerce": "bg-accent-pink/10 text-accent-pink border-accent-pink/20",
@@ -525,7 +550,7 @@ export default function DFYPage() {
 
   const previewSections = useMemo(() => {
     if (!previewSite) return [];
-    return DFY_SECTIONS[previewSite.type] || DFY_SECTIONS["Service"];
+    return getSectionsForSite(previewSite.type, previewSite.id);
   }, [previewSite]);
 
   const previewTone: ToneDefinition = useMemo(() => {
@@ -550,7 +575,7 @@ export default function DFYPage() {
     setClaimError("");
 
     try {
-      const sections = DFY_SECTIONS[previewSite.type] || DFY_SECTIONS["Service"];
+      const sections = getSectionsForSite(previewSite.type, previewSite.id);
       const sectionContents = buildRichContents(previewSite, sections);
 
       const res = await fetch("/api/dfy/claim", {

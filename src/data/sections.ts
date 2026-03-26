@@ -57,6 +57,7 @@ export const SECTION_DEFINITIONS: SectionDefinition[] = [
       { id: "split", name: "Split" },
       { id: "splitReverse", name: "Split Reverse" },
       { id: "minimal", name: "Minimal" },
+      { id: "fullBleed", name: "Full Bleed" },
     ],
   },
   {

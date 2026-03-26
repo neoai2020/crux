@@ -13,11 +13,13 @@ export function FeaturesIconGrid({ tone, content }: SectionProps) {
 
   return (
     <section
-      style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
-      className="py-20 px-6"
+      style={{ background: `linear-gradient(180deg, ${tone.bg} 0%, ${tone.surface} 100%)`, fontFamily: tone.bodyFont }}
+      className="py-20 px-6 relative overflow-hidden"
     >
-      <div className="max-w-6xl mx-auto">
+      <div style={{ position: "absolute", top: -100, right: -100, width: 350, height: 350, borderRadius: "50%", background: tone.primary, opacity: 0.03, pointerEvents: "none" }} />
+      <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-14">
+          <div style={{ width: 48, height: 3, background: tone.gradient, borderRadius: 2, margin: "0 auto 20px" }} />
           <h2
             style={{
               fontFamily: tone.headingFont,
@@ -43,6 +45,9 @@ export function FeaturesIconGrid({ tone, content }: SectionProps) {
                 backgroundColor: tone.surface,
                 borderRadius: tone.radius,
                 padding: 32,
+                border: `1px solid ${tone.border}`,
+                boxShadow: `0 4px 24px -4px ${tone.primary}0A, 0 1px 3px rgba(0,0,0,0.04)`,
+                transition: "transform 0.2s, box-shadow 0.2s",
               }}
             >
               <div
@@ -50,9 +55,10 @@ export function FeaturesIconGrid({ tone, content }: SectionProps) {
                 style={{
                   width: 56,
                   height: 56,
-                  borderRadius: "50%",
-                  backgroundColor: tone.primaryLight,
+                  borderRadius: tone.radius,
+                  background: `linear-gradient(135deg, ${tone.primary}15, ${tone.secondary}15)`,
                   fontSize: 26,
+                  border: `1px solid ${tone.primary}20`,
                 }}
               >
                 {item.icon}
@@ -86,11 +92,12 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
 
   return (
     <section
-      style={{ backgroundColor: tone.bg, fontFamily: tone.bodyFont }}
+      style={{ background: `linear-gradient(180deg, ${tone.bg} 0%, ${tone.surface} 100%)`, fontFamily: tone.bodyFont }}
       className="py-20 px-6"
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
+          <div style={{ width: 48, height: 3, background: tone.gradient, borderRadius: 2, margin: "0 auto 20px" }} />
           <h2
             style={{
               fontFamily: tone.headingFont,
@@ -117,9 +124,22 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
                 className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center`}
               >
                 <div className={isEven ? "md:order-2" : ""}>
-                  <span style={{ fontSize: 40, marginBottom: 12, display: "block" }}>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 64,
+                      height: 64,
+                      borderRadius: tone.radius,
+                      background: `linear-gradient(135deg, ${tone.primary}15, ${tone.secondary}15)`,
+                      border: `1px solid ${tone.primary}20`,
+                      fontSize: 32,
+                      marginBottom: 16,
+                    }}
+                  >
                     {item.icon}
-                  </span>
+                  </div>
                   <h3
                     style={{
                       fontFamily: tone.headingFont,
@@ -141,6 +161,7 @@ export function FeaturesAlternating({ tone, content }: SectionProps) {
                     background: tone.gradient,
                     borderRadius: tone.radius,
                     minHeight: 240,
+                    boxShadow: `0 16px 40px -8px ${tone.primary}20`,
                   }}
                 />
               </div>
@@ -159,10 +180,11 @@ export function FeaturesCompact({ tone, content }: SectionProps) {
 
   return (
     <section
-      style={{ backgroundColor: tone.surface, fontFamily: tone.bodyFont }}
+      style={{ background: `linear-gradient(180deg, ${tone.surface} 0%, ${tone.bg} 100%)`, fontFamily: tone.bodyFont }}
       className="py-20 px-6"
     >
       <div className="max-w-3xl mx-auto">
+        <div style={{ width: 48, height: 3, background: tone.gradient, borderRadius: 2, marginBottom: 20 }} />
         <h2
           className="mb-2"
           style={{
@@ -187,7 +209,22 @@ export function FeaturesCompact({ tone, content }: SectionProps) {
                 <div style={{ height: 1, backgroundColor: tone.border }} />
               )}
               <div className="flex items-center gap-4 py-5">
-                <span style={{ fontSize: 24, flexShrink: 0 }}>{item.icon}</span>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: tone.radius,
+                    background: `linear-gradient(135deg, ${tone.primary}10, ${tone.secondary}10)`,
+                    border: `1px solid ${tone.primary}15`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.icon}
+                </div>
                 <p style={{ color: tone.text, fontSize: 15, lineHeight: 1.6 }}>
                   <span style={{ fontWeight: 700, fontFamily: tone.headingFont }}>
                     {item.title}

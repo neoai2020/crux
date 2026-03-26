@@ -1,6 +1,6 @@
 import { SectionProps, SectionType } from "@/data/sections";
 import { NavbarCentered, NavbarLeftAligned, NavbarMinimal } from "./sections/NavbarSections";
-import { HeroCentered, HeroSplit, HeroSplitReverse, HeroMinimal } from "./sections/HeroSections";
+import { HeroCentered, HeroSplit, HeroSplitReverse, HeroMinimal, HeroFullBleed } from "./sections/HeroSections";
 import { FeaturesIconGrid, FeaturesAlternating, FeaturesCompact } from "./sections/FeaturesSections";
 import { AboutImageLeft, AboutImageRight, AboutCentered } from "./sections/AboutSections";
 import { TestimonialsCards, TestimonialsSpotlight, TestimonialsMinimal } from "./sections/TestimonialsSections";
@@ -24,7 +24,7 @@ type SectionComponent = (props: SectionProps) => React.JSX.Element | null;
 
 const SECTION_MAP: Record<string, Record<string, SectionComponent>> = {
   navbar: { centered: NavbarCentered, leftAligned: NavbarLeftAligned, minimal: NavbarMinimal },
-  hero: { centered: HeroCentered, split: HeroSplit, splitReverse: HeroSplitReverse, minimal: HeroMinimal },
+  hero: { centered: HeroCentered, split: HeroSplit, splitReverse: HeroSplitReverse, minimal: HeroMinimal, fullBleed: HeroFullBleed },
   features: { iconGrid: FeaturesIconGrid, alternating: FeaturesAlternating, compact: FeaturesCompact },
   about: { imageLeft: AboutImageLeft, imageRight: AboutImageRight, centered: AboutCentered },
   testimonials: { cards: TestimonialsCards, spotlight: TestimonialsSpotlight, minimal: TestimonialsMinimal },

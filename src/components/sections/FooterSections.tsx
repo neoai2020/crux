@@ -2,7 +2,7 @@ import type { SectionProps } from "@/data/sections";
 import type { ToneDefinition } from "@/data/tones";
 
 function footerColors(tone: ToneDefinition) {
-  const isDark = tone.id === "dark";
+  const isDark = tone.bg.startsWith("#0") || tone.bg.startsWith("#1");
   return {
     bg: isDark ? tone.surface : tone.text,
     heading: isDark ? tone.text : "#F9FAFB",
@@ -63,9 +63,10 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
 
   return (
     <section
-      className="py-16 px-6"
       style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
+      <div style={{ height: 3, background: tone.gradient }} />
+      <div className="py-16 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
@@ -141,6 +142,7 @@ export function FooterColumns({ tone, content, businessName }: SectionProps) {
           <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
         </div>
       </div>
+      </div>
     </section>
   );
 }
@@ -156,9 +158,10 @@ export function FooterMinimal({ tone, content, businessName }: SectionProps) {
 
   return (
     <section
-      className="py-8 px-6"
       style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
+      <div style={{ height: 3, background: tone.gradient }} />
+      <div className="py-8 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -192,6 +195,7 @@ export function FooterMinimal({ tone, content, businessName }: SectionProps) {
           <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
         </div>
       </div>
+      </div>
     </section>
   );
 }
@@ -207,9 +211,10 @@ export function FooterCentered({ tone, content, businessName }: SectionProps) {
 
   return (
     <section
-      className="py-16 px-6"
       style={{ backgroundColor: fc.bg, fontFamily: tone.bodyFont }}
     >
+      <div style={{ height: 3, background: tone.gradient }} />
+      <div className="py-16 px-6">
       <div className="max-w-4xl mx-auto text-center">
         <div
           className="flex items-center justify-center gap-3"
@@ -263,6 +268,7 @@ export function FooterCentered({ tone, content, businessName }: SectionProps) {
           ))}
         </div>
         <span style={{ fontSize: 13, color: fc.dim }}>{copyright}</span>
+      </div>
       </div>
     </section>
   );
