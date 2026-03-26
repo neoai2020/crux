@@ -1,5 +1,5 @@
 import { ToneDefinition } from "./tones";
-import { getHeroImage, getAboutImage, getGalleryImages, getContentImages, getTeamPhotos, getFeatureImages } from "./images";
+import { getHeroImage, getAboutImage, getGalleryImages, getContentImages, getTeamPhotos, getFeatureImages, getVideoThumbnail, getBenefitImages, getHowItWorksImages } from "./images";
 
 export type SectionType =
   | "navbar"
@@ -242,6 +242,38 @@ function label(category: string, section: string, fallback: string): string {
   return CATEGORY_LABELS[category]?.[section] || fallback;
 }
 
+const SECTION_DISPLAY_NAMES: Record<string, string> = {
+  hero: "Home",
+  features: "Features",
+  about: "About",
+  testimonials: "Testimonials",
+  pricing: "Pricing",
+  faq: "FAQ",
+  contact: "Contact",
+  gallery: "Gallery",
+  stats: "Stats",
+  howItWorks: "How It Works",
+  contentGrid: "Content",
+  team: "Team",
+  benefits: "Benefits",
+  video: "Video",
+  newsletter: "Newsletter",
+};
+
+export function buildNavLinksForSections(sectionTypes: string[]): string[] {
+  const links: string[] = [];
+  const seen = new Set<string>();
+  for (const type of sectionTypes) {
+    if (type === "navbar" || type === "footer") continue;
+    const display = SECTION_DISPLAY_NAMES[type];
+    if (display && !seen.has(display)) {
+      seen.add(display);
+      links.push(display);
+    }
+  }
+  return links;
+}
+
 function nameHash(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
@@ -360,16 +392,18 @@ export function generateDefaultContent(
           { value: "150+", label: "Countries" },
         ],
       };
-    case "howItWorks":
+    case "howItWorks": {
+      const stepImgs = getHowItWorksImages(3, seed);
       return {
         sectionTitle: "How It Works",
         subtitle: "Get started in three simple steps",
         steps: [
-          { number: "01", title: "Sign Up", description: "Create your free account in under a minute. No credit card required." },
-          { number: "02", title: "Configure", description: "Customize your setup to match your exact needs and preferences." },
-          { number: "03", title: "Launch", description: "Go live and start seeing results immediately." },
+          { number: "01", title: "Sign Up", description: "Create your free account in under a minute. No credit card required.", image: stepImgs[0] },
+          { number: "02", title: "Configure", description: "Customize your setup to match your exact needs and preferences.", image: stepImgs[1] },
+          { number: "03", title: "Launch", description: "Go live and start seeing results immediately.", image: stepImgs[2] },
         ],
       };
+    }
     case "contentGrid": {
       const contentImgs = getContentImages(6, seed);
       return {
@@ -410,22 +444,25 @@ export function generateDefaultContent(
         placeholder: "Enter your email",
         buttonText: "Subscribe",
       };
-    case "benefits":
+    case "benefits": {
+      const benefitImgs = getBenefitImages(4, seed);
       return {
         sectionTitle: label(category, "benefits", "Benefits"),
         subtitle: `Why ${businessName} is the right choice`,
         items: [
-          { icon: "🚀", title: "Boost Your Revenue", description: "Our proven methods help increase your bottom line from day one." },
-          { icon: "⏱️", title: "Save Precious Time", description: "Automate repetitive tasks and focus on what truly matters." },
-          { icon: "🏆", title: "Stay Ahead of Competition", description: "Get access to cutting-edge tools your competitors wish they had." },
-          { icon: "💡", title: "Smarter Decisions", description: "Data-driven insights that guide you to better outcomes." },
+          { icon: "🚀", title: "Boost Your Revenue", description: "Our proven methods help increase your bottom line from day one.", image: benefitImgs[0] },
+          { icon: "⏱️", title: "Save Precious Time", description: "Automate repetitive tasks and focus on what truly matters.", image: benefitImgs[1] },
+          { icon: "🏆", title: "Stay Ahead of Competition", description: "Get access to cutting-edge tools your competitors wish they had.", image: benefitImgs[2] },
+          { icon: "💡", title: "Smarter Decisions", description: "Data-driven insights that guide you to better outcomes.", image: benefitImgs[3] },
         ],
       };
+    }
     case "video":
       return {
         headline: "See It in Action",
         description: `Watch how ${businessName} can transform your workflow in just a few minutes.`,
         ctaText: "Watch Now",
+        thumbnailImage: getVideoThumbnail(seed),
       };
     case "countdown":
       return {

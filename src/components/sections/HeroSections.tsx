@@ -113,7 +113,7 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
-          <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+          <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
           <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
         </div>
         {socialProof && (
@@ -188,7 +188,7 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+            <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
             <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
@@ -244,7 +244,7 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <a href="#section-contact" style={ctaStyle(tone)}>{ctaText}</a>
+            <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
             <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
@@ -295,7 +295,7 @@ export function HeroMinimal({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div style={{ marginTop: 40 }}>
-          <a href="#section-contact" style={{ ...ctaStyle(tone), fontSize: 17, padding: "16px 40px" }}>{ctaText}</a>
+          <a href="#section-cta" style={{ ...ctaStyle(tone), fontSize: 17, padding: "16px 40px" }}>{ctaText}</a>
         </div>
       </div>
     </section>
@@ -381,7 +381,7 @@ export function HeroFullBleed({ tone, content, businessName }: SectionProps) {
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
           <a
-            href="#section-contact"
+            href="#section-cta"
             style={{
               ...ctaStyle(tone),
               boxShadow: "0 8px 32px rgba(0,0,0,0.3)",

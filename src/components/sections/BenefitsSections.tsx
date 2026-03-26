@@ -4,6 +4,7 @@ interface BenefitItem {
   icon: string;
   title: string;
   description: string;
+  image?: string;
 }
 
 export function BenefitsIconList({ tone, content }: SectionProps) {
@@ -97,27 +98,40 @@ export function BenefitsCards({ tone, content }: SectionProps) {
               style={{
                 backgroundColor: tone.surface,
                 borderRadius: tone.radius,
-                padding: 32,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+                overflow: "hidden",
+                boxShadow: `0 4px 16px ${tone.primary}08, 0 1px 3px rgba(0,0,0,0.06)`,
+                border: `1px solid ${tone.border}`,
               }}
             >
-              <span style={{ fontSize: 36, display: "block", marginBottom: 14 }}>
-                {item.icon}
-              </span>
-              <h3
-                style={{
-                  fontFamily: tone.headingFont,
-                  fontWeight: 700,
-                  fontSize: 19,
-                  color: tone.text,
-                  marginBottom: 8,
-                }}
-              >
-                {item.title}
-              </h3>
-              <p style={{ color: tone.muted, fontSize: 15, lineHeight: 1.6 }}>
-                {item.description}
-              </p>
+              {item.image && (
+                <div style={{ height: 160, overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                </div>
+              )}
+              <div style={{ padding: 28 }}>
+                <span style={{ fontSize: 36, display: "block", marginBottom: 14 }}>
+                  {item.icon}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: tone.headingFont,
+                    fontWeight: 700,
+                    fontSize: 19,
+                    color: tone.text,
+                    marginBottom: 8,
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p style={{ color: tone.muted, fontSize: 15, lineHeight: 1.6 }}>
+                  {item.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>

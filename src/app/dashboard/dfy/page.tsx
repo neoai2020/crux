@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getWebsitesForUser, SavedWebsite } from "@/lib/websites";
 import { BlueprintSection } from "@/data/blueprints";
-import { SectionType, generateDefaultContent } from "@/data/sections";
+import { SectionType, generateDefaultContent, buildNavLinksForSections } from "@/data/sections";
 import { getToneById, TONES, ToneDefinition } from "@/data/tones";
 import { getFeatureImages, getTeamPhotos, getContentImages, getGalleryImages } from "@/data/images";
 import WebsitePreview from "@/components/WebsitePreview";
@@ -483,6 +483,10 @@ function buildRichContents(
     const key = `${sec.type}-${idx}`;
     const base = generateDefaultContent(sec.type as SectionType, site.name, site.description, site.categoryId);
 
+    if (sec.type === "navbar") {
+      base.navLinks = buildNavLinksForSections(sections.map((s) => s.type));
+    }
+
     if (sec.type === "hero") {
       base.headline = site.name;
       base.subheadline = site.description;
@@ -591,8 +595,7 @@ export default function DFYPage() {
     return buildRichContents(previewSite, previewSections);
   }, [previewSite, previewSections]);
 
-  const handleClaimClick = (site: DFYSite) => {
-    if (claimedIds.has(site.id)) return;
+  const handlePreview = (site: DFYSite) => {
     setClaimError("");
     setPreviewSite(site);
   };
@@ -762,17 +765,23 @@ export default function DFYPage() {
                     </div>
                   </div>
 
-                  {isClaimed && dbSite ? (
-                    <a href={`/site/${dbSite.slug}?id=${dbSite.id}`} target="_blank" rel="noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2 rounded-xl border border-crux-500/10 hover:border-crux-500/30">
-                      View <ExternalLink size={14} className="group-hover/link:translate-x-0.5 transition-transform" />
-                    </a>
-                  ) : (
-                    <button onClick={() => handleClaimClick(site)}
-                      className="flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/30 hover:scale-105 active:scale-95">
-                      Claim Site <ArrowRight size={14} />
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handlePreview(site)}
+                      className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2.5 rounded-xl border border-crux-500/10 hover:border-crux-500/30">
+                      Preview <ExternalLink size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
                     </button>
-                  )}
+                    {isClaimed && dbSite ? (
+                      <a href={`/site/${dbSite.slug}?id=${dbSite.id}`} target="_blank" rel="noreferrer"
+                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-green-500/10 text-green-400 border border-green-500/20 hover:border-green-500/40 hover:bg-green-500/20">
+                        View Live <ExternalLink size={13} />
+                      </a>
+                    ) : (
+                      <button onClick={() => handlePreview(site)}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/20 hover:scale-105 active:scale-95">
+                        Claim <ArrowRight size={13} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -862,14 +871,21 @@ export default function DFYPage() {
                   className="px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-gray-400 bg-gray-800 hover:bg-gray-700 transition-all border border-gray-700 disabled:opacity-50">
                   Cancel
                 </button>
-                <button onClick={handleConfirmClaim} disabled={!!claimingId}
-                  className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-accent-pink hover:bg-accent-pink/80 transition-all shadow-xl shadow-accent-pink/30 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2">
-                  {claimingId ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Adding...</>
-                  ) : (
-                    <><CheckCircle2 size={16} /> Add to My Websites</>
-                  )}
-                </button>
+                {claimedIds.has(previewSite.id) && websiteMap[previewSite.id] ? (
+                  <a href={`/site/${websiteMap[previewSite.id].slug}?id=${websiteMap[previewSite.id].id}`} target="_blank" rel="noreferrer"
+                    className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-green-600 hover:bg-green-500 transition-all shadow-xl shadow-green-600/30 hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <ExternalLink size={16} /> View Live Site
+                  </a>
+                ) : (
+                  <button onClick={handleConfirmClaim} disabled={!!claimingId}
+                    className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-accent-pink hover:bg-accent-pink/80 transition-all shadow-xl shadow-accent-pink/30 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2">
+                    {claimingId ? (
+                      <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Adding...</>
+                    ) : (
+                      <><CheckCircle2 size={16} /> Add to My Websites</>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

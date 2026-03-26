@@ -1,9 +1,38 @@
 import type { SectionProps } from "@/data/sections";
 
+function PlayButton({ tone, size = 72 }: { tone: SectionProps["tone"]; size?: number }) {
+  return (
+    <div
+      className="flex items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        backgroundColor: tone.primary,
+        cursor: "pointer",
+        boxShadow: `0 8px 32px ${tone.primary}40`,
+        transition: "transform 0.2s",
+      }}
+    >
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          borderTop: `${size * 0.19}px solid transparent`,
+          borderBottom: `${size * 0.19}px solid transparent`,
+          borderLeft: `${size * 0.31}px solid #fff`,
+          marginLeft: size * 0.06,
+        }}
+      />
+    </div>
+  );
+}
+
 export function VideoCentered({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "See It in Action";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Watch Now";
+  const thumbnailImage = content.thumbnailImage as string | undefined;
 
   return (
     <section
@@ -40,26 +69,19 @@ export function VideoCentered({ tone, content }: SectionProps) {
             overflow: "hidden",
           }}
         >
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              backgroundColor: tone.primary,
-              cursor: "pointer",
-            }}
-          >
-            <div
-              style={{
-                width: 0,
-                height: 0,
-                borderTop: "14px solid transparent",
-                borderBottom: "14px solid transparent",
-                borderLeft: "22px solid #fff",
-                marginLeft: 4,
-              }}
+          {thumbnailImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={thumbnailImage}
+              alt=""
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             />
+          )}
+          {thumbnailImage && (
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }} />
+          )}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <PlayButton tone={tone} />
           </div>
         </div>
         {ctaText && (
@@ -90,6 +112,7 @@ export function VideoSplit({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "See It in Action";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Watch Now";
+  const thumbnailImage = content.thumbnailImage as string | undefined;
 
   return (
     <section
@@ -142,26 +165,19 @@ export function VideoSplit({ tone, content }: SectionProps) {
             overflow: "hidden",
           }}
         >
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: "50%",
-              backgroundColor: tone.primary,
-              cursor: "pointer",
-            }}
-          >
-            <div
-              style={{
-                width: 0,
-                height: 0,
-                borderTop: "12px solid transparent",
-                borderBottom: "12px solid transparent",
-                borderLeft: "20px solid #fff",
-                marginLeft: 4,
-              }}
+          {thumbnailImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={thumbnailImage}
+              alt=""
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             />
+          )}
+          {thumbnailImage && (
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }} />
+          )}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <PlayButton tone={tone} size={64} />
           </div>
         </div>
       </div>

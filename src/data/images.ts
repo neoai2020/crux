@@ -88,6 +88,20 @@ export const STOCK_IMAGES = {
     U("1460925895917-afdab827c52f"), U("1551434678-e076c223a692"), U("1553877522-43269d4ea984"),
     U("1519389950473-47ba0277781c"), U("1498050108023-c5249f4df085"), U("1504868584819-f8e8b4b6d7e3"),
   ],
+
+  video: [
+    U("1516321497487-e288fb19713f"), U("1536240478700-b869070f9279"), U("1485846234645-a62644f84728"),
+    U("1492691527338-e3d5023dbbc3"), U("1504639725590-34d0984388bd"), U("1522071820081-009f0129c71c"),
+  ],
+
+  benefits: [
+    U("1553877522-43269d4ea984"), U("1460925895917-afdab827c52f"), U("1519389950473-47ba0277781c"),
+    U("1498050108023-c5249f4df085"), U("1551434678-e076c223a692"), U("1504868584819-f8e8b4b6d7e3"),
+  ],
+
+  howItWorks: [
+    U("1517694712202-14dd9538aa97"), U("1460925895917-afdab827c52f"), U("1553877522-43269d4ea984"),
+  ],
 } as const;
 
 export function pickImage(pool: readonly string[], seed: number): string {
@@ -125,4 +139,16 @@ export function getTeamPhotos(count: number, seed: number): string[] {
 
 export function getFeatureImages(count: number, seed: number): string[] {
   return pickImages(STOCK_IMAGES.features, count, seed);
+}
+
+export function getVideoThumbnail(seed: number): string {
+  return pickImage(STOCK_IMAGES.video, seed);
+}
+
+export function getBenefitImages(count: number, seed: number): string[] {
+  return pickImages(STOCK_IMAGES.benefits, count, seed);
+}
+
+export function getHowItWorksImages(count: number, seed: number): string[] {
+  return pickImages(STOCK_IMAGES.howItWorks, count, seed);
 }

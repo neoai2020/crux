@@ -4,6 +4,7 @@ interface StepItem {
   number: string;
   title: string;
   description: string;
+  image?: string;
 }
 
 export function HowItWorksSteps({ tone, content }: SectionProps) {
@@ -41,18 +42,41 @@ export function HowItWorksSteps({ tone, content }: SectionProps) {
               key={i}
               className="flex flex-col items-center text-center"
             >
+              {step.image ? (
+                <div style={{ width: 120, height: 120, borderRadius: "50%", overflow: "hidden", marginBottom: 20, boxShadow: `0 8px 24px ${tone.primary}15`, border: `3px solid ${tone.primary}22` }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={step.image} alt={step.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                </div>
+              ) : (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    backgroundColor: tone.primary,
+                    color: "#fff",
+                    fontFamily: tone.headingFont,
+                    fontWeight: 800,
+                    fontSize: 22,
+                    flexShrink: 0,
+                    marginBottom: 20,
+                  }}
+                >
+                  {step.number}
+                </div>
+              )}
               <div
                 className="flex items-center justify-center"
                 style={{
-                  width: 64,
-                  height: 64,
+                  width: 32,
+                  height: 32,
                   borderRadius: "50%",
-                  backgroundColor: tone.primary,
+                  background: tone.gradient,
                   color: "#fff",
-                  fontFamily: tone.headingFont,
                   fontWeight: 800,
-                  fontSize: 22,
-                  flexShrink: 0,
+                  fontSize: 14,
+                  marginBottom: 12,
                 }}
               >
                 {step.number}
@@ -63,7 +87,6 @@ export function HowItWorksSteps({ tone, content }: SectionProps) {
                   fontWeight: 700,
                   fontSize: 18,
                   color: tone.text,
-                  marginTop: 20,
                   marginBottom: 8,
                 }}
               >
@@ -135,8 +158,15 @@ export function HowItWorksTimeline({ tone, content }: SectionProps) {
                   padding: 24,
                   border: `1px solid ${tone.border}`,
                   flex: 1,
+                  overflow: "hidden",
                 }}
               >
+                {step.image && (
+                  <div style={{ margin: "-24px -24px 16px -24px", height: 140, overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={step.image} alt={step.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                )}
                 <h3
                   style={{
                     fontFamily: tone.headingFont,

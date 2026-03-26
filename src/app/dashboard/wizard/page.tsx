@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CATEGORIES } from "@/data/templates";
 import { TONES, ToneDefinition, getToneById } from "@/data/tones";
-import { SectionType, generateDefaultContent } from "@/data/sections";
+import { SectionType, generateDefaultContent, buildNavLinksForSections } from "@/data/sections";
 import {
   Blueprint,
   BlueprintSection,
@@ -496,14 +496,14 @@ function WizardInner() {
     category: string
   ): Record<string, Record<string, unknown>> {
     const result: Record<string, Record<string, unknown>> = {};
+    const dynamicNavLinks = buildNavLinksForSections(sections.map((s) => s.type));
     sections.forEach((sec, idx) => {
       const key = `${sec.type}-${idx}`;
-      result[key] = generateDefaultContent(
-        sec.type,
-        businessName,
-        description,
-        category
-      );
+      const content = generateDefaultContent(sec.type, businessName, description, category);
+      if (sec.type === "navbar") {
+        content.navLinks = dynamicNavLinks;
+      }
+      result[key] = content;
     });
     return result;
   }
