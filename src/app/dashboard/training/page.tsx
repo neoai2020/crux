@@ -27,13 +27,13 @@ const TRAINING_VIDEOS: TrainingVideo[] = [
   {
     title: "Web Wizard Masterclass",
     description: "Master the Web Wizard — learn how to create stunning, high-converting websites step by step.",
-    vimeoId: "1177422984",
+    vimeoId: "1177480796",
     duration: "8 min",
   },
   {
     title: "My Websites — Manage Your Empire",
     description: "Organize, preview, and manage all your generated websites from one powerful dashboard.",
-    vimeoId: "1177423011",
+    vimeoId: "1177480716",
     duration: "5 min",
   },
   {
@@ -66,7 +66,7 @@ const TRAINING_VIDEOS: TrainingVideo[] = [
   {
     title: "DFY — Done For You Websites",
     description: "Browse and claim from a library of premium, ready-made websites — each with 200 SEO posts.",
-    vimeoId: "1177466083",
+    vimeoId: "1177480609",
     duration: "7 min",
     premium: true,
   },
