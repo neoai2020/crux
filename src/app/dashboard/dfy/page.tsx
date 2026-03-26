@@ -1,21 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  getWebsitesForUser, 
-  saveWebsite, 
-  SavedWebsite 
-} from "@/lib/websites";
-import { 
-  CheckCircle2, 
-  ExternalLink, 
-  Globe, 
-  Layout, 
-  Zap, 
+import { getWebsitesForUser, SavedWebsite } from "@/lib/websites";
+import { BlueprintSection } from "@/data/blueprints";
+import { SectionType, generateDefaultContent } from "@/data/sections";
+import { getToneById, TONES, ToneDefinition } from "@/data/tones";
+import WebsitePreview from "@/components/WebsitePreview";
+import {
+  CheckCircle2,
+  ExternalLink,
+  Globe,
+  Layout,
+  Zap,
   ArrowRight,
   Sparkles,
-  MousePointer2
+  MousePointer2,
+  X,
 } from "lucide-react";
 
 interface DFYSite {
@@ -23,14 +24,25 @@ interface DFYSite {
   name: string;
   niche: string;
   description: string;
-  type: "E-commerce" | "Service" | "Portfolio" | "Landing Page" | "Blog" | "Education" | "Health/Medical" | "Personal Branding" | "Corporate";
+  type: string;
   image: string;
   postsCount: number;
+  toneId: string;
+  categoryId: string;
 }
 
-const SITE_TYPES = ["E-commerce", "Service", "Portfolio", "Landing Page", "Blog", "Education", "Health/Medical", "Personal Branding", "Corporate"] as const;
+const SITE_TYPES = [
+  "E-commerce",
+  "Service",
+  "Portfolio",
+  "Landing Page",
+  "Blog",
+  "Education",
+  "Health/Medical",
+  "Personal Branding",
+  "Corporate",
+] as const;
 
-// Real image pools per type for professional-looking cards
 const TYPE_IMAGES: Record<string, string[]> = {
   "E-commerce": [
     "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
@@ -38,13 +50,13 @@ const TYPE_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80",
     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
   ],
-  "Service": [
+  Service: [
     "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
     "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
     "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80",
     "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
   ],
-  "Portfolio": [
+  Portfolio: [
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
     "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&q=80",
@@ -56,13 +68,13 @@ const TYPE_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80",
     "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80",
   ],
-  "Blog": [
+  Blog: [
     "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80",
     "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80",
     "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=600&q=80",
     "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=80",
   ],
-  "Education": [
+  Education: [
     "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80",
     "https://images.unsplash.com/photo-1523050335456-c38447d0d960?w=600&q=80",
     "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80",
@@ -80,7 +92,7 @@ const TYPE_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80",
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
   ],
-  "Corporate": [
+  Corporate: [
     "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
     "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
     "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=600&q=80",
@@ -88,18 +100,135 @@ const TYPE_IMAGES: Record<string, string[]> = {
   ],
 };
 
-// Generate 180 real-feeling sites (20 per type)
+const DFY_SECTIONS: Record<string, BlueprintSection[]> = {
+  "E-commerce": [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" },
+    { type: "contentGrid", variant: "cards" },
+    { type: "testimonials", variant: "cards" },
+    { type: "cta", variant: "gradientBanner" },
+    { type: "faq", variant: "accordion" },
+    { type: "footer", variant: "columns" },
+  ],
+  Service: [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "centered" },
+    { type: "features", variant: "iconGrid" },
+    { type: "about", variant: "imageRight" },
+    { type: "testimonials", variant: "spotlight" },
+    { type: "pricing", variant: "cards" },
+    { type: "contact", variant: "split" },
+    { type: "footer", variant: "columns" },
+  ],
+  Portfolio: [
+    { type: "navbar", variant: "minimal" },
+    { type: "hero", variant: "minimal" },
+    { type: "gallery", variant: "grid" },
+    { type: "about", variant: "centered" },
+    { type: "stats", variant: "counters" },
+    { type: "testimonials", variant: "minimal" },
+    { type: "contact", variant: "centered" },
+    { type: "footer", variant: "minimal" },
+  ],
+  "Landing Page": [
+    { type: "navbar", variant: "centered" },
+    { type: "hero", variant: "centered" },
+    { type: "benefits", variant: "iconList" },
+    { type: "features", variant: "alternating" },
+    { type: "testimonials", variant: "cards" },
+    { type: "cta", variant: "gradientBanner" },
+    { type: "faq", variant: "accordion" },
+    { type: "footer", variant: "minimal" },
+  ],
+  Blog: [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "centered" },
+    { type: "contentGrid", variant: "cards" },
+    { type: "about", variant: "imageLeft" },
+    { type: "newsletter", variant: "section" },
+    { type: "testimonials", variant: "minimal" },
+    { type: "footer", variant: "columns" },
+  ],
+  Education: [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" },
+    { type: "howItWorks", variant: "steps" },
+    { type: "contentGrid", variant: "cards" },
+    { type: "pricing", variant: "cards" },
+    { type: "testimonials", variant: "cards" },
+    { type: "faq", variant: "accordion" },
+    { type: "footer", variant: "columns" },
+  ],
+  "Health/Medical": [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" },
+    { type: "about", variant: "imageRight" },
+    { type: "stats", variant: "counters" },
+    { type: "testimonials", variant: "spotlight" },
+    { type: "contact", variant: "split" },
+    { type: "footer", variant: "columns" },
+  ],
+  "Personal Branding": [
+    { type: "navbar", variant: "minimal" },
+    { type: "hero", variant: "splitReverse" },
+    { type: "about", variant: "imageLeft" },
+    { type: "stats", variant: "cards" },
+    { type: "gallery", variant: "featured" },
+    { type: "testimonials", variant: "spotlight" },
+    { type: "cta", variant: "boxed" },
+    { type: "footer", variant: "centered" },
+  ],
+  Corporate: [
+    { type: "navbar", variant: "leftAligned" },
+    { type: "hero", variant: "centered" },
+    { type: "features", variant: "iconGrid" },
+    { type: "about", variant: "imageRight" },
+    { type: "team", variant: "grid" },
+    { type: "stats", variant: "counters" },
+    { type: "testimonials", variant: "cards" },
+    { type: "contact", variant: "split" },
+    { type: "footer", variant: "columns" },
+  ],
+};
+
+const TYPE_CATEGORY_MAP: Record<string, string> = {
+  "E-commerce": "ecommerce",
+  Service: "functional",
+  Portfolio: "agency",
+  "Landing Page": "landing",
+  Blog: "blog",
+  Education: "course",
+  "Health/Medical": "functional",
+  "Personal Branding": "agency",
+  Corporate: "functional",
+};
+
+const TYPE_TONE_MAP: Record<string, string> = {
+  "E-commerce": "bold",
+  Service: "modern",
+  Portfolio: "elegant",
+  "Landing Page": "bold",
+  Blog: "warm",
+  Education: "modern",
+  "Health/Medical": "calm",
+  "Personal Branding": "elegant",
+  Corporate: "modern",
+};
+
 const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
   const type = SITE_TYPES[i % SITE_TYPES.length];
   const id = i + 1;
   const names = [
-    "Luxe", "Fit", "Urban", "Pixel", "Pure", "Mindful", "Global", "Creative", "Apex", 
-    "Swift", "Echo", "Zenith", "Nova", "Flux", "Core", "Orbit", "Prime", "Vibe", "Sonic", "Terra"
+    "Luxe", "Fit", "Urban", "Pixel", "Pure", "Mindful", "Global", "Creative", "Apex",
+    "Swift", "Echo", "Zenith", "Nova", "Flux", "Core", "Orbit", "Prime", "Vibe", "Sonic", "Terra",
   ];
   const prefixes = ["Elite", "Pro", "Smart", "Next", "Ultra", "Max", "Cloud", "Fusion", "Alpha"];
   const name = `${prefixes[i % prefixes.length]} ${names[i % names.length]} ${type.split(" ")[0]} ${id}`;
   const imgs = TYPE_IMAGES[type];
-  
+
   return {
     id,
     name,
@@ -107,21 +236,37 @@ const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
     description: `A professionally generated ${type} site with 200 high-quality SEO-optimized posts and premium design. Perfect for scaling your business instantly.`,
     type,
     image: imgs[i % imgs.length],
-    postsCount: 200
+    postsCount: 200,
+    toneId: TYPE_TONE_MAP[type] || "modern",
+    categoryId: TYPE_CATEGORY_MAP[type] || "functional",
   };
 });
 
 const TYPE_COLORS: Record<string, string> = {
   "E-commerce": "bg-accent-pink/10 text-accent-pink border-accent-pink/20",
-  "Service": "bg-accent-green/10 text-accent-green border-accent-green/20",
-  "Portfolio": "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/20",
+  Service: "bg-accent-green/10 text-accent-green border-accent-green/20",
+  Portfolio: "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/20",
   "Landing Page": "bg-accent-orange/10 text-accent-orange border-accent-orange/20",
-  "Blog": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  "Education": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Blog: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  Education: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   "Health/Medical": "bg-red-500/10 text-red-400 border-red-500/20",
   "Personal Branding": "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  "Corporate": "bg-gray-500/10 text-gray-400 border-gray-500/20",
+  Corporate: "bg-gray-500/10 text-gray-400 border-gray-500/20",
 };
+
+function buildSectionContents(
+  sections: BlueprintSection[],
+  businessName: string,
+  description: string,
+  categoryId: string
+): Record<string, Record<string, unknown>> {
+  const result: Record<string, Record<string, unknown>> = {};
+  sections.forEach((sec, idx) => {
+    const key = `${sec.type}-${idx}`;
+    result[key] = generateDefaultContent(sec.type as SectionType, businessName, description, categoryId);
+  });
+  return result;
+}
 
 export default function DFYPage() {
   const { user } = useAuth();
@@ -130,6 +275,8 @@ export default function DFYPage() {
   const [websiteMap, setWebsiteMap] = useState<Record<number, SavedWebsite>>({});
   const [activeType, setActiveType] = useState<string>("All");
   const [visibleCount, setVisibleCount] = useState(12);
+  const [previewSite, setPreviewSite] = useState<DFYSite | null>(null);
+  const [claimError, setClaimError] = useState("");
 
   useEffect(() => {
     async function fetchUserSites() {
@@ -137,63 +284,124 @@ export default function DFYPage() {
       const sites = await getWebsitesForUser(user.id);
       const map: Record<number, SavedWebsite> = {};
       const claimed = new Set<number>();
-      
-      sites.forEach(s => {
+      sites.forEach((s) => {
         if (s.original_dfy_id) {
           map[s.original_dfy_id] = s;
           claimed.add(s.original_dfy_id);
         }
       });
-      
       setWebsiteMap(map);
       setClaimedIds(claimed);
     }
     fetchUserSites();
   }, [user]);
 
-  const handleClaim = async (site: DFYSite) => {
-    if (!user || claimingId) return;
-    setClaimingId(site.id);
+  const previewSections = useMemo(() => {
+    if (!previewSite) return [];
+    return DFY_SECTIONS[previewSite.type] || DFY_SECTIONS["Service"];
+  }, [previewSite]);
+
+  const previewTone: ToneDefinition = useMemo(() => {
+    if (!previewSite) return TONES[0];
+    return getToneById(previewSite.toneId);
+  }, [previewSite]);
+
+  const previewContents = useMemo(() => {
+    if (!previewSite) return {};
+    return buildSectionContents(
+      previewSections,
+      previewSite.name,
+      previewSite.description,
+      previewSite.categoryId
+    );
+  }, [previewSite, previewSections]);
+
+  const handleClaimClick = (site: DFYSite) => {
+    if (claimedIds.has(site.id)) return;
+    setClaimError("");
+    setPreviewSite(site);
+  };
+
+  const handleConfirmClaim = async () => {
+    if (!user || !previewSite || claimingId) return;
+    setClaimingId(previewSite.id);
+    setClaimError("");
+
     try {
-      const updates: any = {
+      const sections = DFY_SECTIONS[previewSite.type] || DFY_SECTIONS["Service"];
+      const sectionContents = buildSectionContents(
+        sections,
+        previewSite.name,
+        previewSite.description,
+        previewSite.categoryId
+      );
+
+      const res = await fetch("/api/dfy/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          siteName: previewSite.name,
+          niche: previewSite.niche,
+          type: previewSite.type,
+          description: previewSite.description,
+          dfyId: previewSite.id,
+          toneId: previewSite.toneId,
+          categoryId: previewSite.categoryId,
+          sections,
+          sectionContents,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Failed to claim" }));
+        setClaimError(err.error || "Failed to claim website. Try again.");
+        setClaimingId(null);
+        return;
+      }
+
+      const data = await res.json();
+
+      const claimed: SavedWebsite = {
+        id: data.siteId,
         userId: user.id,
-        businessName: site.name,
-        description: site.description,
-        category: site.niche,
-        categoryName: site.niche,
-        original_dfy_id: site.id,
-        status: "published",
-        blueprintId: "dfy-standard",
-        blueprintName: "DFY Template",
-        toneId: "modern",
-        sections: [],
-        sectionContents: {},
+        businessName: previewSite.name,
+        email: user.email || "",
+        description: previewSite.description,
         productLink: "",
         logo: "",
         notes: "Claimed from Done-For-You library",
-        email: user.email || "",
+        category: previewSite.categoryId,
+        categoryName: previewSite.type,
+        blueprintId: "dfy",
+        blueprintName: `DFY ${previewSite.type}`,
+        toneId: previewSite.toneId,
+        sections,
+        sectionContents,
+        slug: data.slug,
+        original_dfy_id: previewSite.id,
+        status: "published",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
-      
-      const result = await saveWebsite(updates);
-      
-      if (result) {
-        setClaimedIds(prev => {
-          const next = new Set(prev);
-          next.add(site.id);
-          return next;
-        });
-        setWebsiteMap(prev => ({ ...prev, [site.id]: result }));
-      }
+
+      setClaimedIds((prev) => {
+        const next = new Set(prev);
+        next.add(previewSite.id);
+        return next;
+      });
+      setWebsiteMap((prev) => ({ ...prev, [previewSite.id]: claimed }));
+      setPreviewSite(null);
     } catch (err) {
       console.error("Error claiming site:", err);
+      setClaimError("Connection error. Please try again.");
     } finally {
       setClaimingId(null);
     }
   };
 
-  const filteredSites = activeType === "All" 
-    ? DFY_SITES 
-    : DFY_SITES.filter(s => s.type === activeType);
+  const filteredSites =
+    activeType === "All" ? DFY_SITES : DFY_SITES.filter((s) => s.type === activeType);
 
   const displayedSites = filteredSites.slice(0, visibleCount);
   const types = ["All", ...SITE_TYPES];
@@ -205,13 +413,18 @@ export default function DFYPage() {
           <span className="gradient-text uppercase tracking-tight">Done-For-You Library</span>
         </h1>
         <div className="border-l-4 border-accent-pink pl-6 py-2 bg-accent-pink/5 rounded-r-2xl">
-          <p className="text-gray-200 text-xl font-black">{DFY_SITES.length} websites already generated across the {SITE_TYPES.length} website types + 200 posts per website.</p>
-          <p className="text-gray-500 mt-1 font-medium">Claim your high-authority digital assets instantly.</p>
+          <p className="text-gray-200 text-xl font-black">
+            {DFY_SITES.length} websites already generated across the {SITE_TYPES.length} website
+            types + 200 posts per website.
+          </p>
+          <p className="text-gray-500 mt-1 font-medium">
+            Claim your high-authority digital assets instantly.
+          </p>
         </div>
       </div>
 
       <div className="flex items-center gap-3 mb-10 pb-4 overflow-x-auto no-scrollbar mask-fade-right">
-        {types.map(t => (
+        {types.map((t) => (
           <button
             key={t}
             onClick={() => {
@@ -219,8 +432,8 @@ export default function DFYPage() {
               setVisibleCount(12);
             }}
             className={`whitespace-nowrap px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
-              activeType === t 
-                ? "bg-accent-pink text-white border-accent-pink shadow-xl shadow-accent-pink/30 scale-105 z-10" 
+              activeType === t
+                ? "bg-accent-pink text-white border-accent-pink shadow-xl shadow-accent-pink/30 scale-105 z-10"
                 : "bg-gray-900/60 text-gray-500 border-gray-800 hover:border-gray-700 hover:text-gray-300"
             }`}
           >
@@ -232,21 +445,25 @@ export default function DFYPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayedSites.map((site) => {
           const isClaimed = claimedIds.has(site.id);
-          const isClaiming = claimingId === site.id;
           const dbSite = websiteMap[site.id];
 
           return (
-            <div key={site.id} className="card group p-0 overflow-hidden bg-gray-900/40 border-gray-800/50 hover:border-crux-500/30 transition-all shadow-xl hover:shadow-2xl flex flex-col">
-              {/* Image Container */}
+            <div
+              key={site.id}
+              className="card group p-0 overflow-hidden bg-gray-900/40 border-gray-800/50 hover:border-crux-500/30 transition-all shadow-xl hover:shadow-2xl flex flex-col"
+            >
               <div className="relative h-52 overflow-hidden">
-                <img 
-                  src={site.image} 
-                  alt={site.name} 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={site.image}
+                  alt={site.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-70" />
                 <div className="absolute top-4 right-4">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md ${TYPE_COLORS[site.type]}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md ${TYPE_COLORS[site.type]}`}
+                  >
                     {site.type}
                   </span>
                 </div>
@@ -259,7 +476,6 @@ export default function DFYPage() {
                 )}
               </div>
 
-              {/* Content */}
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-accent-pink transition-colors truncate flex-1 pr-2">
@@ -279,7 +495,9 @@ export default function DFYPage() {
                       <Layout size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">Niche Area</p>
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">
+                        Niche Area
+                      </p>
                       <p className="text-xs font-bold text-gray-300">{site.niche}</p>
                     </div>
                   </div>
@@ -291,31 +509,34 @@ export default function DFYPage() {
                       rel="noreferrer"
                       className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2 rounded-xl border border-crux-500/10 hover:border-crux-500/30"
                     >
-                      View <ExternalLink size={14} className="group-hover/link:translate-x-0.5 transition-transform" />
+                      View{" "}
+                      <ExternalLink
+                        size={14}
+                        className="group-hover/link:translate-x-0.5 transition-transform"
+                      />
                     </a>
                   ) : (
                     <button
-                      onClick={() => handleClaim(site)}
-                      disabled={isClaiming || isClaimed}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl ${
-                        isClaiming 
-                          ? "bg-gray-800 text-gray-500 cursor-wait" 
-                          : "bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/30 hover:scale-105 active:scale-95"
-                      }`}
+                      onClick={() => handleClaimClick(site)}
+                      className="flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/30 hover:scale-105 active:scale-95"
                     >
-                      {isClaiming ? "Cloning..." : <>Claim Site <ArrowRight size={14} /></>}
+                      Claim Site <ArrowRight size={14} />
                     </button>
                   )}
                 </div>
               </div>
-              
-              {/* Decorative bar */}
-              <div className={`h-1.5 w-full bg-gradient-to-r opacity-30 ${
-                site.type === "E-commerce" ? "from-accent-pink via-accent-orange to-accent-pink" :
-                site.type === "Service" ? "from-accent-green via-accent-cyan to-accent-green" :
-                site.type === "Portfolio" ? "from-accent-cyan via-accent-pink to-accent-cyan" :
-                "from-accent-orange via-yellow-400 to-accent-orange"
-              }`} />
+
+              <div
+                className={`h-1.5 w-full bg-gradient-to-r opacity-30 ${
+                  site.type === "E-commerce"
+                    ? "from-accent-pink via-accent-orange to-accent-pink"
+                    : site.type === "Service"
+                      ? "from-accent-green via-accent-cyan to-accent-green"
+                      : site.type === "Portfolio"
+                        ? "from-accent-cyan via-accent-pink to-accent-cyan"
+                        : "from-accent-orange via-yellow-400 to-accent-orange"
+                }`}
+              />
             </div>
           );
         })}
@@ -323,11 +544,15 @@ export default function DFYPage() {
 
       {visibleCount < filteredSites.length && (
         <div className="mt-16 text-center">
-          <button 
-            onClick={() => setVisibleCount(prev => Math.min(prev + 12, filteredSites.length))}
+          <button
+            onClick={() => setVisibleCount((prev) => Math.min(prev + 12, filteredSites.length))}
             className="px-14 py-5 rounded-3xl bg-gray-900 border border-gray-800 text-gray-400 font-black uppercase tracking-widest hover:border-crux-500 hover:text-crux-400 transition-all shadow-2xl hover:scale-105 active:scale-95 group"
           >
-            Load More Assets <span className="text-gray-600 mx-2">|</span> <span className="text-crux-500 font-black">{filteredSites.length - visibleCount} remaining</span>
+            Load More Assets{" "}
+            <span className="text-gray-600 mx-2">|</span>{" "}
+            <span className="text-crux-500 font-black">
+              {filteredSites.length - visibleCount} remaining
+            </span>
           </button>
         </div>
       )}
@@ -336,31 +561,129 @@ export default function DFYPage() {
       <div className="mt-24 card p-12 border-gray-800/50 bg-gradient-to-br from-gray-900/80 via-gray-900/40 to-transparent relative overflow-hidden rounded-3xl">
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-accent-pink/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-crux-500/5 rounded-full blur-3xl" />
-        
         <div className="relative z-10 grid md:grid-cols-3 gap-12">
           <div className="text-center group/feature">
             <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-pink/50 group-hover/feature:bg-accent-pink/5 transition-all duration-500 group-hover/feature:scale-110">
               <Sparkles className="text-accent-pink" size={32} />
             </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">AI Optimized</h4>
-            <p className="text-sm text-gray-500 leading-relaxed">Every template is pre-tuned for maximum conversion and lightning fast load times.</p>
+            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
+              AI Optimized
+            </h4>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Every template is pre-tuned for maximum conversion and lightning fast load times.
+            </p>
           </div>
           <div className="text-center group/feature">
             <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-green/50 group-hover/feature:bg-accent-green/5 transition-all duration-500 group-hover/feature:scale-110">
               <Zap className="text-accent-green" size={32} />
             </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">Instant Deploy</h4>
-            <p className="text-sm text-gray-500 leading-relaxed">Claim, clone, and launch in under 60 seconds. No hosting or configuration needed.</p>
+            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
+              Instant Deploy
+            </h4>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Claim, clone, and launch in under 60 seconds. No hosting or configuration needed.
+            </p>
           </div>
           <div className="text-center group/feature">
             <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-cyan/50 group-hover/feature:bg-accent-cyan/5 transition-all duration-500 group-hover/feature:scale-110">
               <MousePointer2 className="text-accent-cyan" size={32} />
             </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">Full Control</h4>
-            <p className="text-sm text-gray-500 leading-relaxed">Once claimed, you have full access to edit content, products, and styles at any time.</p>
+            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
+              Full Control
+            </h4>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Once claimed, you have full access to edit content, products, and styles at any time.
+            </p>
           </div>
         </div>
       </div>
+
+      {/* ===== PREVIEW & CLAIM MODAL ===== */}
+      {previewSite && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6">
+          <div
+            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+            onClick={() => {
+              if (!claimingId) setPreviewSite(null);
+            }}
+          />
+          <div className="relative z-10 w-full max-w-5xl max-h-[95vh] flex flex-col animate-scale-in">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur-md p-5 rounded-t-2xl border-t border-x border-gray-800">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-accent-pink flex items-center justify-center shadow-lg shadow-accent-pink/30">
+                  <Globe size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                    {previewSite.name}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {previewSite.type} &middot; {previewSite.niche}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if (!claimingId) setPreviewSite(null);
+                }}
+                className="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-lg transition-all"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Preview Body */}
+            <div className="flex-1 overflow-hidden border-x border-gray-800 bg-gray-950">
+              <WebsitePreview
+                sections={previewSections}
+                tone={previewTone}
+                businessName={previewSite.name}
+                category={previewSite.categoryId}
+                description={previewSite.description}
+                sectionContents={previewContents}
+                maxHeight="60vh"
+                scale={0.5}
+                showChrome={false}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-900/90 backdrop-blur-md p-5 rounded-b-2xl border-b border-x border-gray-800 flex flex-col sm:flex-row items-center gap-4">
+              {claimError && (
+                <p className="text-sm text-red-400 font-medium flex-1">{claimError}</p>
+              )}
+              <div className="flex items-center gap-3 ml-auto">
+                <button
+                  onClick={() => {
+                    if (!claimingId) setPreviewSite(null);
+                  }}
+                  disabled={!!claimingId}
+                  className="px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-gray-400 bg-gray-800 hover:bg-gray-700 transition-all border border-gray-700 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmClaim}
+                  disabled={!!claimingId}
+                  className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-accent-pink hover:bg-accent-pink/80 transition-all shadow-xl shadow-accent-pink/30 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2"
+                >
+                  {claimingId ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={16} /> Add to My Websites
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

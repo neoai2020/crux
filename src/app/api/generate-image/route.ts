@@ -5,31 +5,18 @@ export const maxDuration = 60;
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
 
-function extractBase64FromResponse(json: Record<string, unknown>): string | null {
-  if (typeof json.image === "string" && json.image.length > 100) return json.image;
-  if (typeof json.image_base64 === "string") return json.image_base64;
-  if (typeof json.result === "string" && json.result.length > 100) return json.result;
-  if (typeof json.output === "string" && json.output.length > 100) return json.output;
-  if (typeof json.b64_json === "string") return json.b64_json;
-
-  if (Array.isArray(json.data) && json.data.length > 0) {
-    const first = json.data[0] as Record<string, unknown>;
-    if (typeof first.b64_json === "string") return first.b64_json;
-    if (typeof first.url === "string") return first.url;
-    if (typeof first.image === "string") return first.image;
+async function fetchImageAsDataUrl(imageUrl: string): Promise<string | null> {
+  try {
+    const res = await fetch(imageUrl, { signal: AbortSignal.timeout(30000) });
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength < 1000) return null;
+    const ct = res.headers.get("content-type") || "image/png";
+    const mime = ct.startsWith("image/") ? ct.split(";")[0] : "image/png";
+    return `data:${mime};base64,${Buffer.from(buf).toString("base64")}`;
+  } catch {
+    return null;
   }
-
-  if (Array.isArray(json.images) && json.images.length > 0) {
-    const first = json.images[0];
-    if (typeof first === "string") return first;
-    if (typeof first === "object" && first !== null) {
-      const img = first as Record<string, unknown>;
-      if (typeof img.url === "string") return img.url;
-      if (typeof img.b64_json === "string") return img.b64_json;
-    }
-  }
-
-  return null;
 }
 
 export async function POST(request: Request) {
@@ -49,104 +36,101 @@ export async function POST(request: Request) {
 
     let dataUrl: string | null = null;
 
-    // --- Method 1: RapidAPI Google Nano Banana ---
+    // --- Method 1: ChatGPT-42 text-to-image (primary — proven working) ---
     try {
-      const body = new URLSearchParams({
-        prompt: imagePrompt,
-        negative_prompt: "blurry, bad quality, distorted, ugly, watermark, text",
-        width: "640",
-        height: "480",
-      });
-
-      const rapidRes = await fetch("https://google-nano-banana4.p.rapidapi.com/index.php", {
+      const res = await fetch("https://chatgpt-42.p.rapidapi.com/texttoimage", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           "x-rapidapi-key": RAPIDAPI_KEY,
-          "x-rapidapi-host": "google-nano-banana4.p.rapidapi.com",
-          "Content-Type": "application/x-www-form-urlencoded",
+          "x-rapidapi-host": "chatgpt-42.p.rapidapi.com",
         },
-        body: body.toString(),
-        signal: AbortSignal.timeout(50000),
+        body: JSON.stringify({ text: imagePrompt }),
+        signal: AbortSignal.timeout(55000),
       });
 
-      if (rapidRes.ok) {
-        const contentType = rapidRes.headers.get("content-type") || "";
-
-        if (contentType.startsWith("image/")) {
-          const buf = await rapidRes.arrayBuffer();
-          if (buf.byteLength > 1000) {
-            const base64 = Buffer.from(buf).toString("base64");
-            dataUrl = `data:${contentType.split(";")[0]};base64,${base64}`;
-          }
-        } else {
-          const text = await rapidRes.text();
-
-          try {
-            const json = JSON.parse(text) as Record<string, unknown>;
-            const extracted = extractBase64FromResponse(json);
-
-            if (extracted) {
-              if (extracted.startsWith("http")) {
-                const imgRes = await fetch(extracted, { signal: AbortSignal.timeout(30000) });
-                if (imgRes.ok) {
-                  const ct = imgRes.headers.get("content-type") || "image/png";
-                  const buf = await imgRes.arrayBuffer();
-                  if (buf.byteLength > 1000) {
-                    dataUrl = `data:${ct.split(";")[0]};base64,${Buffer.from(buf).toString("base64")}`;
-                  }
-                }
-              } else if (extracted.startsWith("data:")) {
-                dataUrl = extracted;
-              } else {
-                dataUrl = `data:image/png;base64,${extracted}`;
-              }
-            }
-          } catch {
-            if (text.length > 1000 && /^[A-Za-z0-9+/=\s]+$/.test(text.trim())) {
-              dataUrl = `data:image/png;base64,${text.trim()}`;
-            }
-          }
+      if (res.ok) {
+        const json = await res.json();
+        const imgUrl = json.generated_image || json.image || json.url || json.result;
+        if (typeof imgUrl === "string" && imgUrl.startsWith("http")) {
+          dataUrl = await fetchImageAsDataUrl(imgUrl);
         }
       } else {
-        console.error("RapidAPI returned status:", rapidRes.status);
+        console.error("ChatGPT-42 texttoimage status:", res.status);
       }
     } catch (e) {
-      console.error("RapidAPI image generation failed:", e);
+      console.error("ChatGPT-42 texttoimage failed:", e);
     }
 
-    // --- Method 2: Pollinations fallback ---
+    // --- Method 2: RapidAPI Google Nano Banana (secondary) ---
     if (!dataUrl) {
-      const seed = Math.floor(Math.random() * 999999);
-      const urls = [
-        `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
-        `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
-      ];
+      try {
+        const body = new URLSearchParams({
+          prompt: imagePrompt,
+          negative_prompt: "blurry, bad quality, distorted, ugly, watermark, text",
+          width: "640",
+          height: "480",
+        });
 
-      for (const url of urls) {
-        try {
-          const response = await fetch(url, {
-            redirect: "follow",
-            signal: AbortSignal.timeout(50000),
-          });
-          if (response.ok) {
-            const ct = response.headers.get("content-type") || "";
-            if (ct.startsWith("image/")) {
-              const buf = await response.arrayBuffer();
-              if (buf.byteLength > 1000) {
-                const base64 = Buffer.from(buf).toString("base64");
-                dataUrl = `data:${ct.split(";")[0]};base64,${base64}`;
-                break;
+        const rapidRes = await fetch("https://google-nano-banana4.p.rapidapi.com/index.php", {
+          method: "POST",
+          headers: {
+            "x-rapidapi-key": RAPIDAPI_KEY,
+            "x-rapidapi-host": "google-nano-banana4.p.rapidapi.com",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body.toString(),
+          signal: AbortSignal.timeout(50000),
+        });
+
+        if (rapidRes.ok) {
+          const contentType = rapidRes.headers.get("content-type") || "";
+
+          if (contentType.startsWith("image/")) {
+            const buf = await rapidRes.arrayBuffer();
+            if (buf.byteLength > 1000) {
+              dataUrl = `data:${contentType.split(";")[0]};base64,${Buffer.from(buf).toString("base64")}`;
+            }
+          } else {
+            const text = await rapidRes.text();
+            try {
+              const json = JSON.parse(text) as Record<string, unknown>;
+              if (json.status === "error") {
+                console.error("Nano Banana error:", json.message);
+              } else {
+                const val =
+                  (typeof json.image === "string" && json.image) ||
+                  (typeof json.image_base64 === "string" && json.image_base64) ||
+                  (typeof json.result === "string" && json.result) ||
+                  (Array.isArray(json.data) && json.data[0] &&
+                    ((json.data[0] as Record<string, unknown>).b64_json ||
+                     (json.data[0] as Record<string, unknown>).url)) ||
+                  null;
+
+                if (typeof val === "string" && val.length > 100) {
+                  if (val.startsWith("http")) {
+                    dataUrl = await fetchImageAsDataUrl(val);
+                  } else if (val.startsWith("data:")) {
+                    dataUrl = val;
+                  } else {
+                    dataUrl = `data:image/png;base64,${val}`;
+                  }
+                }
+              }
+            } catch {
+              if (text.length > 1000 && /^[A-Za-z0-9+/=\s]+$/.test(text.trim())) {
+                dataUrl = `data:image/png;base64,${text.trim()}`;
               }
             }
           }
-        } catch (e) {
-          console.error("Pollinations fallback failed:", e);
         }
+      } catch (e) {
+        console.error("Nano Banana failed:", e);
       }
     }
 
     if (!dataUrl) {
-      return NextResponse.json({ error: "Image generation timed out. Please try again." }, { status: 502 });
+      return NextResponse.json({ error: "Image generation failed. Please try again." }, { status: 502 });
     }
 
     await recordImageGeneration(userId);
