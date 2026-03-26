@@ -135,11 +135,9 @@ export default function WebsitesPage() {
                           <h3 className="text-xl font-black text-white truncate uppercase tracking-tight group-hover:text-crux-300 transition-colors">
                             {website.businessName}
                           </h3>
-                          {website.status === "published" && (
-                            <span className="bg-green-500/10 text-green-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-green-500/20 uppercase">
-                              Published
+                          <span className="bg-green-500/10 text-green-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-green-500/20 uppercase">
+                              Active
                             </span>
-                          )}
                         </div>
                         <p className="text-sm text-gray-400 flex items-center gap-2">
                           <span className="font-bold">{website.categoryName}</span>

@@ -128,7 +128,6 @@ Make each article 2-3 paragraphs, informative and helpful for ${niche} audience.
       user_id: userId,
       title: a.title,
       content: a.content,
-      status: "published",
     }));
 
     await supabase.from("articles").insert(rows);
