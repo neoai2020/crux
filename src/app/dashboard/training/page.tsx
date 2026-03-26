@@ -4,6 +4,8 @@ import {
   PlayCircle,
   MessageCircleQuestion,
   Crown,
+  Play,
+  X,
 } from "lucide-react";
 import FaqSection from "@/components/FaqSection";
 
@@ -74,6 +76,7 @@ type Tab = "videos" | "faq";
 
 export default function TrainingPage() {
   const [activeTab, setActiveTab] = useState<Tab>("videos");
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "videos", label: "Video Library", icon: <PlayCircle size={16} /> },
@@ -111,50 +114,91 @@ export default function TrainingPage() {
 
       {/* ========== VIDEO LIBRARY TAB ========== */}
       {activeTab === "videos" && (
-        <div className="w-full space-y-6">
-          {TRAINING_VIDEOS.length > 0 ? (
-            <div className="grid gap-5">
-              {TRAINING_VIDEOS.map((vid) => (
-                <div
-                  key={vid.vimeoId}
-                  className="card p-0 overflow-hidden border-gray-800/50 hover:border-crux-500/30 transition-all"
-                >
-                  <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                    <iframe
-                      src={`https://player.vimeo.com/video/${vid.vimeoId}?autoplay=0&title=0&byline=0&portrait=0&dnt=1`}
-                      className="absolute inset-0 w-full h-full"
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                      style={{ border: 0 }}
-                    />
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center gap-3 mb-1 flex-wrap">
-                      <h3 className="text-lg font-black text-white">{vid.title}</h3>
-                      <span className="text-[10px] font-black bg-crux-500/20 text-crux-400 px-2 py-0.5 rounded-full border border-crux-500/30 uppercase tracking-widest">
-                        {vid.duration}
-                      </span>
-                      {vid.premium && (
-                        <span className="flex items-center gap-1 text-[10px] font-black bg-amber-500/15 text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-widest">
-                          <Crown size={10} className="fill-amber-400" /> Premium
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-400">{vid.description}</p>
-                  </div>
+        <div className="w-full space-y-4">
+          {/* Active player */}
+          {playingId && (
+            <div className="card p-0 overflow-hidden border-crux-500/30 mb-2">
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  key={playingId}
+                  src={`https://player.vimeo.com/video/${playingId}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
+                  className="absolute inset-0 w-full h-full"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 0 }}
+                />
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-white">
+                    {TRAINING_VIDEOS.find((v) => v.vimeoId === playingId)?.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {TRAINING_VIDEOS.find((v) => v.vimeoId === playingId)?.description}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="card border-dashed border-gray-700 text-center py-16">
-              <PlayCircle size={48} className="mx-auto text-gray-700 mb-4" />
-              <h3 className="text-lg font-bold text-gray-400 mb-1">Video Library</h3>
-              <p className="text-sm text-gray-600">Training videos will appear here as they become available.</p>
+                <button
+                  onClick={() => setPlayingId(null)}
+                  className="shrink-0 ml-4 p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
           )}
 
-          <div className="card border-dashed border-gray-700/50 text-center py-10">
-            <p className="text-sm text-gray-600 font-medium">More training videos coming soon...</p>
+          {/* Video list */}
+          <div className="grid gap-3">
+            {TRAINING_VIDEOS.map((vid, idx) => {
+              const isPlaying = playingId === vid.vimeoId;
+              return (
+                <button
+                  key={vid.vimeoId}
+                  onClick={() => setPlayingId(isPlaying ? null : vid.vimeoId)}
+                  className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                    isPlaying
+                      ? "bg-crux-500/10 border-crux-500/30"
+                      : "bg-gray-900/40 border-gray-800/50 hover:border-gray-700 hover:bg-gray-900/60"
+                  }`}
+                >
+                  {/* Number + play icon */}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                    isPlaying
+                      ? "bg-crux-500/20 text-crux-400"
+                      : "bg-gray-800/60 text-gray-500 group-hover:text-white"
+                  }`}>
+                    {isPlaying ? (
+                      <div className="w-3 h-3 rounded-sm bg-crux-400" />
+                    ) : (
+                      <Play size={16} className="ml-0.5" />
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-bold text-gray-600">{String(idx + 1).padStart(2, "0")}</span>
+                      <h3 className={`text-sm font-bold truncate ${isPlaying ? "text-crux-300" : "text-white"}`}>
+                        {vid.title}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{vid.description}</p>
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {vid.premium && (
+                      <span className="flex items-center gap-1 text-[9px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wider">
+                        <Crown size={9} className="fill-amber-400" /> Premium
+                      </span>
+                    )}
+                    <span className="text-[10px] font-bold text-gray-600 bg-gray-800/60 px-2 py-0.5 rounded-full">
+                      {vid.duration}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
