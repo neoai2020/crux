@@ -883,88 +883,84 @@ export default function DFYPage() {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedSites.map((site) => {
           const isClaimed = claimedIds.has(site.id);
           const dbSite = websiteMap[site.id];
           const tone = getToneById(site.toneId);
 
           return (
-            <div key={site.id} className="card group p-0 overflow-hidden bg-gray-900/40 border-gray-800/50 hover:border-crux-500/30 transition-all shadow-xl hover:shadow-2xl flex flex-col">
+            <div
+              key={site.id}
+              className="group relative rounded-2xl overflow-hidden bg-gray-900/60 border border-gray-800/60 hover:border-gray-700/80 transition-all duration-300 flex flex-col"
+            >
               {/* Image */}
-              <div className="relative h-52 overflow-hidden">
+              <div className="relative h-44 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={site.image} alt={site.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-70" />
-                <div className="absolute top-4 left-4">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md" style={{ backgroundColor: tone.primary + "22", color: tone.primary, borderColor: tone.primary + "44" }}>
-                    {tone.name} Theme
-                  </span>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md ${TYPE_COLORS[site.type]}`}>
-                    {site.type}
-                  </span>
-                </div>
+                <img src={site.image} alt={site.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent" />
+
+                {/* Category pill — bottom-left on image */}
+                <span className={`absolute bottom-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border backdrop-blur-sm ${TYPE_COLORS[site.type]}`}>
+                  {site.type}
+                </span>
+
                 {isClaimed && (
-                  <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center animate-fade-in">
-                    <div className="bg-green-500/20 text-green-400 border border-green-500/30 px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-2xl">
-                      <CheckCircle2 size={18} /> Already Claimed
-                    </div>
-                  </div>
+                  <span className="absolute top-3 right-3 flex items-center gap-1 bg-green-500/20 text-green-400 border border-green-500/30 backdrop-blur-sm px-2 py-0.5 rounded-lg text-[10px] font-bold">
+                    <CheckCircle2 size={11} /> Claimed
+                  </span>
                 )}
               </div>
 
-              {/* Content */}
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-accent-pink transition-colors truncate flex-1 pr-2">
-                    {site.name}
-                  </h3>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleViewPosts(site); }}
-                    className="shrink-0 flex items-center gap-1.5 bg-crux-500/10 text-crux-400 px-3 py-1 rounded-xl border border-crux-500/20 text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-crux-500/20 hover:border-crux-500/40 transition-all cursor-pointer"
-                  >
-                    <Zap size={12} className="fill-crux-500" /> 200 POSTS
-                  </button>
-                </div>
-                <p className="text-sm text-gray-500 mb-8 line-clamp-3 leading-relaxed">
+              {/* Body */}
+              <div className="p-5 flex-1 flex flex-col gap-3">
+                <h3 className="text-base font-bold text-white leading-tight line-clamp-1">
+                  {site.name}
+                </h3>
+                <p className="text-[13px] text-gray-500 line-clamp-2 leading-relaxed">
                   {site.description}
                 </p>
 
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800/50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-inner transition-all" style={{ backgroundColor: tone.primary + "11", borderColor: tone.primary + "33", color: tone.primary }}>
-                      <Layout size={20} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">Niche</p>
-                      <p className="text-xs font-bold text-gray-300">{site.niche}</p>
-                    </div>
-                  </div>
+                {/* Meta row */}
+                <div className="flex items-center gap-2 mt-auto pt-1">
+                  <span className="text-[10px] font-medium text-gray-600">{site.niche}</span>
+                  <span className="text-gray-800">·</span>
+                  <span className="text-[10px] font-medium" style={{ color: tone.primary }}>{tone.name}</span>
+                </div>
 
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => handlePreview(site)}
-                      className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2.5 rounded-xl border border-crux-500/10 hover:border-crux-500/30">
-                      Preview <ExternalLink size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-800/40">
+                  <button
+                    onClick={() => handlePreview(site)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold text-gray-300 bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 hover:border-gray-600 transition-all"
+                  >
+                    <ExternalLink size={12} /> Preview
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleViewPosts(site); }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold text-crux-400 bg-crux-500/8 hover:bg-crux-500/15 border border-crux-500/15 hover:border-crux-500/30 transition-all"
+                  >
+                    <Zap size={11} className="fill-crux-500" /> 200 Posts
+                  </button>
+                  {isClaimed && dbSite ? (
+                    <a
+                      href={`/site/${dbSite.slug}?id=${dbSite.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold text-green-400 bg-green-500/8 hover:bg-green-500/15 border border-green-500/15 hover:border-green-500/30 transition-all"
+                    >
+                      <Globe size={12} /> Live
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => handlePreview(site)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold text-white bg-accent-pink/90 hover:bg-accent-pink border border-accent-pink/50 transition-all"
+                    >
+                      Claim <ArrowRight size={11} />
                     </button>
-                    {isClaimed && dbSite ? (
-                      <a href={`/site/${dbSite.slug}?id=${dbSite.id}`} target="_blank" rel="noreferrer"
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-green-500/10 text-green-400 border border-green-500/20 hover:border-green-500/40 hover:bg-green-500/20">
-                        View Live <ExternalLink size={13} />
-                      </a>
-                    ) : (
-                      <button onClick={() => handlePreview(site)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/20 hover:scale-105 active:scale-95">
-                        Claim <ArrowRight size={13} />
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
-
-              {/* Tone accent bar */}
-              <div className="h-1.5 w-full" style={{ background: tone.gradient, opacity: 0.5 }} />
             </div>
           );
         })}
