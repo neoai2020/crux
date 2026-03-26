@@ -71,6 +71,39 @@ async function fetchProfile(userId: string) {
   }
 }
 
+const FEATURES_CACHE_KEY = "crux_features";
+
+function getCachedFeatures(userId: string): string[] {
+  try {
+    const raw = localStorage.getItem(FEATURES_CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (parsed.userId === userId && Array.isArray(parsed.features)) {
+      return parsed.features;
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function setCachedFeatures(userId: string, features: string[]) {
+  try {
+    localStorage.setItem(
+      FEATURES_CACHE_KEY,
+      JSON.stringify({ userId, features })
+    );
+  } catch {
+    // localStorage unavailable
+  }
+}
+
+function clearCachedFeatures() {
+  try {
+    localStorage.removeItem(FEATURES_CACHE_KEY);
+  } catch {}
+}
+
 async function fetchFeatures(userId: string): Promise<string[]> {
   try {
     const query = async () => {
@@ -79,7 +112,11 @@ async function fetchFeatures(userId: string): Promise<string[]> {
       const data = await res.json();
       return (data.features as string[]) || [];
     };
-    return await withTimeout(query(), 5000, []);
+    const features = await withTimeout(query(), 5000, []);
+    if (features.length > 0) {
+      setCachedFeatures(userId, features);
+    }
+    return features;
   } catch {
     return [];
   }
@@ -103,12 +140,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(async ({ data: { session } }) => {
         if (!mounted) return;
         if (session?.user) {
-          setUser(toAppUser(session.user));
-          const [profile, features] = await Promise.all([
+          const cached = getCachedFeatures(session.user.id);
+          setUser(toAppUser(session.user, undefined, cached));
+
+          const [profile, freshFeatures] = await Promise.all([
             fetchProfile(session.user.id),
             fetchFeatures(session.user.id),
           ]);
-          if (mounted) setUser(toAppUser(session.user, profile || undefined, features));
+          if (mounted) {
+            const merged = [...new Set([...cached, ...freshFeatures])];
+            if (merged.length > 0) setCachedFeatures(session.user.id, merged);
+            setUser(toAppUser(session.user, profile || undefined, merged));
+          }
         }
       })
       .catch(() => {})
@@ -122,13 +165,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       if (session?.user) {
-        setUser(toAppUser(session.user));
-        const [profile, features] = await Promise.all([
+        const cached = getCachedFeatures(session.user.id);
+        setUser(toAppUser(session.user, undefined, cached));
+
+        const [profile, freshFeatures] = await Promise.all([
           fetchProfile(session.user.id),
           fetchFeatures(session.user.id),
         ]);
-        if (mounted) setUser(toAppUser(session.user, profile || undefined, features));
+        if (mounted) {
+          const merged = [...new Set([...cached, ...freshFeatures])];
+          if (merged.length > 0) setCachedFeatures(session.user.id, merged);
+          setUser(toAppUser(session.user, profile || undefined, merged));
+        }
       } else {
+        clearCachedFeatures();
         if (mounted) setUser(null);
       }
     });
@@ -147,12 +197,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       if (error || !data.user) return false;
-      setUser(toAppUser(data.user));
+      const cached = getCachedFeatures(data.user.id);
+      setUser(toAppUser(data.user, undefined, cached));
       Promise.all([
         fetchProfile(data.user.id),
         fetchFeatures(data.user.id),
-      ]).then(([profile, features]) => {
-        setUser(toAppUser(data.user, profile || undefined, features));
+      ]).then(([profile, freshFeatures]) => {
+        const merged = [...new Set([...cached, ...freshFeatures])];
+        if (merged.length > 0) setCachedFeatures(data.user.id, merged);
+        setUser(toAppUser(data.user, profile || undefined, merged));
       }).catch(() => {});
       return true;
     } catch {
@@ -185,6 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
+    clearCachedFeatures();
     setUser(null);
   };
 
