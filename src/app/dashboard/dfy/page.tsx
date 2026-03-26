@@ -19,7 +19,13 @@ import {
   Sparkles,
   MousePointer2,
   X,
+  FileText,
+  Copy,
+  ChevronLeft,
+  ChevronRight,
+  Search,
 } from "lucide-react";
+import { getPostsForSite, SeoPost } from "@/data/seo-posts";
 
 /* ------------------------------------------------------------------ */
 /*  DATA: unique business names per type (20 each)                    */
@@ -706,6 +712,12 @@ export default function DFYPage() {
   const [visibleCount, setVisibleCount] = useState(12);
   const [previewSite, setPreviewSite] = useState<DFYSite | null>(null);
   const [claimError, setClaimError] = useState("");
+  const [postsSite, setPostsSite] = useState<DFYSite | null>(null);
+  const [postsData, setPostsData] = useState<SeoPost[]>([]);
+  const [postsPage, setPostsPage] = useState(0);
+  const [postsSearch, setPostsSearch] = useState("");
+  const [expandedPost, setExpandedPost] = useState<number | null>(null);
+  const [copiedPost, setCopiedPost] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchUserSites() {
@@ -744,6 +756,21 @@ export default function DFYPage() {
   const handlePreview = (site: DFYSite) => {
     setClaimError("");
     setPreviewSite(site);
+  };
+
+  const handleViewPosts = (site: DFYSite) => {
+    const posts = getPostsForSite(site.type, site.name, site.id);
+    setPostsData(posts);
+    setPostsSite(site);
+    setPostsPage(0);
+    setPostsSearch("");
+    setExpandedPost(null);
+  };
+
+  const handleCopyPost = (post: SeoPost, idx: number) => {
+    navigator.clipboard.writeText(`${post.title}\n\n${post.body}`);
+    setCopiedPost(idx);
+    setTimeout(() => setCopiedPost(null), 2000);
   };
 
   const handleConfirmClaim = async () => {
@@ -894,9 +921,12 @@ export default function DFYPage() {
                   <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-accent-pink transition-colors truncate flex-1 pr-2">
                     {site.name}
                   </h3>
-                  <div className="shrink-0 flex items-center gap-1.5 bg-crux-500/10 text-crux-400 px-3 py-1 rounded-xl border border-crux-500/20 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleViewPosts(site); }}
+                    className="shrink-0 flex items-center gap-1.5 bg-crux-500/10 text-crux-400 px-3 py-1 rounded-xl border border-crux-500/20 text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-crux-500/20 hover:border-crux-500/40 transition-all cursor-pointer"
+                  >
                     <Zap size={12} className="fill-crux-500" /> 200 POSTS
-                  </div>
+                  </button>
                 </div>
                 <p className="text-sm text-gray-500 mb-8 line-clamp-3 leading-relaxed">
                   {site.description}
@@ -1039,6 +1069,158 @@ export default function DFYPage() {
           </div>
         </div>
       )}
+      {/* ===== POSTS BROWSER MODAL ===== */}
+      {postsSite && postsData.length > 0 && (() => {
+        const POSTS_PER_PAGE = 20;
+        const filtered = postsSearch.trim()
+          ? postsData.filter((p) =>
+              p.title.toLowerCase().includes(postsSearch.toLowerCase()) ||
+              p.excerpt.toLowerCase().includes(postsSearch.toLowerCase())
+            )
+          : postsData;
+        const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
+        const pagePosts = filtered.slice(postsPage * POSTS_PER_PAGE, (postsPage + 1) * POSTS_PER_PAGE);
+
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6">
+            <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setPostsSite(null)} />
+            <div className="relative z-10 w-full max-w-4xl max-h-[92vh] flex flex-col animate-scale-in">
+              {/* Header */}
+              <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur-md p-5 rounded-t-2xl border-t border-x border-gray-800">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center shadow-lg">
+                    <FileText size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight">{postsSite.name}</h3>
+                    <p className="text-xs text-gray-500">{filtered.length} SEO Posts &middot; {postsSite.type}</p>
+                  </div>
+                </div>
+                <button onClick={() => setPostsSite(null)}
+                  className="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-lg transition-all">
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="bg-gray-900/80 border-x border-gray-800 px-5 py-3">
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Search posts..."
+                    value={postsSearch}
+                    onChange={(e) => { setPostsSearch(e.target.value); setPostsPage(0); }}
+                    className="w-full bg-gray-800/60 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-crux-500 focus:ring-1 focus:ring-crux-500/50 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Posts List */}
+              <div className="flex-1 overflow-y-auto border-x border-gray-800 bg-gray-950 p-5 space-y-3">
+                {pagePosts.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500 text-sm">No posts match your search.</div>
+                ) : (
+                  pagePosts.map((post, idx) => {
+                    const globalIdx = postsPage * POSTS_PER_PAGE + idx;
+                    const isExpanded = expandedPost === globalIdx;
+                    const isCopied = copiedPost === globalIdx;
+                    return (
+                      <div
+                        key={globalIdx}
+                        className={`rounded-xl border transition-all ${
+                          isExpanded
+                            ? "border-crux-500/30 bg-gray-800/40"
+                            : "border-gray-800/50 bg-gray-900/40 hover:border-gray-700"
+                        }`}
+                      >
+                        <button
+                          onClick={() => setExpandedPost(isExpanded ? null : globalIdx)}
+                          className="w-full text-left px-4 py-3 flex items-start gap-3"
+                        >
+                          <span className="text-[10px] font-black text-gray-600 bg-gray-800 rounded-md px-2 py-1 mt-0.5 shrink-0">
+                            {globalIdx + 1}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-bold ${isExpanded ? "text-white" : "text-gray-300"}`}>
+                              {post.title}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1 line-clamp-1">{post.excerpt}</p>
+                          </div>
+                          <ChevronRight size={14} className={`text-gray-600 shrink-0 mt-1 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                        </button>
+                        {isExpanded && (
+                          <div className="px-4 pb-4 pt-0 border-t border-gray-800/50 mt-0">
+                            <pre className="text-sm text-gray-400 whitespace-pre-wrap font-sans leading-relaxed mt-3">
+                              {post.body}
+                            </pre>
+                            <div className="flex items-center gap-2 mt-3">
+                              {post.tags.map((tag) => (
+                                <span key={tag} className="text-[10px] font-bold bg-crux-500/10 text-crux-400 px-2 py-0.5 rounded-md border border-crux-500/20">
+                                  #{tag}
+                                </span>
+                              ))}
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleCopyPost(post, globalIdx); }}
+                                className={`ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                                  isCopied
+                                    ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                                    : "bg-gray-800 text-gray-400 hover:text-white border border-gray-700 hover:border-gray-600"
+                                }`}
+                              >
+                                <Copy size={12} /> {isCopied ? "Copied!" : "Copy"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Pagination */}
+              <div className="bg-gray-900/90 backdrop-blur-md p-4 rounded-b-2xl border-b border-x border-gray-800 flex items-center justify-between">
+                <span className="text-xs text-gray-500">
+                  Page {postsPage + 1} of {totalPages} &middot; {filtered.length} posts
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPostsPage((p) => Math.max(0, p - 1))}
+                    disabled={postsPage === 0}
+                    className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white border border-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    const page = totalPages <= 5 ? i : Math.max(0, Math.min(postsPage - 2, totalPages - 5)) + i;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setPostsPage(page)}
+                        className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                          postsPage === page
+                            ? "bg-crux-500/20 text-crux-300 border border-crux-500/30"
+                            : "bg-gray-800 text-gray-500 border border-gray-700 hover:text-white"
+                        }`}
+                      >
+                        {page + 1}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setPostsPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={postsPage >= totalPages - 1}
+                    className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white border border-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
