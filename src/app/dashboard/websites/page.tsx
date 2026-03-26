@@ -1,12 +1,26 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { getWebsitesForUser, deleteWebsite, getRemainingGenerations, SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
 import WebsitePreview from "@/components/WebsitePreview";
-import { ExternalLink, Globe, Trash2, Edit3, Plus, X } from "lucide-react";
+import { ExternalLink, Globe, Trash2, Edit3, Plus, X, Languages } from "lucide-react";
+
+const LANG_FLAGS: Record<string, string> = {
+  Spanish: "🇪🇸", French: "🇫🇷", German: "🇩🇪", Portuguese: "🇧🇷", Italian: "🇮🇹",
+  Dutch: "🇳🇱", Russian: "🇷🇺", "Chinese (Simplified)": "🇨🇳", Japanese: "🇯🇵",
+  Korean: "🇰🇷", Arabic: "🇸🇦", Hindi: "🇮🇳", Turkish: "🇹🇷", Polish: "🇵🇱",
+  Swedish: "🇸🇪", Danish: "🇩🇰", Finnish: "🇫🇮", Greek: "🇬🇷", Czech: "🇨🇿",
+  Romanian: "🇷🇴", Thai: "🇹🇭", Vietnamese: "🇻🇳", Indonesian: "🇮🇩",
+  Ukrainian: "🇺🇦", Hebrew: "🇮🇱",
+};
+
+function parseTranslationParentId(notes: string): string | null {
+  const m = notes.match(/\[Translated from ([^\]]+)\]/);
+  return m ? m[1] : null;
+}
 
 export default function WebsitesPage() {
   const { user } = useAuth();
@@ -40,6 +54,26 @@ export default function WebsitesPage() {
   const handleEdit = (website: SavedWebsite) => {
     router.push(`/dashboard/wizard?edit=${website.id}`);
   };
+
+  const translationMap = useMemo(() => {
+    const map: Record<string, SavedWebsite[]> = {};
+    const translationIds = new Set<string>();
+
+    for (const site of websites) {
+      const parentId = parseTranslationParentId(site.notes || "");
+      if (parentId) {
+        if (!map[parentId]) map[parentId] = [];
+        map[parentId].push(site);
+        translationIds.add(site.id);
+      }
+    }
+
+    return { map, translationIds };
+  }, [websites]);
+
+  const displayWebsites = useMemo(() => {
+    return websites.filter((w) => !translationMap.translationIds.has(w.id));
+  }, [websites, translationMap]);
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in pb-20">
@@ -85,8 +119,9 @@ export default function WebsitesPage() {
         </div>
       ) : (
         <div className="grid gap-6">
-          {websites.map((website) => {
+          {displayWebsites.map((website) => {
             const tone = getToneById(website.toneId);
+            const translations = translationMap.map[website.id] || [];
             return (
               <div key={website.id} className="card group hover:border-crux-500/30 transition-all bg-gray-900/40 border-gray-800/50 p-6 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-crux-500/5 to-transparent -mr-32 -mt-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -136,8 +171,13 @@ export default function WebsitesPage() {
                             {website.businessName}
                           </h3>
                           <span className="bg-green-500/10 text-green-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-green-500/20 uppercase">
-                              Active
+                            Active
+                          </span>
+                          {website.language && (
+                            <span className="bg-accent-cyan/10 text-accent-cyan text-[10px] font-black px-2 py-0.5 rounded-full border border-accent-cyan/20 uppercase flex items-center gap-1">
+                              {LANG_FLAGS[website.language] || "🌐"} {website.language}
                             </span>
+                          )}
                         </div>
                         <p className="text-sm text-gray-400 flex items-center gap-2">
                           <span className="font-bold">{website.categoryName}</span>
@@ -190,6 +230,33 @@ export default function WebsitesPage() {
                         <span className="hidden sm:inline font-black text-gray-600 bg-gray-800/50 px-2 py-0.5 rounded-md">{website.sections.length} SECTIONS</span>
                       )}
                     </div>
+
+                    {/* Translations / Languages */}
+                    {translations.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-800/50">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Languages size={14} className="text-accent-pink" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            Translations ({translations.length})
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {translations.map((t) => (
+                            <a
+                              key={t.id}
+                              href={`/site/${t.slug}?id=${t.id}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-accent-pink/5 text-accent-pink border border-accent-pink/15 hover:border-accent-pink/40 hover:bg-accent-pink/10 transition-all"
+                            >
+                              <span className="text-sm">{LANG_FLAGS[t.language || ""] || "🌐"}</span>
+                              {t.language || "Unknown"}
+                              <ExternalLink size={10} className="opacity-50" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import WebsiteWizard from "@/components/WebsiteWizard";
 import SharedPremiumGate from "@/components/PremiumGate";
-import { getWebsitesForUser, saveWebsite, SavedWebsite } from "@/lib/websites";
+import { getWebsitesForUser, SavedWebsite } from "@/lib/websites";
 import { getToneById } from "@/data/tones";
 import WebsitePreview from "@/components/WebsitePreview";
 
@@ -101,31 +101,36 @@ function TranslateSection({ userId }: { userId: string }) {
       }
 
       const cloneName = `${selectedSite.businessName} (${lang.name})`;
-      const result = await saveWebsite({
-        userId,
-        businessName: cloneName,
-        email: selectedSite.email,
-        description: selectedSite.description,
-        productLink: selectedSite.productLink,
-        logo: selectedSite.logo,
-        notes: `[Translated from ${selectedSite.id}] language: ${lang.name}`,
-        category: selectedSite.category,
-        categoryName: selectedSite.categoryName,
-        blueprintId: selectedSite.blueprintId,
-        blueprintName: selectedSite.blueprintName,
-        toneId: selectedSite.toneId,
-        sections: selectedSite.sections,
-        sectionContents: translatedContent,
-        language: lang.name,
+      const saveResp = await fetch("/api/save-translation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          businessName: cloneName,
+          email: selectedSite.email,
+          description: selectedSite.description,
+          productLink: selectedSite.productLink,
+          logo: selectedSite.logo,
+          notes: `[Translated from ${selectedSite.id}] language: ${lang.name}`,
+          category: selectedSite.category,
+          categoryName: selectedSite.categoryName,
+          blueprintId: selectedSite.blueprintId,
+          blueprintName: selectedSite.blueprintName,
+          toneId: selectedSite.toneId,
+          sections: selectedSite.sections,
+          sectionContents: translatedContent,
+          language: lang.name,
+        }),
       });
 
-      if (result) {
+      if (saveResp.ok) {
         setSuccess(`Created "${cloneName}" successfully!`);
         setSelectedSite(null);
         setSelectedLang("");
         await loadSites();
       } else {
-        setError("Failed to save translated website.");
+        const errData = await saveResp.json().catch(() => ({}));
+        setError(errData.error || "Failed to save translated website.");
       }
     } catch {
       setError("Connection error. Please try again.");
