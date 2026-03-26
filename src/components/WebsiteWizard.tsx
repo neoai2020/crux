@@ -329,7 +329,20 @@ function ContentEditorBlock({
   if (fields.length === 0) return null;
 
   function buildPrompt(context?: string): string {
-    return `${context || sectionType} for ${businessName}. ${description}`;
+    const sectionLabel = SECTION_LABELS[sectionType] || sectionType;
+    const base = `Professional ${context || sectionLabel.toLowerCase()} image for a ${description || "business"} website called "${businessName}".`;
+    const styleHints: Record<string, string> = {
+      hero: "Cinematic wide-angle hero shot, dramatic lighting, aspirational mood, high-end commercial photography style",
+      about: "Warm authentic team or workspace photo, natural lighting, professional candid style",
+      gallery: "High-quality portfolio or showcase photograph, beautiful composition, editorial style",
+      features: "Clean modern product or concept illustration, minimal background, professional photography",
+      testimonials: "Professional headshot or lifestyle portrait, shallow depth of field, warm tones",
+      contact: "Inviting office or storefront exterior, welcoming atmosphere, architectural photography",
+      team: "Professional corporate headshot, studio lighting, clean background",
+      contentGrid: "Editorial content photography, rich colors, magazine-quality composition",
+    };
+    const style = styleHints[sectionType] || "High-quality professional photography, clean and modern";
+    return `${base} ${style}. No text, no watermarks, photorealistic.`;
   }
 
   return (
@@ -364,9 +377,11 @@ function ContentEditorBlock({
                     maxItems={field.maxItems}
                     itemLabel={field.arrayLabel}
                     userId={userId}
-                    imagePromptBuilder={(itemData, fieldKey) =>
-                      `${fieldKey} for ${(itemData.title as string) || businessName}. ${description}`
-                    }
+                    imagePromptBuilder={(itemData, fieldKey) => {
+                      const itemTitle = (itemData.title as string) || (itemData.name as string) || "";
+                      const sectionLabel = SECTION_LABELS[sectionType] || sectionType;
+                      return `Professional ${fieldKey} image for "${itemTitle || businessName}" in the ${sectionLabel} section of a ${description || "business"} website. High-quality, modern, photorealistic, no text or watermarks.`;
+                    }}
                   />
                 </div>
               );
@@ -617,15 +632,26 @@ export default function WebsiteWizard({
     if (!form.description && !prompt) return;
     setGeneratingName(true);
     try {
-      const resp = await fetch("/api/analyze-prompt", {
+      const resp = await fetch("/api/generate-name", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: form.description || prompt }),
+        body: JSON.stringify({ description: form.description || prompt }),
       });
       if (resp.ok) {
         const data = await resp.json();
-        if (data.businessName) {
-          setForm((f) => ({ ...f, businessName: data.businessName }));
+        if (data.name) {
+          const newName = data.name;
+          setForm((f) => ({ ...f, businessName: newName }));
+          if (selectedBlueprint) {
+            setSectionContents(
+              buildDefaultContentsFromArgs(
+                selectedBlueprint.sections,
+                newName,
+                form.description,
+                form.category
+              )
+            );
+          }
         }
       }
     } catch {
@@ -975,6 +1001,18 @@ export default function WebsiteWizard({
                       onChange={(e) =>
                         setForm({ ...form, businessName: e.target.value })
                       }
+                      onBlur={() => {
+                        if (selectedBlueprint && form.businessName) {
+                          setSectionContents(
+                            buildDefaultContentsFromArgs(
+                              selectedBlueprint.sections,
+                              form.businessName,
+                              form.description,
+                              form.category
+                            )
+                          );
+                        }
+                      }}
                       className="input-field flex-1"
                       placeholder="e.g. Awesome Digital Co."
                     />
@@ -1011,6 +1049,18 @@ export default function WebsiteWizard({
                     onChange={(e) =>
                       setForm({ ...form, description: e.target.value })
                     }
+                    onBlur={() => {
+                      if (selectedBlueprint && form.businessName) {
+                        setSectionContents(
+                          buildDefaultContentsFromArgs(
+                            selectedBlueprint.sections,
+                            form.businessName,
+                            form.description,
+                            form.category
+                          )
+                        );
+                      }
+                    }}
                     className="input-field min-h-[80px] resize-none"
                     placeholder="Briefly describe what your business does..."
                     rows={3}

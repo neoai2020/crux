@@ -45,7 +45,7 @@ export default function SupportPage() {
                 Browse help articles, submit tickets, and track your requests.
               </p>
               <a
-                href="https://neoaifreshdesk.freshdesk.com"
+                href="https://neoaifreshdesk-help.freshdesk.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-sm text-crux-400 hover:text-crux-300 font-medium transition"
