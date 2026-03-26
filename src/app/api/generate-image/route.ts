@@ -5,6 +5,33 @@ export const maxDuration = 60;
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
 
+function extractBase64FromResponse(json: Record<string, unknown>): string | null {
+  if (typeof json.image === "string" && json.image.length > 100) return json.image;
+  if (typeof json.image_base64 === "string") return json.image_base64;
+  if (typeof json.result === "string" && json.result.length > 100) return json.result;
+  if (typeof json.output === "string" && json.output.length > 100) return json.output;
+  if (typeof json.b64_json === "string") return json.b64_json;
+
+  if (Array.isArray(json.data) && json.data.length > 0) {
+    const first = json.data[0] as Record<string, unknown>;
+    if (typeof first.b64_json === "string") return first.b64_json;
+    if (typeof first.url === "string") return first.url;
+    if (typeof first.image === "string") return first.image;
+  }
+
+  if (Array.isArray(json.images) && json.images.length > 0) {
+    const first = json.images[0];
+    if (typeof first === "string") return first;
+    if (typeof first === "object" && first !== null) {
+      const img = first as Record<string, unknown>;
+      if (typeof img.url === "string") return img.url;
+      if (typeof img.b64_json === "string") return img.b64_json;
+    }
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   try {
     const { prompt, userId } = await request.json();
@@ -20,10 +47,9 @@ export async function POST(request: Request) {
 
     const imagePrompt = `${prompt}, professional high quality photo, clean modern`;
 
-    // Try RapidAPI (Google Nano) first, then Pollinations as fallback
     let dataUrl: string | null = null;
 
-    // --- Method 1: RapidAPI Google Nano ---
+    // --- Method 1: RapidAPI Google Nano Banana ---
     try {
       const body = new URLSearchParams({
         prompt: imagePrompt,
@@ -44,10 +70,45 @@ export async function POST(request: Request) {
       });
 
       if (rapidRes.ok) {
-        const json = await rapidRes.json();
-        if (json.status === "success" && json.image_base64) {
-          dataUrl = `data:image/png;base64,${json.image_base64}`;
+        const contentType = rapidRes.headers.get("content-type") || "";
+
+        if (contentType.startsWith("image/")) {
+          const buf = await rapidRes.arrayBuffer();
+          if (buf.byteLength > 1000) {
+            const base64 = Buffer.from(buf).toString("base64");
+            dataUrl = `data:${contentType.split(";")[0]};base64,${base64}`;
+          }
+        } else {
+          const text = await rapidRes.text();
+
+          try {
+            const json = JSON.parse(text) as Record<string, unknown>;
+            const extracted = extractBase64FromResponse(json);
+
+            if (extracted) {
+              if (extracted.startsWith("http")) {
+                const imgRes = await fetch(extracted, { signal: AbortSignal.timeout(30000) });
+                if (imgRes.ok) {
+                  const ct = imgRes.headers.get("content-type") || "image/png";
+                  const buf = await imgRes.arrayBuffer();
+                  if (buf.byteLength > 1000) {
+                    dataUrl = `data:${ct.split(";")[0]};base64,${Buffer.from(buf).toString("base64")}`;
+                  }
+                }
+              } else if (extracted.startsWith("data:")) {
+                dataUrl = extracted;
+              } else {
+                dataUrl = `data:image/png;base64,${extracted}`;
+              }
+            }
+          } catch {
+            if (text.length > 1000 && /^[A-Za-z0-9+/=\s]+$/.test(text.trim())) {
+              dataUrl = `data:image/png;base64,${text.trim()}`;
+            }
+          }
         }
+      } else {
+        console.error("RapidAPI returned status:", rapidRes.status);
       }
     } catch (e) {
       console.error("RapidAPI image generation failed:", e);
@@ -57,8 +118,8 @@ export async function POST(request: Request) {
     if (!dataUrl) {
       const seed = Math.floor(Math.random() * 999999);
       const urls = [
-        `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
         `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
+        `https://gen.pollinations.ai/image/${encodeURIComponent(imagePrompt)}?width=640&height=480&nologo=true&seed=${seed}&model=flux`,
       ];
 
       for (const url of urls) {
@@ -73,7 +134,7 @@ export async function POST(request: Request) {
               const buf = await response.arrayBuffer();
               if (buf.byteLength > 1000) {
                 const base64 = Buffer.from(buf).toString("base64");
-                dataUrl = `data:${ct};base64,${base64}`;
+                dataUrl = `data:${ct.split(";")[0]};base64,${base64}`;
                 break;
               }
             }
