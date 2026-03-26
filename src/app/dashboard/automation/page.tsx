@@ -1,5 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
+import { useAuth } from "@/context/AuthContext";
+import PremiumGate from "@/components/PremiumGate";
 import {
   Zap,
   Search,
@@ -278,12 +280,17 @@ function SourceCard({
 
 /* ─── main page ─── */
 export default function AutomationPage() {
+  const { user } = useAuth();
+  const hasAccess = user?.features?.includes("automation");
+
   const [activeNiche, setActiveNiche] = useState("All");
   const [search, setSearch] = useState("");
   const [affiliateLink, setAffiliateLink] = useState(
     "https://your-affiliate-link.com/ref=you"
   );
   const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
+
+  if (!hasAccess) return <PremiumGate feature="automation" />;
 
   const filteredSources = useMemo(() => {
     let list = ALL_SOURCES;

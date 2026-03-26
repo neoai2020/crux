@@ -8,6 +8,7 @@ import { SectionType, generateDefaultContent, buildNavLinksForSections } from "@
 import { getToneById, TONES, ToneDefinition } from "@/data/tones";
 import { getFeatureImages, getTeamPhotos, getContentImages, getGalleryImages } from "@/data/images";
 import WebsitePreview from "@/components/WebsitePreview";
+import PremiumGate from "@/components/PremiumGate";
 import {
   CheckCircle2,
   ExternalLink,
@@ -553,6 +554,7 @@ function parseDfyId(notes: string): number | null {
 
 export default function DFYPage() {
   const { user } = useAuth();
+  const hasAccess = user?.features?.includes("dfy");
   const [claimedIds, setClaimedIds] = useState<Set<number>>(new Set());
   const [claimingId, setClaimingId] = useState<number | null>(null);
   const [websiteMap, setWebsiteMap] = useState<Record<number, SavedWebsite>>({});
@@ -671,6 +673,8 @@ export default function DFYPage() {
     activeType === "All" ? DFY_SITES : DFY_SITES.filter((s) => s.type === activeType);
   const displayedSites = filteredSites.slice(0, visibleCount);
   const types = ["All", ...SITE_TYPES];
+
+  if (!hasAccess) return <PremiumGate feature="dfy" />;
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in pb-20">

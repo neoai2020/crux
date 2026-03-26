@@ -125,3 +125,26 @@ create policy "Users can insert own image generations"
 create policy "Users can update own image generations"
   on public.image_generations for update
   using (auth.uid() = user_id);
+
+
+-- 5. Feature access table (per-feature premium unlocks)
+create table if not exists public.feature_access (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  feature text not null,
+  granted_at timestamptz not null default now(),
+  unique(user_id, feature)
+);
+
+alter table public.feature_access enable row level security;
+
+create policy "Users can view own feature access"
+  on public.feature_access for select
+  using (auth.uid() = user_id);
+
+-- Service role inserts only — users cannot grant themselves access
+-- Insert policy intentionally omitted for anon/authenticated roles
+
+
+-- 6. Add language column to websites (if not present)
+alter table public.websites add column if not exists language text;

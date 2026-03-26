@@ -5,7 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 
 import { 
-  BarChart3, 
   Wand2, 
   Globe, 
   Zap, 
@@ -15,7 +14,8 @@ import {
   Infinity, 
   Hammer,
   LayoutDashboard,
-  LogOut
+  LogOut,
+  Lock,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -28,10 +28,10 @@ const NAV_ITEMS = [
 ];
 
 const PREMIUM_ITEMS = [
-  { href: "/dashboard/10x", label: "10x", icon: <Rocket size={18} /> },
-  { href: "/dashboard/automation", label: "Automation", icon: <Zap size={18} /> },
-  { href: "/dashboard/infinite", label: "Infinite", icon: <Infinity size={18} /> },
-  { href: "/dashboard/dfy", label: "DFY", icon: <Hammer size={18} /> },
+  { href: "/dashboard/10x", label: "10x", icon: <Rocket size={18} />, feature: "10x" },
+  { href: "/dashboard/automation", label: "Automation", icon: <Zap size={18} />, feature: "automation" },
+  { href: "/dashboard/infinite", label: "Infinite", icon: <Infinity size={18} />, feature: "infinite" },
+  { href: "/dashboard/dfy", label: "DFY", icon: <Hammer size={18} />, feature: "dfy" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -93,6 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </p>
             {PREMIUM_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href);
+              const isLocked = !user.features?.includes(item.feature);
               return (
                 <Link
                   key={item.href}
@@ -107,6 +108,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {item.icon}
                   </span>
                   {item.label}
+                  {isLocked && (
+                    <Lock size={12} className="ml-auto text-gray-600" />
+                  )}
                 </Link>
               );
             })}

@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import PremiumGate from "@/components/PremiumGate";
 import {
   Zap,
   Share2,
@@ -106,11 +108,16 @@ const WHEN_HOW = [
 ];
 
 export default function TenXPage() {
+  const { user } = useAuth();
+  const hasAccess = user?.features?.includes("10x");
+
   const [linkName, setLinkName] = useState("");
   const [promoLink, setPromoLink] = useState("");
   const [posts, setPosts] = useState<string[]>([]);
   const [generated, setGenerated] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  if (!hasAccess) return <PremiumGate feature="10x" />;
 
   const handleGenerate = () => {
     const result = generatePosts(linkName, promoLink);

@@ -14,6 +14,7 @@ export interface User {
   name: string;
   email: string;
   plan: string;
+  features: string[];
   createdAt: string;
 }
 
@@ -28,7 +29,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function toAppUser(su: SupabaseUser, profile?: Record<string, string>): User {
+function toAppUser(
+  su: SupabaseUser,
+  profile?: Record<string, string>,
+  features?: string[]
+): User {
   return {
     id: su.id,
     name:
@@ -38,6 +43,7 @@ function toAppUser(su: SupabaseUser, profile?: Record<string, string>): User {
       "User",
     email: su.email || "",
     plan: profile?.plan || "Starter",
+    features: features || [],
     createdAt: profile?.created_at || su.created_at,
   };
 }
@@ -65,6 +71,21 @@ async function fetchProfile(userId: string) {
   }
 }
 
+async function fetchFeatures(userId: string): Promise<string[]> {
+  try {
+    const query = async () => {
+      const { data } = await supabase
+        .from("feature_access")
+        .select("feature")
+        .eq("user_id", userId);
+      return (data || []).map((r: { feature: string }) => r.feature);
+    };
+    return await withTimeout(query(), 4000, []);
+  } catch {
+    return [];
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,8 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!mounted) return;
         if (session?.user) {
           setUser(toAppUser(session.user));
-          const profile = await fetchProfile(session.user.id);
-          if (mounted && profile) setUser(toAppUser(session.user, profile));
+          const [profile, features] = await Promise.all([
+            fetchProfile(session.user.id),
+            fetchFeatures(session.user.id),
+          ]);
+          if (mounted) setUser(toAppUser(session.user, profile || undefined, features));
         }
       })
       .catch(() => {})
@@ -100,8 +124,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
       if (session?.user) {
         setUser(toAppUser(session.user));
-        const profile = await fetchProfile(session.user.id);
-        if (mounted && profile) setUser(toAppUser(session.user, profile));
+        const [profile, features] = await Promise.all([
+          fetchProfile(session.user.id),
+          fetchFeatures(session.user.id),
+        ]);
+        if (mounted) setUser(toAppUser(session.user, profile || undefined, features));
       } else {
         if (mounted) setUser(null);
       }
@@ -122,8 +149,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (error || !data.user) return false;
       setUser(toAppUser(data.user));
-      fetchProfile(data.user.id).then((profile) => {
-        if (profile) setUser(toAppUser(data.user, profile));
+      Promise.all([
+        fetchProfile(data.user.id),
+        fetchFeatures(data.user.id),
+      ]).then(([profile, features]) => {
+        setUser(toAppUser(data.user, profile || undefined, features));
       }).catch(() => {});
       return true;
     } catch {
