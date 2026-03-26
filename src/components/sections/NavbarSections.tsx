@@ -21,11 +21,21 @@ function NavLogo({ tone, logoData, businessName, size = 40 }: { tone: ToneDefini
         fontFamily: tone.headingFont,
         fontWeight: 700,
         fontSize: size * 0.45,
+        boxShadow: `0 2px 8px ${tone.primary}30`,
       }}
     >
       {initial}
     </div>
   );
+}
+
+function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  e.preventDefault();
+  const id = href.replace("#", "");
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 export function NavbarCentered({ tone, content, businessName }: SectionProps) {
@@ -36,9 +46,14 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
   return (
     <section
       style={{
-        backgroundColor: tone.bg,
         borderBottom: `1px solid ${tone.border}`,
         fontFamily: tone.bodyFont,
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        backgroundColor: `${tone.bg}ee`,
       }}
     >
       <div className="max-w-7xl mx-auto px-6 py-3">
@@ -59,20 +74,28 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
             )}
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link, i) => (
-              <a
-                key={i}
-                href={`#section-${link.toLowerCase().replace(/\s+/g, "-")}`}
-                style={{
-                  color: tone.muted,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  textDecoration: "none",
-                }}
-              >
-                {link}
-              </a>
-            ))}
+            {navLinks.map((link, i) => {
+              const href = `#section-${link.toLowerCase().replace(/\s+/g, "-")}`;
+              return (
+                <a
+                  key={i}
+                  href={href}
+                  onClick={(e) => handleSmoothScroll(e, href)}
+                  style={{
+                    color: tone.muted,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s",
+                    padding: "4px 0",
+                  }}
+                  onMouseEnter={(e) => { (e.target as HTMLElement).style.color = tone.text; }}
+                  onMouseLeave={(e) => { (e.target as HTMLElement).style.color = tone.muted; }}
+                >
+                  {link}
+                </a>
+              );
+            })}
           </nav>
           <button
             style={{
@@ -85,6 +108,7 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
               border: "none",
               padding: "8px 20px",
               cursor: "pointer",
+              boxShadow: `0 2px 8px ${tone.primary}25`,
             }}
           >
             {ctaText}
@@ -103,9 +127,14 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
   return (
     <section
       style={{
-        backgroundColor: tone.bg,
         borderBottom: `1px solid ${tone.border}`,
         fontFamily: tone.bodyFont,
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        backgroundColor: `${tone.bg}ee`,
       }}
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -126,20 +155,28 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
             )}
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link, i) => (
-              <a
-                key={i}
-                href={`#section-${link.toLowerCase().replace(/\s+/g, "-")}`}
-                style={{
-                  color: tone.muted,
-                  fontSize: 15,
-                  fontWeight: 500,
-                  textDecoration: "none",
-                }}
-              >
-                {link}
-              </a>
-            ))}
+            {navLinks.map((link, i) => {
+              const href = `#section-${link.toLowerCase().replace(/\s+/g, "-")}`;
+              return (
+                <a
+                  key={i}
+                  href={href}
+                  onClick={(e) => handleSmoothScroll(e, href)}
+                  style={{
+                    color: tone.muted,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s",
+                    padding: "4px 0",
+                  }}
+                  onMouseEnter={(e) => { (e.target as HTMLElement).style.color = tone.text; }}
+                  onMouseLeave={(e) => { (e.target as HTMLElement).style.color = tone.muted; }}
+                >
+                  {link}
+                </a>
+              );
+            })}
           </nav>
           <button
             style={{
@@ -152,6 +189,7 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
               border: "none",
               padding: "8px 22px",
               cursor: "pointer",
+              boxShadow: `0 2px 8px ${tone.primary}25`,
             }}
           >
             {ctaText}
@@ -169,9 +207,14 @@ export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
   return (
     <section
       style={{
-        backgroundColor: tone.bg,
         borderBottom: `1px solid ${tone.border}`,
         fontFamily: tone.bodyFont,
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        backgroundColor: `${tone.bg}ee`,
       }}
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -202,6 +245,7 @@ export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
               border: "none",
               padding: "8px 20px",
               cursor: "pointer",
+              boxShadow: `0 2px 8px ${tone.primary}25`,
             }}
           >
             {ctaText}

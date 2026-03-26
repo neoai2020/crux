@@ -250,65 +250,205 @@ const HERO_IMGS: Record<string, string[]> = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  DATA: hero taglines per type (rotate across sites)                */
+/* ------------------------------------------------------------------ */
+
+const HERO_TAGLINES: Record<string, string[]> = {
+  "E-commerce": [
+    "Shop the Future of Style", "Where Quality Meets Convenience", "Discover. Shop. Love.",
+    "Your One-Stop Premium Store", "Curated Collections, Delivered Fast",
+  ],
+  Service: [
+    "Excellence in Every Detail", "Professional Solutions, Personal Touch",
+    "Your Trusted Partner in Success", "Where Expertise Meets Dedication",
+    "Premium Service, Exceptional Results",
+  ],
+  Portfolio: [
+    "Design That Speaks Volumes", "Crafted with Passion & Precision",
+    "Where Ideas Become Visual Stories", "Creative Vision, Flawless Execution",
+    "The Art of Digital Excellence",
+  ],
+  "Landing Page": [
+    "The Future Starts Here", "Transform the Way You Work",
+    "Built for Growth, Designed for You", "Unlock Your Full Potential",
+    "Innovation at Your Fingertips",
+  ],
+  Blog: [
+    "Stories Worth Your Time", "Insights That Move You Forward",
+    "Where Ideas Come to Life", "Fresh Perspectives, Daily",
+    "Read. Learn. Grow.",
+  ],
+  Education: [
+    "Learn Without Limits", "Master New Skills, Your Way",
+    "Knowledge That Transforms Careers", "Education Reimagined",
+    "Your Journey to Expertise Starts Here",
+  ],
+  "Health/Medical": [
+    "Your Health, Our Priority", "Compassionate Care, Modern Medicine",
+    "Wellness Begins with Trust", "Where Science Meets Compassion",
+    "Better Health Starts Today",
+  ],
+  "Personal Branding": [
+    "Making an Impact That Lasts", "Ideas. Leadership. Results.",
+    "Elevating Brands, Empowering People", "The Voice Behind the Vision",
+    "Where Expertise Meets Influence",
+  ],
+  Corporate: [
+    "Building Tomorrow's Solutions Today", "Innovation at Enterprise Scale",
+    "Driving Growth Through Excellence", "Global Vision, Local Expertise",
+    "Leading the Industry Forward",
+  ],
+};
+
+/* ------------------------------------------------------------------ */
 /*  DATA: feature icon sets (cycle through per site)                  */
 /* ------------------------------------------------------------------ */
 
+const NICHE_FEATURES: Record<string, { icon: string; title: string; description: string }[]> = {
+  "E-commerce": [
+    { icon: "🛒", title: "One-Click Checkout", description: "Frictionless purchasing experience that maximizes conversion rates and reduces cart abandonment." },
+    { icon: "📦", title: "Real-Time Inventory", description: "Automated stock management synced across all channels with low-stock alerts." },
+    { icon: "💳", title: "Secure Payments", description: "PCI-compliant payment processing with support for 40+ payment methods worldwide." },
+    { icon: "🚚", title: "Smart Shipping", description: "Integrated shipping calculators with real-time tracking and automated fulfillment." },
+    { icon: "📊", title: "Sales Analytics", description: "Revenue dashboards, customer lifetime value tracking, and predictive demand forecasting." },
+    { icon: "🎁", title: "Loyalty Rewards", description: "Built-in points system and referral programs that turn buyers into brand advocates." },
+  ],
+  Service: [
+    { icon: "📅", title: "Online Booking", description: "Let clients schedule appointments 24/7 with automated confirmations and reminders." },
+    { icon: "⭐", title: "Client Reviews", description: "Verified review system that builds trust and showcases your best feedback." },
+    { icon: "💬", title: "Live Chat Support", description: "Instant communication with visitors to answer questions and convert leads." },
+    { icon: "📋", title: "Service Catalog", description: "Beautifully organized service packages with transparent pricing and comparison." },
+    { icon: "🔔", title: "Instant Quotes", description: "Automated quote generation based on client requirements and project scope." },
+    { icon: "🏆", title: "Certifications", description: "Prominently display your credentials, awards, and industry certifications." },
+  ],
+  Portfolio: [
+    { icon: "🖼️", title: "Visual Gallery", description: "High-resolution image galleries with lightbox viewing, filtering, and project categories." },
+    { icon: "🎬", title: "Case Studies", description: "In-depth project breakdowns showing process, challenges, and measurable results." },
+    { icon: "✏️", title: "Creative Process", description: "Showcase your workflow from concept to delivery with interactive timelines." },
+    { icon: "🎨", title: "Style Variety", description: "Multiple layout options to match your creative identity and body of work." },
+    { icon: "📧", title: "Inquiry Forms", description: "Custom contact forms with project type selection and budget range options." },
+    { icon: "🔗", title: "Social Integration", description: "Seamless links to Behance, Dribbble, Instagram, and other creative platforms." },
+  ],
+  "Landing Page": [
+    { icon: "🎯", title: "Conversion Focused", description: "Every element is positioned and designed to maximize your signup and purchase rates." },
+    { icon: "⚡", title: "Blazing Fast", description: "Sub-second load times with optimized assets — because every millisecond counts." },
+    { icon: "📱", title: "Mobile-First", description: "Responsive design that looks stunning on every device, from phones to desktops." },
+    { icon: "🧪", title: "A/B Ready", description: "Built-in structure for testing headlines, CTAs, and layouts to find what converts." },
+    { icon: "📈", title: "Lead Capture", description: "Strategically placed opt-in forms with integrations for all major email platforms." },
+    { icon: "🔒", title: "Trust Signals", description: "Social proof, security badges, and guarantees positioned where they matter most." },
+  ],
+  Blog: [
+    { icon: "✍️", title: "Rich Editor", description: "Write beautiful posts with images, embeds, code blocks, and custom formatting." },
+    { icon: "🏷️", title: "Smart Categories", description: "Organized content with tags, categories, and related post suggestions." },
+    { icon: "🔍", title: "SEO Optimized", description: "Built-in meta tags, schema markup, and clean URLs for maximum search visibility." },
+    { icon: "💌", title: "Newsletter", description: "Integrated email capture with automated digest emails to keep readers engaged." },
+    { icon: "💬", title: "Comments", description: "Threaded discussion system that builds community around your content." },
+    { icon: "📊", title: "Read Analytics", description: "Track engagement, reading time, and popular posts to guide your content strategy." },
+  ],
+  Education: [
+    { icon: "🎓", title: "Course Builder", description: "Structured modules with lessons, quizzes, and progress tracking for every student." },
+    { icon: "🎥", title: "Video Lessons", description: "HD video hosting with playback controls, chapters, and downloadable resources." },
+    { icon: "📝", title: "Assessments", description: "Interactive quizzes and assignments with automated grading and feedback." },
+    { icon: "🏅", title: "Certificates", description: "Branded completion certificates that students can share on LinkedIn." },
+    { icon: "👥", title: "Student Community", description: "Discussion forums and group features that enhance the learning experience." },
+    { icon: "📈", title: "Progress Tracking", description: "Visual dashboards showing student progress, completion rates, and engagement." },
+  ],
+  "Health/Medical": [
+    { icon: "🩺", title: "Patient Portal", description: "Secure online access for appointment scheduling, records, and communication." },
+    { icon: "💊", title: "Service Directory", description: "Comprehensive listing of treatments, specialties, and medical services offered." },
+    { icon: "🏥", title: "Virtual Visits", description: "HIPAA-compliant telehealth integration for remote consultations." },
+    { icon: "📋", title: "Health Resources", description: "Educational content library with condition guides, wellness tips, and FAQs." },
+    { icon: "⭐", title: "Provider Profiles", description: "Detailed doctor and staff bios with credentials, specialties, and patient reviews." },
+    { icon: "🔒", title: "HIPAA Compliant", description: "Enterprise-grade security ensuring patient data privacy and regulatory compliance." },
+  ],
+  "Personal Branding": [
+    { icon: "🎤", title: "Speaking & Events", description: "Showcase upcoming talks, workshops, and events with easy booking integration." },
+    { icon: "📚", title: "Published Work", description: "Highlight books, articles, and media appearances with links and excerpts." },
+    { icon: "🎯", title: "Services & Coaching", description: "Clearly defined offerings with pricing, outcomes, and testimonials." },
+    { icon: "📰", title: "Media Kit", description: "Downloadable press assets, bio, and hi-res photos for media inquiries." },
+    { icon: "💌", title: "Newsletter Signup", description: "Grow your audience with a compelling email opt-in and lead magnet." },
+    { icon: "🤝", title: "Social Proof", description: "Logos of companies you've worked with, press mentions, and endorsements." },
+  ],
+  Corporate: [
+    { icon: "🏢", title: "Company Overview", description: "Compelling corporate story with mission, vision, and values front and center." },
+    { icon: "📊", title: "Investor Relations", description: "Financial reports, press releases, and shareholder information hub." },
+    { icon: "🌍", title: "Global Presence", description: "Interactive map showing offices, partners, and market coverage worldwide." },
+    { icon: "👥", title: "Leadership Team", description: "Executive profiles with bios, achievements, and professional backgrounds." },
+    { icon: "🏆", title: "Case Studies", description: "Detailed success stories demonstrating measurable impact and ROI." },
+    { icon: "📞", title: "Enterprise Contact", description: "Department-specific contact forms with office locations and direct lines." },
+  ],
+};
+
 const FEATURE_SETS = [
-  [
-    { icon: "⚡", title: "Lightning Fast", description: "Optimized for speed and performance at every level." },
-    { icon: "🛡️", title: "Secure & Reliable", description: "Enterprise-grade security to protect what matters." },
-    { icon: "🎨", title: "Beautiful Design", description: "Stunning visuals that capture attention instantly." },
-    { icon: "📱", title: "Mobile Ready", description: "Perfect experience on every screen size." },
-    { icon: "🔧", title: "Easy Setup", description: "Get started in minutes with zero complexity." },
-    { icon: "📈", title: "Growth Focused", description: "Built to scale with your ambitions." },
-  ],
-  [
-    { icon: "🌍", title: "Global Reach", description: "Serve customers in 150+ countries seamlessly." },
-    { icon: "💬", title: "24/7 Support", description: "Our team is always here when you need us." },
-    { icon: "🔑", title: "Custom Solutions", description: "Tailored exactly to your unique requirements." },
-    { icon: "🏆", title: "Award Winning", description: "Recognized by industry experts for excellence." },
-    { icon: "🔄", title: "Seamless Integration", description: "Works with all your favorite tools out of the box." },
-    { icon: "💎", title: "Premium Quality", description: "We never compromise on quality or attention to detail." },
-  ],
-  [
-    { icon: "🚀", title: "Launch Faster", description: "Go from idea to live product in record time." },
-    { icon: "🧠", title: "AI-Powered", description: "Smart automation that works while you sleep." },
-    { icon: "📊", title: "Deep Analytics", description: "Real-time insights to guide your decisions." },
-    { icon: "🎯", title: "Precision Targeting", description: "Reach exactly the right audience every time." },
-    { icon: "💡", title: "Innovation First", description: "Always ahead of the curve with latest technology." },
-    { icon: "🤝", title: "Trusted Partners", description: "Building long-term relationships that drive results." },
-  ],
-  [
-    { icon: "✨", title: "Effortless Experience", description: "Intuitive design that just works from day one." },
-    { icon: "🔒", title: "Privacy First", description: "Your data stays yours — always encrypted, never sold." },
-    { icon: "⏱️", title: "Save Time", description: "Automate repetitive tasks and focus on what matters." },
-    { icon: "🌱", title: "Sustainable", description: "Built with eco-friendly practices and green hosting." },
-    { icon: "📦", title: "All-in-One", description: "Everything you need in a single powerful platform." },
-    { icon: "🔥", title: "High Performance", description: "Blazing fast speeds that keep users engaged." },
-  ],
+  NICHE_FEATURES["E-commerce"],
+  NICHE_FEATURES["Service"],
+  NICHE_FEATURES["Portfolio"],
+  NICHE_FEATURES["Landing Page"],
+  NICHE_FEATURES["Blog"],
+  NICHE_FEATURES["Education"],
+  NICHE_FEATURES["Health/Medical"],
+  NICHE_FEATURES["Personal Branding"],
+  NICHE_FEATURES["Corporate"],
 ];
 
+const NICHE_TESTIMONIALS: Record<string, { quote: string; name: string; role: string }[]> = {
+  "E-commerce": [
+    { quote: "Our online sales increased 240% after launching. The checkout experience is flawless — customers love it.", name: "Sarah Mitchell", role: "Founder, ShopNova" },
+    { quote: "We went from zero to $50K/month in revenue within our first quarter. The product pages convert like crazy.", name: "James Cooper", role: "CEO, TrendBuy" },
+    { quote: "Cart abandonment dropped 60% overnight. The design builds so much trust with our buyers.", name: "Emily Zhang", role: "COO, LuxeShop" },
+  ],
+  Service: [
+    { quote: "Booking requests tripled since we launched. Clients say our site feels more professional than competitors charging 5x more.", name: "Michael Torres", role: "Owner, ProAssist" },
+    { quote: "The service catalog and review sections sold our packages for us. Best investment we've made.", name: "Lisa Park", role: "Director, CarePlus" },
+    { quote: "We stopped cold-calling entirely. The website now generates 20+ qualified leads per week.", name: "David Chen", role: "Founder, TaskPro" },
+  ],
+  Portfolio: [
+    { quote: "My portfolio finally matches the quality of my work. I've landed 3 major clients since launching.", name: "Rachel Kim", role: "Creative Director" },
+    { quote: "Agencies started reaching out to me instead of the other way around. The case study layout is incredible.", name: "Tom Henderson", role: "Freelance Designer" },
+    { quote: "Every photographer I know is jealous of my site. It loaded fast and looks like a gallery exhibition.", name: "Amanda Foster", role: "Photographer" },
+  ],
+  "Landing Page": [
+    { quote: "Conversion rate went from 2% to 11% in the first week. The layout and copy flow is perfectly optimized.", name: "Chris Nakamura", role: "CMO, NovaTech" },
+    { quote: "We collected 5,000 emails in our first month. The lead magnet placement is genius.", name: "Natalie Russo", role: "Founder, BrightLeaf" },
+    { quote: "Our cost-per-acquisition dropped 65% after switching to this landing page. The ROI is insane.", name: "Marcus Williams", role: "VP Growth, Atlas" },
+  ],
+  Blog: [
+    { quote: "Organic traffic grew 400% in 6 months. The SEO structure is baked right into every page.", name: "Jessica Lane", role: "Editor, The Daily Digest" },
+    { quote: "Reader engagement doubled. The clean design and fast load times keep people reading longer.", name: "Robert Hayes", role: "Blogger, InsightHub" },
+    { quote: "My newsletter signups went from 5/day to 50/day just from the blog redesign. Incredible results.", name: "Maria Santos", role: "Content Creator" },
+  ],
+  Education: [
+    { quote: "Student enrollment increased 180% in our first semester. The course layout makes complex topics approachable.", name: "Dr. Alan Wright", role: "Dean, LearnPath Academy" },
+    { quote: "Completion rates jumped from 30% to 78%. Students say the progress tracking keeps them motivated.", name: "Priya Sharma", role: "Founder, SkillForge" },
+    { quote: "Parents love the professional look. It gives them confidence that their investment in education is well-placed.", name: "Carlos Mendez", role: "Director, BrightClass" },
+  ],
+  "Health/Medical": [
+    { quote: "Patient satisfaction scores improved 35%. The online booking system alone saved us 15 hours per week.", name: "Dr. Elena Ross", role: "Director, VitalCare" },
+    { quote: "New patient inquiries increased 200% after launching. The design conveys trust and professionalism instantly.", name: "Dr. Kevin Park", role: "Founder, WellPath" },
+    { quote: "Our telehealth adoption went from 10% to 60% of visits. The site made virtual care feel natural and easy.", name: "Dr. Susan Okafor", role: "CTO, PulseHealth" },
+  ],
+  "Personal Branding": [
+    { quote: "I went from unknown to booked solid for 6 months after launching my personal site. The design is a conversation starter.", name: "Jordan Rivera", role: "Keynote Speaker" },
+    { quote: "Speaking engagements doubled. Event organizers say my site sold them before we even had a call.", name: "Taylor Chen", role: "Executive Coach" },
+    { quote: "The media kit section alone landed me 3 podcast features and a magazine interview in the first month.", name: "Casey Brooks", role: "Author & Strategist" },
+  ],
+  Corporate: [
+    { quote: "Investor confidence measurably improved. The IR section and case studies tell our story better than any pitch deck.", name: "Richard Okafor", role: "CFO, Apex Industries" },
+    { quote: "Enterprise client acquisition increased 45%. The professional design immediately positions us as a market leader.", name: "Diane Cho", role: "VP Sales, Vertex Global" },
+    { quote: "Recruitment quality improved dramatically. Top candidates say our careers page convinced them to apply.", name: "Mark Stevens", role: "CHRO, Pinnacle Group" },
+  ],
+};
+
 const TESTIMONIAL_SETS = [
-  [
-    { quote: "This completely transformed our business. Revenue grew 300% in 6 months.", name: "Sarah Mitchell", role: "CEO, TechVentures" },
-    { quote: "The best decision we made this year. Professional, fast, and incredibly effective.", name: "James Cooper", role: "Founder, GrowthLab" },
-    { quote: "Outstanding quality. I recommend them to every entrepreneur I know.", name: "Emily Zhang", role: "Director, BrightPath" },
-  ],
-  [
-    { quote: "We doubled our customer base within 90 days. The ROI is incredible.", name: "Michael Torres", role: "CTO, DataFlow" },
-    { quote: "Incredible attention to detail. They really understood our vision and executed perfectly.", name: "Lisa Park", role: "CMO, Elevate Inc" },
-    { quote: "Finally a solution that actually delivers on its promises. Highly recommend.", name: "David Chen", role: "Founder, ScaleUp" },
-  ],
-  [
-    { quote: "The team went above and beyond. Our conversion rates tripled overnight.", name: "Rachel Kim", role: "VP Marketing, NovaTech" },
-    { quote: "I've tried dozens of alternatives. Nothing comes close to this level of quality.", name: "Tom Henderson", role: "CEO, BlueSky Digital" },
-    { quote: "From onboarding to results, the entire experience was seamless and professional.", name: "Amanda Foster", role: "Director, SparkMedia" },
-  ],
-  [
-    { quote: "Game-changer for our industry. We wish we'd started using this years ago.", name: "Chris Nakamura", role: "COO, Meridian Group" },
-    { quote: "The support team is phenomenal. They solved every issue within hours.", name: "Natalie Russo", role: "Founder, BrightLeaf" },
-    { quote: "Our clients are blown away by the results. This pays for itself in a week.", name: "Marcus Williams", role: "Partner, Atlas Advisory" },
-  ],
+  NICHE_TESTIMONIALS["E-commerce"],
+  NICHE_TESTIMONIALS["Service"],
+  NICHE_TESTIMONIALS["Portfolio"],
+  NICHE_TESTIMONIALS["Landing Page"],
+  NICHE_TESTIMONIALS["Blog"],
+  NICHE_TESTIMONIALS["Education"],
+  NICHE_TESTIMONIALS["Health/Medical"],
+  NICHE_TESTIMONIALS["Personal Branding"],
+  NICHE_TESTIMONIALS["Corporate"],
 ];
 
 /* ------------------------------------------------------------------ */
@@ -489,10 +629,14 @@ function buildRichContents(
     }
 
     if (sec.type === "hero") {
-      base.headline = site.name;
+      const taglines = HERO_TAGLINES[site.type] || [];
+      const tagline = taglines[site.id % taglines.length] || site.name;
+      base.headline = tagline;
       base.subheadline = site.description;
       base.heroImage = site.heroImage;
-      base.socialProof = `Trusted by ${(seed % 50 + 5) * 1000}+ customers`;
+      const proofNum = (seed % 50 + 5) * 1000;
+      const proofLabels = ["Trusted by", "Loved by", "Chosen by", "Used by", "Powering"];
+      base.socialProof = `${proofLabels[site.id % proofLabels.length]} ${proofNum.toLocaleString()}+ ${site.type === "Education" ? "students" : site.type === "Health/Medical" ? "patients" : site.type === "Blog" ? "readers" : "customers"}`;
     }
 
     if (sec.type === "about") {
@@ -501,15 +645,15 @@ function buildRichContents(
 
     if (sec.type === "features") {
       const featureImgs = getFeatureImages(6, seed);
-      const featureSet = FEATURE_SETS[site.featureSetIdx];
-      base.items = featureSet.map((f, fi) => ({ ...f, image: featureImgs[fi % featureImgs.length] }));
+      const nicheFeatures = NICHE_FEATURES[site.type] || FEATURE_SETS[site.featureSetIdx];
+      base.items = nicheFeatures.map((f, fi) => ({ ...f, image: featureImgs[fi % featureImgs.length] }));
       base.subtitle = `Everything you need from ${site.name}`;
     }
 
     if (sec.type === "testimonials") {
       const avatars = getTeamPhotos(3, seed + 200);
-      const testimonialSet = TESTIMONIAL_SETS[site.testimonialSetIdx];
-      base.items = testimonialSet.map((t, ti) => ({ ...t, avatar: avatars[ti % avatars.length] }));
+      const nicheTestimonials = NICHE_TESTIMONIALS[site.type] || TESTIMONIAL_SETS[site.testimonialSetIdx];
+      base.items = nicheTestimonials.map((t, ti) => ({ ...t, avatar: avatars[ti % avatars.length] }));
     }
 
     if (sec.type === "contentGrid") {
