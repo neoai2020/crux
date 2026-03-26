@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Rocket,
   Zap,
@@ -108,11 +109,8 @@ export default function ActivateFeaturePage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center font-black text-lg">
-              C
-            </div>
-            <span className="text-2xl font-black gradient-text">Crux</span>
+          <Link href="/auth/signin" className="inline-flex items-center gap-2 mb-6">
+            <Image src="/logo.png" alt="Crux" width={140} height={48} priority />
           </Link>
         </div>
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignInPage() {
@@ -42,12 +43,9 @@ export default function SignInPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center font-black text-lg">
-              C
-            </div>
-            <span className="text-2xl font-black gradient-text">Crux</span>
-          </Link>
+          <div className="inline-flex items-center gap-2 mb-6">
+            <Image src="/logo.png" alt="Crux" width={140} height={48} priority />
+          </div>
           <h1 className="text-3xl font-black mb-2">Welcome Back</h1>
           <p className="text-gray-400">Sign in to continue building amazing websites</p>
         </div>
@@ -107,7 +105,7 @@ export default function SignInPage() {
           <p className="text-center text-sm text-gray-400 mt-6">
             Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="text-crux-400 hover:text-crux-300 font-medium transition">
-              Sign up for free
+              Sign up
             </Link>
           </p>
         </div>

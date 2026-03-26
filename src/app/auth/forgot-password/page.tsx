@@ -1,25 +1,25 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const success = await resetPassword(email);
-      if (success) {
-        setSent(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        setError(error.message);
       } else {
-        setError("Could not send reset link. Please try again.");
+        setSent(true);
       }
     } catch {
       setError("Connection error. Please try again.");
@@ -33,11 +33,8 @@ export default function ForgotPasswordPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center font-black text-lg">
-              C
-            </div>
-            <span className="text-2xl font-black gradient-text">Crux</span>
+          <Link href="/auth/signin" className="inline-flex items-center gap-2 mb-6">
+            <Image src="/logo.png" alt="Crux" width={140} height={48} priority />
           </Link>
           <h1 className="text-3xl font-black mb-2">Reset Password</h1>
           <p className="text-gray-400">Enter your email and we&apos;ll send you a reset link</p>
@@ -53,6 +50,7 @@ export default function ForgotPasswordPage() {
               <p className="text-gray-400 text-sm mb-6">
                 We&apos;ve sent a password reset link to <span className="text-white font-medium">{email}</span>
               </p>
+              <p className="text-gray-500 text-xs mb-6">Don&apos;t see it? Check your spam folder.</p>
               <Link href="/auth/signin" className="btn-primary inline-block">
                 Back to Sign In
               </Link>

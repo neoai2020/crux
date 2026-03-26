@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
@@ -59,10 +60,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="w-64 bg-gray-900/80 backdrop-blur-xl border-r border-gray-800/50 flex flex-col fixed h-full">
         <div className="p-5 border-b border-gray-800/50">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center font-black">
-              C
-            </div>
-            <span className="text-xl font-black gradient-text">Crux</span>
+            <Image src="/logo.png" alt="Crux" width={100} height={34} priority />
           </Link>
         </div>
 

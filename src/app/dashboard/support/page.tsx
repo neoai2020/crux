@@ -1,5 +1,5 @@
 "use client";
-import { Mail, BookOpen, MessageCircle, ChevronRight } from "lucide-react";
+import { Mail, BookOpen, MessageCircle, ExternalLink } from "lucide-react";
 
 export default function SupportPage() {
   return (
@@ -13,7 +13,7 @@ export default function SupportPage() {
         </p>
       </div>
 
-      <div className="grid gap-5">
+      <div className="grid gap-5 w-full">
         <div className="card hover:border-crux-500/30 transition-all">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center text-white shrink-0 shadow-lg">
@@ -25,10 +25,10 @@ export default function SupportPage() {
                 Get a response within 24 hours from our dedicated team.
               </p>
               <a
-                href="mailto:support@crux.site"
+                href="mailto:crux@neoai.freshdesk.com"
                 className="text-sm text-crux-400 hover:text-crux-300 font-medium transition"
               >
-                support@crux.site →
+                crux@neoai.freshdesk.com →
               </a>
             </div>
           </div>
@@ -40,11 +40,18 @@ export default function SupportPage() {
               <BookOpen size={24} />
             </div>
             <div>
-              <h3 className="font-bold mb-1">Knowledge Base</h3>
+              <h3 className="font-bold mb-1">Support Portal</h3>
               <p className="text-sm text-gray-400 mb-3">
-                Browse guides, tutorials, and FAQs to find answers fast.
+                Browse help articles, submit tickets, and track your requests.
               </p>
-              <span className="text-sm text-gray-500">Coming soon</span>
+              <a
+                href="https://neoaifreshdesk.freshdesk.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-crux-400 hover:text-crux-300 font-medium transition"
+              >
+                Open Support Portal <ExternalLink size={14} />
+              </a>
             </div>
           </div>
         </div>

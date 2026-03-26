@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignUpPage() {
@@ -51,12 +52,9 @@ export default function SignUpPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-crux-500 to-accent-pink flex items-center justify-center font-black text-lg">
-              C
-            </div>
-            <span className="text-2xl font-black gradient-text">Crux</span>
-          </Link>
+          <div className="inline-flex items-center gap-2 mb-6">
+            <Image src="/logo.png" alt="Crux" width={140} height={48} priority />
+          </div>
           <h1 className="text-3xl font-black mb-2">Create Your Account</h1>
           <p className="text-gray-400">Start building your online empire in minutes</p>
         </div>
@@ -133,7 +131,7 @@ export default function SignUpPage() {
               />
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? "Creating account..." : "Sign Up"}
             </button>
           </form>
           <p className="text-center text-sm text-gray-400 mt-6">
