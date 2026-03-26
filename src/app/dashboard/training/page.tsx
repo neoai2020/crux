@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   PlayCircle,
   MessageCircleQuestion,
+  Crown,
 } from "lucide-react";
 import FaqSection from "@/components/FaqSection";
 
@@ -11,6 +12,7 @@ interface TrainingVideo {
   description: string;
   vimeoId: string;
   duration: string;
+  premium?: boolean;
 }
 
 const TRAINING_VIDEOS: TrainingVideo[] = [
@@ -19,6 +21,52 @@ const TRAINING_VIDEOS: TrainingVideo[] = [
     description: "A complete walkthrough of the Crux platform — from sign-in to your first published website.",
     vimeoId: "1177422137",
     duration: "5 min",
+  },
+  {
+    title: "Web Wizard Masterclass",
+    description: "Master the Web Wizard — learn how to create stunning, high-converting websites step by step.",
+    vimeoId: "1177422984",
+    duration: "8 min",
+  },
+  {
+    title: "My Websites — Manage Your Empire",
+    description: "Organize, preview, and manage all your generated websites from one powerful dashboard.",
+    vimeoId: "1177423011",
+    duration: "5 min",
+  },
+  {
+    title: "Traffic Magnet — AI Marketing Engine",
+    description: "Generate scroll-stopping marketing messages with AI to drive traffic to every site you build.",
+    vimeoId: "1177433708",
+    duration: "6 min",
+  },
+  {
+    title: "10X Facebook Post Generator",
+    description: "Turn one link into 10 high-converting Facebook posts, ready to copy and publish instantly.",
+    vimeoId: "1177452332",
+    duration: "5 min",
+    premium: true,
+  },
+  {
+    title: "Automation Hub — Your Free Traffic Empire",
+    description: "Unlock 60+ free traffic sources across every profitable niche with step-by-step playbooks.",
+    vimeoId: "1177452411",
+    duration: "7 min",
+    premium: true,
+  },
+  {
+    title: "Infinite Mode — Unlimited Creation",
+    description: "Build unlimited websites with no caps, plus clone and translate them into any language.",
+    vimeoId: "1177462152",
+    duration: "6 min",
+    premium: true,
+  },
+  {
+    title: "DFY — Done For You Websites",
+    description: "Browse and claim from a library of premium, ready-made websites — each with 200 SEO posts.",
+    vimeoId: "1177466083",
+    duration: "7 min",
+    premium: true,
   },
 ];
 
@@ -81,11 +129,16 @@ export default function TrainingPage() {
                     />
                   </div>
                   <div className="p-5">
-                    <div className="flex items-center gap-3 mb-1">
+                    <div className="flex items-center gap-3 mb-1 flex-wrap">
                       <h3 className="text-lg font-black text-white">{vid.title}</h3>
                       <span className="text-[10px] font-black bg-crux-500/20 text-crux-400 px-2 py-0.5 rounded-full border border-crux-500/30 uppercase tracking-widest">
                         {vid.duration}
                       </span>
+                      {vid.premium && (
+                        <span className="flex items-center gap-1 text-[10px] font-black bg-amber-500/15 text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-widest">
+                          <Crown size={10} className="fill-amber-400" /> Premium
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-400">{vid.description}</p>
                   </div>
