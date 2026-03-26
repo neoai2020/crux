@@ -36,7 +36,7 @@ export default function FeatureVideo({
       </div>
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
         <iframe
-          src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=0&background=0&title=0&byline=0&portrait=0&dnt=1`}
+          src={`https://player.vimeo.com/video/${vimeoId}?autoplay=0&title=0&byline=0&portrait=0&dnt=1`}
           className="absolute inset-0 w-full h-full"
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen

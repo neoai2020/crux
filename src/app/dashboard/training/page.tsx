@@ -411,7 +411,7 @@ export default function TrainingPage() {
                               <div className="mx-5 mt-2 mb-3 rounded-xl overflow-hidden border border-gray-800 bg-black">
                                 <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                                   <iframe
-                                    src={`https://player.vimeo.com/video/${lesson.vimeoId}?autoplay=1&muted=0&title=0&byline=0&portrait=0&dnt=1`}
+                                    src={`https://player.vimeo.com/video/${lesson.vimeoId}?autoplay=0&title=0&byline=0&portrait=0&dnt=1`}
                                     className="absolute inset-0 w-full h-full"
                                     allow="autoplay; fullscreen; picture-in-picture"
                                     allowFullScreen
