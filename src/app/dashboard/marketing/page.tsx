@@ -20,83 +20,6 @@ const PLATFORMS = [
   { id: "quora", name: "Quora", icon: "❓", color: "from-red-600 to-red-400" },
 ];
 
-function generateMessages(businessName: string, websiteUrl: string, description: string, platforms: string[]): MarketingMessage[] {
-  const messages: MarketingMessage[] = [];
-  const name = businessName || "My Website";
-  const url = websiteUrl || "crux.site/my-site";
-  const desc = description || "an amazing new platform";
-
-  if (platforms.includes("reddit")) {
-    messages.push({
-      platform: "Reddit",
-      icon: "🔴",
-      title: `Check out ${name} - ${desc}`,
-      subreddit: "r/Entrepreneur",
-      message: `Hey everyone! I just launched ${name} and wanted to share it with this community. ${desc}.\n\nI've been working on this for a while and would love your feedback. It's completely free to check out.\n\n👉 ${url}\n\nWould love to hear your thoughts! What features would you find most useful?`,
-    });
-    messages.push({
-      platform: "Reddit",
-      icon: "🔴",
-      title: `I built ${name} to solve a common problem`,
-      subreddit: "r/SideProject",
-      message: `After noticing how many people struggle with this, I decided to build ${name}.\n\nHere's what it does:\n- ${desc}\n- Easy to use interface\n- Free to get started\n\nCheck it out: ${url}\n\nI'm the creator so happy to answer any questions! 🚀`,
-    });
-  }
-
-  if (platforms.includes("forum")) {
-    messages.push({
-      platform: "Forums",
-      icon: "💬",
-      title: `New Resource: ${name}`,
-      message: `Hi everyone,\n\nI wanted to share a resource I recently created that I think this community would find valuable.\n\n${name} - ${desc}\n\nIt's designed to help people like us get more done with less effort. I'd really appreciate if you could check it out and share your honest feedback.\n\nLink: ${url}\n\nThanks in advance! Looking forward to hearing what you all think.`,
-    });
-  }
-
-  if (platforms.includes("facebook")) {
-    messages.push({
-      platform: "Facebook Groups",
-      icon: "📘",
-      title: `Excited to share ${name}!`,
-      message: `🚀 Exciting news! I just launched ${name}!\n\n${desc}\n\nIf you've been looking for a solution like this, I'd love for you to check it out:\n👉 ${url}\n\nDrop a comment if you have any questions - I'm here to help! 💪`,
-    });
-  }
-
-  if (platforms.includes("twitter")) {
-    messages.push({
-      platform: "X / Twitter",
-      icon: "🐦",
-      title: "Launch Tweet",
-      message: `🚀 Just launched ${name}!\n\n${desc}\n\nCheck it out 👇\n${url}\n\n#launch #startup #entrepreneur`,
-    });
-    messages.push({
-      platform: "X / Twitter",
-      icon: "🐦",
-      title: "Thread Starter",
-      message: `I spent weeks building ${name} and it's finally live! 🎉\n\nHere's what it does and why you should care:\n\n🧵 Thread 👇\n\n1/ ${desc}\n\n2/ The best part? It's super easy to get started.\n\n3/ Check it out: ${url}`,
-    });
-  }
-
-  if (platforms.includes("linkedin")) {
-    messages.push({
-      platform: "LinkedIn",
-      icon: "💼",
-      title: "Professional Announcement",
-      message: `I'm thrilled to announce the launch of ${name}! 🎉\n\n${desc}\n\nThis project has been a labor of love, and I'm excited to share it with my professional network.\n\nKey highlights:\n✅ Professional quality\n✅ Easy to use\n✅ Designed for results\n\nI'd love your feedback: ${url}\n\n#NewLaunch #Innovation #Entrepreneurship`,
-    });
-  }
-
-  if (platforms.includes("quora")) {
-    messages.push({
-      platform: "Quora",
-      icon: "❓",
-      title: "Helpful Answer Format",
-      message: `Great question! Based on my experience, here's what I'd recommend:\n\n${desc}\n\nI actually built a tool called ${name} that addresses exactly this. It's helped a lot of people already and I think you'd find it useful too.\n\nYou can check it out here: ${url}\n\nHope this helps! Let me know if you have any follow-up questions.`,
-    });
-  }
-
-  return messages;
-}
-
 export default function MarketingPage() {
   const { user } = useAuth();
   const [websites, setWebsites] = useState<SavedWebsite[]>([]);
@@ -104,8 +27,11 @@ export default function MarketingPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [messages, setMessages] = useState<MarketingMessage[]>([]);
   const [generated, setGenerated] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [loadingSites, setLoadingSites] = useState(true);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -116,11 +42,16 @@ export default function MarketingPage() {
     const timeout = setTimeout(() => {
       if (!cancelled) setLoadingSites(false);
     }, 6000);
+
     (async () => {
       try {
-        const sites = await getWebsitesForUser(user.id);
+        const [sites, remRes] = await Promise.all([
+          getWebsitesForUser(user.id),
+          fetch(`/api/generate-marketing?userId=${user.id}`).then((r) => r.json()),
+        ]);
         if (!cancelled) {
           setWebsites(sites);
+          setRemaining(remRes.remaining ?? 15);
           if (sites.length > 0) setSelectedSiteId(sites[0].id);
         }
       } catch {
@@ -142,12 +73,56 @@ export default function MarketingPage() {
     );
   };
 
-  const handleGenerate = () => {
-    if (!selectedSite || selectedPlatforms.length === 0) return;
-    const url = `crux.site/${selectedSite.slug}`;
-    const result = generateMessages(selectedSite.businessName, url, selectedSite.description, selectedPlatforms);
-    setMessages(result);
-    setGenerated(true);
+  const handleGenerate = async () => {
+    if (!selectedSite || selectedPlatforms.length === 0 || !user) return;
+    if (remaining !== null && remaining <= 0) {
+      setError("You've reached your daily limit of 15 generations. Resets tomorrow!");
+      return;
+    }
+
+    setGenerating(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/generate-marketing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessName: selectedSite.businessName,
+          url: `crux.site/${selectedSite.slug}`,
+          description: selectedSite.description,
+          platforms: selectedPlatforms,
+          userId: user.id,
+        }),
+      });
+
+      if (res.status === 429) {
+        const data = await res.json();
+        setError(data.error || "Daily limit reached (15/day).");
+        if (data.remaining !== undefined) setRemaining(data.remaining);
+        setGenerating(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setError("Generation failed. Please try again.");
+        setGenerating(false);
+        return;
+      }
+
+      const data = await res.json();
+      setMessages(data.messages);
+      if (data.remaining !== undefined) setRemaining(data.remaining);
+      setGenerated(true);
+    } catch {
+      setError("Connection error. Please try again.");
+    }
+    setGenerating(false);
+  };
+
+  const handleRegenerate = async () => {
+    setGenerated(false);
+    setMessages([]);
   };
 
   const handleCopy = (text: string, idx: number) => {
@@ -162,12 +137,28 @@ export default function MarketingPage() {
         <h1 className="text-2xl font-black mb-1">
           <span className="gradient-text">Traffic Magnet</span>
         </h1>
-        <p className="text-gray-400">Generate ready-to-post marketing messages for your websites.</p>
+        <p className="text-gray-400">
+          AI-powered marketing messages for your websites.
+        </p>
+        {remaining !== null && (
+          <div className="mt-3 inline-flex items-center gap-2 bg-gray-800/60 border border-gray-700/50 rounded-full px-4 py-1.5 text-sm">
+            <span className="text-gray-400">Daily generations:</span>
+            <span className={`font-bold ${remaining > 5 ? "text-accent-green" : remaining > 0 ? "text-yellow-400" : "text-red-400"}`}>
+              {remaining}/15
+            </span>
+            <span className="text-gray-500 text-xs">remaining</span>
+          </div>
+        )}
       </div>
+
+      {error && (
+        <div className="w-full max-w-2xl mb-4 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400 text-center">
+          {error}
+        </div>
+      )}
 
       {!generated ? (
         <div className="card max-w-2xl w-full space-y-5">
-          {/* Website selector */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">Select a Website *</label>
             {loadingSites ? (
@@ -238,24 +229,58 @@ export default function MarketingPage() {
 
               <button
                 onClick={handleGenerate}
-                disabled={selectedPlatforms.length === 0}
-                className="btn-primary w-full text-lg disabled:opacity-50"
+                disabled={selectedPlatforms.length === 0 || generating || (remaining !== null && remaining <= 0)}
+                className="btn-primary w-full text-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Generate Messages →
+                {generating ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating with AI...
+                  </>
+                ) : remaining !== null && remaining <= 0 ? (
+                  "Daily Limit Reached — Resets Tomorrow"
+                ) : (
+                  "Generate Messages →"
+                )}
               </button>
+
+              {remaining !== null && remaining > 0 && remaining <= 5 && (
+                <p className="text-xs text-center text-yellow-400/80">
+                  {remaining} generation{remaining !== 1 ? "s" : ""} remaining today
+                </p>
+              )}
             </>
           )}
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="w-full space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <p className="text-gray-400">
               Generated <span className="text-white font-medium">{messages.length} messages</span> for{" "}
               <span className="text-white font-medium">{selectedSite?.businessName}</span>
             </p>
-            <button onClick={() => setGenerated(false)} className="btn-secondary text-sm">
-              ← Edit & Regenerate
-            </button>
+            <div className="flex items-center gap-3">
+              {remaining !== null && (
+                <span className="text-xs text-gray-500">{remaining}/15 left today</span>
+              )}
+              <button
+                onClick={handleGenerate}
+                disabled={generating || (remaining !== null && remaining <= 0)}
+                className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50"
+              >
+                {generating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Regenerating...
+                  </>
+                ) : (
+                  "🔄 Regenerate"
+                )}
+              </button>
+              <button onClick={handleRegenerate} className="btn-secondary text-sm">
+                ← Edit Settings
+              </button>
+            </div>
           </div>
 
           {messages.map((msg, idx) => (

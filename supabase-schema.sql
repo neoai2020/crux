@@ -148,3 +148,16 @@ create policy "Users can view own feature access"
 
 -- 6. Add language column to websites (if not present)
 alter table public.websites add column if not exists language text;
+
+
+-- 7. Marketing generations table (tracks daily Traffic Magnet usage, 15/day)
+create table if not exists public.marketing_generations (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid not null,
+  date date not null default current_date,
+  count integer not null default 0,
+  created_at timestamptz default now(),
+  unique(user_id, date)
+);
+
+alter table public.marketing_generations enable row level security;
