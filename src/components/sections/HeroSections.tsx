@@ -73,7 +73,9 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const secondaryCtaLink = (content.secondaryCtaLink as string) || "#section-about";
   const socialProof = (content.socialProof as string) || "Trusted by 10,000+ customers";
 
   return (
@@ -113,8 +115,8 @@ export function HeroCentered({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
-          <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
-          <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
+          <a href={ctaLink} target={ctaLink.startsWith("http") ? "_blank" : undefined} rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={ctaStyle(tone)}>{ctaText}</a>
+          <a href={secondaryCtaLink} target={secondaryCtaLink.startsWith("http") ? "_blank" : undefined} rel={secondaryCtaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={secondaryStyle(tone)}>{secondaryCtaText}</a>
         </div>
         {socialProof && (
           <div
@@ -151,7 +153,9 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const secondaryCtaLink = (content.secondaryCtaLink as string) || "#section-about";
   const heroImage = content.heroImage as string | undefined;
 
   return (
@@ -188,8 +192,8 @@ export function HeroSplit({ tone, content, businessName }: SectionProps) {
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
-            <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
+            <a href={ctaLink} target={ctaLink.startsWith("http") ? "_blank" : undefined} rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={ctaStyle(tone)}>{ctaText}</a>
+            <a href={secondaryCtaLink} target={secondaryCtaLink.startsWith("http") ? "_blank" : undefined} rel={secondaryCtaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
         <div style={{ aspectRatio: "4/3", width: "100%", overflow: "hidden", borderRadius: tone.radius, boxShadow: `0 24px 48px -12px ${tone.primary}22, 0 12px 24px -8px rgba(0,0,0,0.1)` }}>
@@ -204,7 +208,9 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const secondaryCtaLink = (content.secondaryCtaLink as string) || "#section-about";
   const heroImage = content.heroImage as string | undefined;
 
   return (
@@ -244,8 +250,8 @@ export function HeroSplitReverse({ tone, content, businessName }: SectionProps) 
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-start gap-4" style={{ marginTop: 32 }}>
-            <a href="#section-cta" style={ctaStyle(tone)}>{ctaText}</a>
-            <a href="#section-about" style={secondaryStyle(tone)}>{secondaryCtaText}</a>
+            <a href={ctaLink} target={ctaLink.startsWith("http") ? "_blank" : undefined} rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={ctaStyle(tone)}>{ctaText}</a>
+            <a href={secondaryCtaLink} target={secondaryCtaLink.startsWith("http") ? "_blank" : undefined} rel={secondaryCtaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={secondaryStyle(tone)}>{secondaryCtaText}</a>
           </div>
         </div>
       </div>
@@ -257,6 +263,7 @@ export function HeroMinimal({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
 
   return (
     <section
@@ -295,7 +302,7 @@ export function HeroMinimal({ tone, content, businessName }: SectionProps) {
           </p>
         )}
         <div style={{ marginTop: 40 }}>
-          <a href="#section-cta" style={{ ...ctaStyle(tone), fontSize: 17, padding: "16px 40px" }}>{ctaText}</a>
+          <a href={ctaLink} target={ctaLink.startsWith("http") ? "_blank" : undefined} rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined} style={{ ...ctaStyle(tone), fontSize: 17, padding: "16px 40px" }}>{ctaText}</a>
         </div>
       </div>
     </section>
@@ -306,7 +313,9 @@ export function HeroFullBleed({ tone, content, businessName }: SectionProps) {
   const headline = (content.headline as string) || businessName;
   const subheadline = (content.subheadline as string) || "";
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const secondaryCtaText = (content.secondaryCtaText as string) || "Learn More";
+  const secondaryCtaLink = (content.secondaryCtaLink as string) || "#section-about";
   const heroImage = content.heroImage as string | undefined;
   const socialProof = (content.socialProof as string) || "";
 
@@ -381,7 +390,9 @@ export function HeroFullBleed({ tone, content, businessName }: SectionProps) {
         )}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ marginTop: 36 }}>
           <a
-            href="#section-cta"
+            href={ctaLink}
+            target={ctaLink.startsWith("http") ? "_blank" : undefined}
+            rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               ...ctaStyle(tone),
               boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
@@ -390,7 +401,9 @@ export function HeroFullBleed({ tone, content, businessName }: SectionProps) {
             {ctaText}
           </a>
           <a
-            href="#section-about"
+            href={secondaryCtaLink}
+            target={secondaryCtaLink.startsWith("http") ? "_blank" : undefined}
+            rel={secondaryCtaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               background: "rgba(255,255,255,0.15)",
               backdropFilter: "blur(8px)",

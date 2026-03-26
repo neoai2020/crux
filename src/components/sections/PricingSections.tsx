@@ -6,6 +6,7 @@ interface PricingPlan {
   period: string;
   features: string[];
   ctaText: string;
+  ctaLink?: string;
   highlighted: boolean;
 }
 
@@ -149,7 +150,10 @@ export function PricingCards({ tone, content }: SectionProps) {
                 ))}
               </ul>
               <div className="mt-auto">
-                <button
+                <a
+                  href={plan.ctaLink || "#section-contact"}
+                  target={(plan.ctaLink || "").startsWith("http") ? "_blank" : undefined}
+                  rel={(plan.ctaLink || "").startsWith("http") ? "noopener noreferrer" : undefined}
                   style={{
                     width: "100%",
                     background: plan.highlighted ? tone.gradient : "transparent",
@@ -163,10 +167,13 @@ export function PricingCards({ tone, content }: SectionProps) {
                     cursor: "pointer",
                     boxShadow: plan.highlighted ? `0 4px 20px ${tone.primary}30` : "none",
                     transition: "box-shadow 0.3s",
+                    textDecoration: "none",
+                    display: "block",
+                    textAlign: "center",
                   }}
                 >
                   {plan.ctaText}
-                </button>
+                </a>
               </div>
             </div>
           ))}
@@ -349,7 +356,10 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   </li>
                 ))}
               </ul>
-              <button
+              <a
+                href={others[0].ctaLink || "#section-contact"}
+                target={(others[0].ctaLink || "").startsWith("http") ? "_blank" : undefined}
+                rel={(others[0].ctaLink || "").startsWith("http") ? "noopener noreferrer" : undefined}
                 style={{
                   width: "100%",
                   backgroundColor: "transparent",
@@ -360,10 +370,13 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   border: `2px solid ${tone.primary}`,
                   padding: "12px 20px",
                   cursor: "pointer",
+                  textDecoration: "none",
+                  display: "block",
+                  textAlign: "center",
                 }}
               >
                 {others[0].ctaText}
-              </button>
+              </a>
             </div>
           )}
           {highlighted && (
@@ -415,7 +428,10 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   </li>
                 ))}
               </ul>
-              <button
+              <a
+                href={highlighted.ctaLink || "#section-contact"}
+                target={(highlighted.ctaLink || "").startsWith("http") ? "_blank" : undefined}
+                rel={(highlighted.ctaLink || "").startsWith("http") ? "noopener noreferrer" : undefined}
                 style={{
                   width: "100%",
                   backgroundColor: "#fff",
@@ -427,10 +443,13 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   padding: "14px 24px",
                   cursor: "pointer",
                   boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                  textDecoration: "none",
+                  display: "block",
+                  textAlign: "center",
                 }}
               >
                 {highlighted.ctaText}
-              </button>
+              </a>
             </div>
           )}
           {others[1] && (
@@ -461,7 +480,10 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   </li>
                 ))}
               </ul>
-              <button
+              <a
+                href={others[1].ctaLink || "#section-contact"}
+                target={(others[1].ctaLink || "").startsWith("http") ? "_blank" : undefined}
+                rel={(others[1].ctaLink || "").startsWith("http") ? "noopener noreferrer" : undefined}
                 style={{
                   width: "100%",
                   backgroundColor: "transparent",
@@ -472,10 +494,13 @@ export function PricingHighlight({ tone, content }: SectionProps) {
                   border: `2px solid ${tone.primary}`,
                   padding: "12px 20px",
                   cursor: "pointer",
+                  textDecoration: "none",
+                  display: "block",
+                  textAlign: "center",
                 }}
               >
                 {others[1].ctaText}
-              </button>
+              </a>
             </div>
           )}
         </div>

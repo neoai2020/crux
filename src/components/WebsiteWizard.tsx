@@ -99,12 +99,17 @@ const EDITABLE_FIELDS: Record<
     maxItems?: number;
   }[]
 > = {
-  navbar: [{ key: "ctaText", label: "CTA Button", type: "text" }],
+  navbar: [
+    { key: "ctaText", label: "CTA Button Text", type: "text" },
+    { key: "ctaLink", label: "CTA Button Link", type: "text" },
+  ],
   hero: [
     { key: "headline", label: "Headline", type: "text" },
     { key: "subheadline", label: "Subheadline", type: "textarea" },
-    { key: "ctaText", label: "CTA Button", type: "text" },
-    { key: "secondaryCtaText", label: "Secondary CTA", type: "text" },
+    { key: "ctaText", label: "CTA Button Text", type: "text" },
+    { key: "ctaLink", label: "CTA Button Link", type: "text" },
+    { key: "secondaryCtaText", label: "Secondary CTA Text", type: "text" },
+    { key: "secondaryCtaLink", label: "Secondary CTA Link", type: "text" },
     { key: "socialProof", label: "Social Proof Text", type: "text" },
     { key: "heroImage", label: "Hero Image", type: "image", imageContext: "hero banner" },
   ],
@@ -149,7 +154,9 @@ const EDITABLE_FIELDS: Record<
     { key: "headline", label: "Headline", type: "text" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "buttonText", label: "Button Text", type: "text" },
-    { key: "secondaryButtonText", label: "Secondary Button", type: "text" },
+    { key: "buttonLink", label: "Button Link", type: "text" },
+    { key: "secondaryButtonText", label: "Secondary Button Text", type: "text" },
+    { key: "secondaryButtonLink", label: "Secondary Button Link", type: "text" },
     { key: "disclaimer", label: "Disclaimer", type: "text" },
   ],
   pricing: [
@@ -167,6 +174,7 @@ const EDITABLE_FIELDS: Record<
         { key: "price", label: "Price", type: "text" },
         { key: "period", label: "Period", type: "text" },
         { key: "ctaText", label: "Button Text", type: "text" },
+        { key: "ctaLink", label: "Button Link", type: "text" },
       ],
     },
   ],
@@ -192,6 +200,7 @@ const EDITABLE_FIELDS: Record<
     { key: "phone", label: "Phone", type: "text" },
     { key: "address", label: "Address", type: "text" },
     { key: "buttonText", label: "Button Text", type: "text" },
+    { key: "buttonLink", label: "Button Link", type: "text" },
   ],
   gallery: [
     { key: "sectionTitle", label: "Section Title", type: "text" },
@@ -272,6 +281,7 @@ const EDITABLE_FIELDS: Record<
     { key: "description", label: "Description", type: "textarea" },
     { key: "placeholder", label: "Placeholder", type: "text" },
     { key: "buttonText", label: "Button Text", type: "text" },
+    { key: "buttonLink", label: "Button Link", type: "text" },
   ],
   benefits: [
     { key: "sectionTitle", label: "Section Title", type: "text" },
@@ -293,11 +303,13 @@ const EDITABLE_FIELDS: Record<
     { key: "headline", label: "Headline", type: "text" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "ctaText", label: "CTA Text", type: "text" },
+    { key: "ctaLink", label: "CTA Link", type: "text" },
   ],
   countdown: [
     { key: "headline", label: "Headline", type: "text" },
     { key: "description", label: "Description", type: "textarea" },
     { key: "ctaText", label: "CTA Text", type: "text" },
+    { key: "ctaLink", label: "CTA Link", type: "text" },
   ],
   footer: [
     { key: "tagline", label: "Tagline", type: "textarea" },
@@ -525,6 +537,28 @@ export default function WebsiteWizard({
     return () => { cancelled = true; };
   }, [user, editId, unlimited]);
 
+  function resolveCtaLink(): string {
+    if (form.productLink && form.productLink.trim()) return form.productLink.trim();
+    if (form.email && form.email.trim()) return `mailto:${form.email.trim()}`;
+    return "#section-contact";
+  }
+
+  function injectLinks(content: Record<string, unknown>, link: string): Record<string, unknown> {
+    const linkKeys = ["ctaLink", "secondaryCtaLink", "buttonLink", "secondaryButtonLink"];
+    for (const k of linkKeys) {
+      if (k in content) {
+        content[k] = link;
+      }
+    }
+    if (Array.isArray(content.plans)) {
+      content.plans = (content.plans as Record<string, unknown>[]).map((plan) => ({
+        ...plan,
+        ctaLink: link,
+      }));
+    }
+    return content;
+  }
+
   function buildDefaultContentsFromArgs(
     sections: BlueprintSection[],
     businessName: string,
@@ -533,12 +567,14 @@ export default function WebsiteWizard({
   ): Record<string, Record<string, unknown>> {
     const result: Record<string, Record<string, unknown>> = {};
     const dynamicNavLinks = buildNavLinksForSections(sections.map((s) => s.type));
+    const link = resolveCtaLink();
     sections.forEach((sec, idx) => {
       const key = `${sec.type}-${idx}`;
       const content = generateDefaultContent(sec.type, businessName, description, category);
       if (sec.type === "navbar") {
         content.navLinks = dynamicNavLinks;
       }
+      injectLinks(content, link);
       result[key] = content;
     });
     return result;
@@ -1039,6 +1075,24 @@ export default function WebsiteWizard({
                     className="input-field"
                     placeholder="contact@yourbusiness.com"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                    Your Link
+                    <span className="text-gray-500 font-normal ml-1">(all CTA buttons will link here)</span>
+                  </label>
+                  <input
+                    type="url"
+                    value={form.productLink}
+                    onChange={(e) =>
+                      setForm({ ...form, productLink: e.target.value })
+                    }
+                    className="input-field"
+                    placeholder="https://your-link.com or leave blank for email link"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    All buttons will link to this URL. If blank, buttons will use your email as a mailto link.
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">

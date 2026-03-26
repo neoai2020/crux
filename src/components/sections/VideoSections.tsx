@@ -32,6 +32,7 @@ export function VideoCentered({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "See It in Action";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Watch Now";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const thumbnailImage = content.thumbnailImage as string | undefined;
 
   return (
@@ -86,7 +87,10 @@ export function VideoCentered({ tone, content }: SectionProps) {
         </div>
         {ctaText && (
           <div className="text-center" style={{ marginTop: 20 }}>
-            <button
+            <a
+              href={ctaLink}
+              target={ctaLink.startsWith("http") ? "_blank" : undefined}
+              rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 backgroundColor: tone.primary,
                 color: "#fff",
@@ -97,10 +101,12 @@ export function VideoCentered({ tone, content }: SectionProps) {
                 fontSize: 15,
                 padding: "12px 28px",
                 cursor: "pointer",
+                textDecoration: "none",
+                display: "inline-block",
               }}
             >
               {ctaText}
-            </button>
+            </a>
           </div>
         )}
       </div>
@@ -112,6 +118,7 @@ export function VideoSplit({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "See It in Action";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Watch Now";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const thumbnailImage = content.thumbnailImage as string | undefined;
 
   return (
@@ -138,7 +145,10 @@ export function VideoSplit({ tone, content }: SectionProps) {
               {description}
             </p>
           )}
-          <button
+          <a
+            href={ctaLink}
+            target={ctaLink.startsWith("http") ? "_blank" : undefined}
+            rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               backgroundColor: tone.primary,
               color: "#fff",
@@ -149,10 +159,12 @@ export function VideoSplit({ tone, content }: SectionProps) {
               fontSize: 15,
               padding: "14px 32px",
               cursor: "pointer",
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {ctaText}
-          </button>
+          </a>
         </div>
         <div
           className="flex items-center justify-center"

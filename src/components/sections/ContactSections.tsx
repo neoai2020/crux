@@ -7,6 +7,7 @@ export function ContactSplit({ tone, content }: SectionProps) {
   const phone = (content.phone as string) || "";
   const address = (content.address as string) || "";
   const buttonText = (content.buttonText as string) || "Send Message";
+  const buttonLink = (content.buttonLink as string) || (email ? `mailto:${email}` : "#section-contact");
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -202,7 +203,10 @@ export function ContactSplit({ tone, content }: SectionProps) {
               rows={5}
               style={{ ...inputStyle, resize: "none" }}
             />
-            <button
+            <a
+              href={buttonLink}
+              target={buttonLink.startsWith("http") ? "_blank" : undefined}
+              rel={buttonLink.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 background: tone.gradient,
                 color: "#fff",
@@ -215,10 +219,12 @@ export function ContactSplit({ tone, content }: SectionProps) {
                 cursor: "pointer",
                 marginTop: 4,
                 boxShadow: `0 4px 20px ${tone.primary}30`,
+                textDecoration: "none",
+                display: "inline-block",
               }}
             >
               {buttonText} →
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -233,6 +239,7 @@ export function ContactCentered({ tone, content }: SectionProps) {
   const phone = (content.phone as string) || "";
   const address = (content.address as string) || "";
   const buttonText = (content.buttonText as string) || "Send Message";
+  const buttonLink = (content.buttonLink as string) || (email ? `mailto:${email}` : "#section-contact");
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -311,7 +318,10 @@ export function ContactCentered({ tone, content }: SectionProps) {
               rows={5}
               style={{ ...inputStyle, resize: "none" }}
             />
-            <button
+            <a
+              href={buttonLink}
+              target={buttonLink.startsWith("http") ? "_blank" : undefined}
+              rel={buttonLink.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 background: tone.gradient,
                 color: "#fff",
@@ -325,10 +335,13 @@ export function ContactCentered({ tone, content }: SectionProps) {
                 width: "100%",
                 marginTop: 4,
                 boxShadow: `0 4px 20px ${tone.primary}30`,
+                textDecoration: "none",
+                display: "block",
+                textAlign: "center",
               }}
             >
               {buttonText} →
-            </button>
+            </a>
           </div>
         </div>
         <div

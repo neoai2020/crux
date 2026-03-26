@@ -41,6 +41,7 @@ function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string
 export function NavbarCentered({ tone, content, businessName }: SectionProps) {
   const navLinks = (content.navLinks as string[]) || [];
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const logoData = content.logoData as string | undefined;
 
   return (
@@ -97,7 +98,10 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
               );
             })}
           </nav>
-          <button
+          <a
+            href={ctaLink}
+            target={ctaLink.startsWith("http") ? "_blank" : undefined}
+            rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               background: tone.gradient,
               color: "#fff",
@@ -109,10 +113,12 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
               padding: "8px 20px",
               cursor: "pointer",
               boxShadow: `0 2px 8px ${tone.primary}25`,
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {ctaText}
-          </button>
+          </a>
         </div>
       </div>
     </section>
@@ -122,6 +128,7 @@ export function NavbarCentered({ tone, content, businessName }: SectionProps) {
 export function NavbarLeftAligned({ tone, content, businessName }: SectionProps) {
   const navLinks = (content.navLinks as string[]) || [];
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const logoData = content.logoData as string | undefined;
 
   return (
@@ -178,7 +185,10 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
               );
             })}
           </nav>
-          <button
+          <a
+            href={ctaLink}
+            target={ctaLink.startsWith("http") ? "_blank" : undefined}
+            rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               background: tone.gradient,
               color: "#fff",
@@ -190,10 +200,12 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
               padding: "8px 22px",
               cursor: "pointer",
               boxShadow: `0 2px 8px ${tone.primary}25`,
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {ctaText}
-          </button>
+          </a>
         </div>
       </div>
     </section>
@@ -202,6 +214,7 @@ export function NavbarLeftAligned({ tone, content, businessName }: SectionProps)
 
 export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
   const ctaText = (content.ctaText as string) || "Get Started";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const logoData = content.logoData as string | undefined;
 
   return (
@@ -234,7 +247,10 @@ export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
               </span>
             )}
           </div>
-          <button
+          <a
+            href={ctaLink}
+            target={ctaLink.startsWith("http") ? "_blank" : undefined}
+            rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               background: tone.gradient,
               color: "#fff",
@@ -246,10 +262,12 @@ export function NavbarMinimal({ tone, content, businessName }: SectionProps) {
               padding: "8px 20px",
               cursor: "pointer",
               boxShadow: `0 2px 8px ${tone.primary}25`,
+              textDecoration: "none",
+              display: "inline-block",
             }}
           >
             {ctaText}
-          </button>
+          </a>
         </div>
       </div>
     </section>

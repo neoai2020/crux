@@ -16,6 +16,7 @@ export function CountdownBanner({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Limited Time Offer";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Claim Your Spot";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const timeBlocks = (content.timeBlocks as TimeBlock[]) || DEFAULT_TIME_BLOCKS;
 
   return (
@@ -69,7 +70,10 @@ export function CountdownBanner({ tone, content }: SectionProps) {
             </div>
           ))}
         </div>
-        <button
+        <a
+          href={ctaLink}
+          target={ctaLink.startsWith("http") ? "_blank" : undefined}
+          rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
           style={{
             backgroundColor: "#fff",
             color: tone.primary,
@@ -80,10 +84,12 @@ export function CountdownBanner({ tone, content }: SectionProps) {
             fontSize: 16,
             padding: "16px 40px",
             cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-block",
           }}
         >
           {ctaText}
-        </button>
+        </a>
       </div>
     </section>
   );
@@ -93,6 +99,7 @@ export function CountdownCard({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Limited Time Offer";
   const description = (content.description as string) || "";
   const ctaText = (content.ctaText as string) || "Claim Your Spot";
+  const ctaLink = (content.ctaLink as string) || "#section-contact";
   const timeBlocks = (content.timeBlocks as TimeBlock[]) || DEFAULT_TIME_BLOCKS;
 
   return (
@@ -163,7 +170,10 @@ export function CountdownCard({ tone, content }: SectionProps) {
             {description}
           </p>
         )}
-        <button
+        <a
+          href={ctaLink}
+          target={ctaLink.startsWith("http") ? "_blank" : undefined}
+          rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
           style={{
             backgroundColor: tone.primary,
             color: "#fff",
@@ -174,10 +184,12 @@ export function CountdownCard({ tone, content }: SectionProps) {
             fontSize: 15,
             padding: "14px 36px",
             cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-block",
           }}
         >
           {ctaText}
-        </button>
+        </a>
       </div>
     </section>
   );

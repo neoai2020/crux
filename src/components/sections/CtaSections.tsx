@@ -4,7 +4,9 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Ready to Get Started?";
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
+  const buttonLink = (content.buttonLink as string) || "#section-contact";
   const secondaryButtonText = (content.secondaryButtonText as string) || "Contact Us";
+  const secondaryButtonLink = (content.secondaryButtonLink as string) || "#section-contact";
   const disclaimer = (content.disclaimer as string) || "";
 
   return (
@@ -41,7 +43,9 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
           )}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="#section-contact"
+              href={buttonLink}
+              target={buttonLink.startsWith("http") ? "_blank" : undefined}
+              rel={buttonLink.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 backgroundColor: "#fff",
                 color: tone.primary,
@@ -60,7 +64,9 @@ export function CtaGradientBanner({ tone, content }: SectionProps) {
               {buttonText}
             </a>
             <a
-              href="#section-contact"
+              href={secondaryButtonLink}
+              target={secondaryButtonLink.startsWith("http") ? "_blank" : undefined}
+              rel={secondaryButtonLink.startsWith("http") ? "noopener noreferrer" : undefined}
               style={{
                 backgroundColor: "transparent",
                 color: "#fff",
@@ -93,6 +99,7 @@ export function CtaBoxed({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Ready to Get Started?";
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
+  const buttonLink = (content.buttonLink as string) || "#section-contact";
   const disclaimer = (content.disclaimer as string) || "";
 
   return (
@@ -128,7 +135,9 @@ export function CtaBoxed({ tone, content }: SectionProps) {
           </p>
         )}
         <a
-          href="#section-contact"
+          href={buttonLink}
+          target={buttonLink.startsWith("http") ? "_blank" : undefined}
+          rel={buttonLink.startsWith("http") ? "noopener noreferrer" : undefined}
           style={{
             background: tone.gradient,
             color: "#fff",
@@ -160,6 +169,7 @@ export function CtaSplit({ tone, content }: SectionProps) {
   const headline = (content.headline as string) || "Ready to Get Started?";
   const description = (content.description as string) || "";
   const buttonText = (content.buttonText as string) || "Start Now";
+  const buttonLink = (content.buttonLink as string) || "#section-contact";
   const disclaimer = (content.disclaimer as string) || "";
 
   return (
@@ -197,7 +207,9 @@ export function CtaSplit({ tone, content }: SectionProps) {
         </div>
         <div className="flex flex-col items-start md:items-end gap-3">
           <a
-            href="#section-contact"
+            href={buttonLink}
+            target={buttonLink.startsWith("http") ? "_blank" : undefined}
+            rel={buttonLink.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               background: tone.gradient,
               color: "#fff",

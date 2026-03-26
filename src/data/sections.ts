@@ -290,13 +290,15 @@ export function generateDefaultContent(
   const seed = nameHash(businessName + category);
   switch (sectionType) {
     case "navbar":
-      return { businessName, navLinks: ["Home", "Features", "About", "Pricing", "Contact"], ctaText: "Get Started" };
+      return { businessName, navLinks: ["Home", "Features", "About", "Pricing", "Contact"], ctaText: "Get Started", ctaLink: "#section-contact" };
     case "hero":
       return {
         headline: businessName,
         subheadline: desc,
         ctaText: "Get Started Today",
+        ctaLink: "#section-contact",
         secondaryCtaText: "Learn More",
+        secondaryCtaLink: "#section-about",
         socialProof: "Trusted by 10,000+ customers",
         heroImage: getHeroImage(category, seed),
       };
@@ -338,7 +340,9 @@ export function generateDefaultContent(
         headline: "Ready to Get Started?",
         description: `Join thousands who already trust ${businessName}. Take the first step today.`,
         buttonText: "Start Now",
+        buttonLink: "#section-contact",
         secondaryButtonText: "Contact Us",
+        secondaryButtonLink: "#section-contact",
         disclaimer: "No credit card required",
       };
     case "pricing":
@@ -347,9 +351,9 @@ export function generateDefaultContent(
         subtitle: "Choose the plan that fits your needs",
         highlightLabel: "Popular",
         plans: [
-          { name: "Starter", price: "$29", period: "/month", features: ["Core features", "Email support", "1 user", "Basic analytics"], ctaText: "Get Started", highlighted: false },
-          { name: "Professional", price: "$79", period: "/month", features: ["All Starter features", "Priority support", "5 users", "Advanced analytics", "Custom integrations"], ctaText: "Go Pro", highlighted: true },
-          { name: "Enterprise", price: "$199", period: "/month", features: ["All Pro features", "Dedicated support", "Unlimited users", "Full API access", "White labeling", "SLA guarantee"], ctaText: "Contact Sales", highlighted: false },
+          { name: "Starter", price: "$29", period: "/month", features: ["Core features", "Email support", "1 user", "Basic analytics"], ctaText: "Get Started", ctaLink: "#section-contact", highlighted: false },
+          { name: "Professional", price: "$79", period: "/month", features: ["All Starter features", "Priority support", "5 users", "Advanced analytics", "Custom integrations"], ctaText: "Go Pro", ctaLink: "#section-contact", highlighted: true },
+          { name: "Enterprise", price: "$199", period: "/month", features: ["All Pro features", "Dedicated support", "Unlimited users", "Full API access", "White labeling", "SLA guarantee"], ctaText: "Contact Sales", ctaLink: "#section-contact", highlighted: false },
         ],
       };
     case "faq":
@@ -372,6 +376,7 @@ export function generateDefaultContent(
         phone: "+1 (555) 123-4567",
         address: "123 Business Ave, Suite 100",
         buttonText: "Send Message",
+        buttonLink: `mailto:hello@${businessName.toLowerCase().replace(/\s+/g, "")}.com`,
       };
     case "gallery": {
       const galleryImgs = getGalleryImages(6, seed);
@@ -443,6 +448,7 @@ export function generateDefaultContent(
         description: "Get the latest updates, tips, and exclusive content delivered straight to your inbox.",
         placeholder: "Enter your email",
         buttonText: "Subscribe",
+        buttonLink: "#section-contact",
       };
     case "benefits": {
       const benefitImgs = getBenefitImages(4, seed);
@@ -462,6 +468,7 @@ export function generateDefaultContent(
         headline: "See It in Action",
         description: `Watch how ${businessName} can transform your workflow in just a few minutes.`,
         ctaText: "Watch Now",
+        ctaLink: "#section-contact",
         thumbnailImage: getVideoThumbnail(seed),
       };
     case "countdown":
@@ -469,6 +476,7 @@ export function generateDefaultContent(
         headline: "Limited Time Offer",
         description: "Don't miss out — this special deal ends soon!",
         ctaText: "Claim Your Spot",
+        ctaLink: "#section-contact",
         timeBlocks: [
           { value: "07", label: "Days" },
           { value: "23", label: "Hours" },
