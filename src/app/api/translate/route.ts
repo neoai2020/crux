@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
 
-const apiKey = "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
+const apiKey = process.env.RAPIDAPI_KEY || "";
 const apiHost = "chatgpt-42.p.rapidapi.com";
 
 export async function POST(req: NextRequest) {

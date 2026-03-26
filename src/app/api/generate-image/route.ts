@@ -3,7 +3,7 @@ import { canGenerateImage, recordImageGeneration, getRemainingImageGenerations }
 
 export const maxDuration = 60;
 
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "";
 
 async function fetchImageAsDataUrl(imageUrl: string): Promise<string | null> {
   try {

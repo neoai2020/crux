@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
 
 export const maxDuration = 60;
 
@@ -22,10 +22,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseAdmin = createServiceClient();
 
     const baseSlug = siteName
       .toLowerCase()
@@ -82,7 +79,7 @@ async function generateArticlesInBackground(
   niche: string
 ) {
   try {
-    const apiKey = process.env.RAPIDAPI_KEY || "e58a784d0dmsh8c00f2f58365008p103943jsn729926f8c316";
+    const apiKey = process.env.RAPIDAPI_KEY || "";
     const apiHost = "chatgpt-42.p.rapidapi.com";
 
     const prompt = `Generate 10 unique blog article titles and summaries for a website called "${businessName}" in the "${niche}" niche.

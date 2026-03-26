@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
 
 const VALID_FEATURES = ["10x", "automation", "infinite", "dfy"] as const;
 
@@ -21,10 +21,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseAdmin = createServiceClient();
 
     const { data: users, error: listErr } =
       await supabaseAdmin.auth.admin.listUsers();
