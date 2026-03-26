@@ -596,7 +596,6 @@ export default function DFYPage() {
         sections,
         sectionContents,
         slug: data.slug,
-        status: "published",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };

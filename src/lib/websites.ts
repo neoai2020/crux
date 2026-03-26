@@ -19,7 +19,6 @@ export interface SavedWebsite {
   sectionContents: Record<string, Record<string, unknown>>;
   slug: string;
   language?: string;
-  status?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,7 +42,6 @@ function toSnake(w: Omit<SavedWebsite, "id" | "slug" | "createdAt" | "updatedAt"
     sections: w.sections,
     section_contents: w.sectionContents,
     language: w.language,
-    status: (w as any).status,
     slug: w.businessName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -71,7 +69,6 @@ function toCamel(row: any): SavedWebsite {
     sectionContents: row.section_contents,
     slug: row.slug,
     language: row.language,
-    status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -123,7 +120,6 @@ export async function updateWebsite(
       | "sections"
       | "sectionContents"
       | "language"
-      | "status"
     >
   >
 ): Promise<SavedWebsite | null> {
@@ -149,7 +145,6 @@ export async function updateWebsite(
   if (updates.sections !== undefined) patch.sections = updates.sections;
   if (updates.sectionContents !== undefined) patch.section_contents = updates.sectionContents;
   if (updates.language !== undefined) patch.language = updates.language;
-  if ((updates as any).status !== undefined) patch.status = (updates as any).status;
 
   const { data, error } = await supabase
     .from("websites")

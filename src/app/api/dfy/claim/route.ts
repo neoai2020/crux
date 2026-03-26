@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
         section_contents: sectionContents || {},
         language: "English",
         slug,
-        status: "published",
       })
       .select()
       .single();
