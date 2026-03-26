@@ -19,228 +19,371 @@ import {
   X,
 } from "lucide-react";
 
-interface DFYSite {
-  id: number;
-  name: string;
-  niche: string;
-  description: string;
-  type: string;
-  image: string;
-  postsCount: number;
-  toneId: string;
-  categoryId: string;
-}
+/* ------------------------------------------------------------------ */
+/*  DATA: unique business names per type (20 each)                    */
+/* ------------------------------------------------------------------ */
 
-const SITE_TYPES = [
-  "E-commerce",
-  "Service",
-  "Portfolio",
-  "Landing Page",
-  "Blog",
-  "Education",
-  "Health/Medical",
-  "Personal Branding",
-  "Corporate",
-] as const;
-
-const TYPE_IMAGES: Record<string, string[]> = {
+const NAMES: Record<string, string[]> = {
   "E-commerce": [
-    "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
-    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&q=80",
-    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+    "ShopNova", "CartFlow", "PrimeMart", "BuyBright", "RetailEdge",
+    "VendorVault", "StoreSync", "QuickCart", "UrbanMart", "LuxeShop",
+    "TrendBuy", "ShelfWave", "DealDrop", "MarketPeak", "GlowShop",
+    "SnapBuy", "FluxStore", "NovaMart", "PureShop", "BloomCart",
   ],
   Service: [
-    "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
-    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80",
-    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
+    "ServeRight", "TaskPro", "FixItNow", "ServicePeak", "HelpBridge",
+    "CarePlus", "ProAssist", "TrustFix", "SwiftServe", "CoreCare",
+    "PrimeFix", "EliteAid", "ClearPath", "ProResolve", "ReliaCare",
+    "ServeWell", "QuickHelp", "TrustPro", "SmartCare", "AidFlow",
   ],
   Portfolio: [
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
-    "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&q=80",
-    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&q=80",
+    "PixelCraft Studio", "VisualEdge", "CreativeArc", "Artisan Lab", "LensCraft",
+    "DesignPulse", "Studio Noir", "Framework", "BoldCanvas", "CraftHouse",
+    "Luminary Studio", "PixelPerfect", "The Design Co", "ArtVault", "StudioBloom",
+    "CreativeNest", "VisualForge", "CanvasWorks", "InkFlow Studio", "MomentCraft",
   ],
   "Landing Page": [
-    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80",
-    "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80",
-    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80",
-    "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=80",
+    "LaunchPad Pro", "ConvertFlow", "LeadSurge", "ClickBoost", "FunnelForge",
+    "GrowthPoint", "SparkLead", "PageOne Pro", "RapidLaunch", "ImpactPage",
+    "BeaconLeads", "CaptureKit", "ConvertEdge", "LeadPrime", "BoostPage",
+    "ClickPrime", "LaunchKit", "SurgePoint", "GrowthHub", "MomentumPage",
   ],
   Blog: [
-    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80",
-    "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80",
-    "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=600&q=80",
-    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=80",
+    "The Daily Digest", "InkWell Journal", "ContentPulse", "The Open Page", "StoryForge",
+    "ThoughtStream", "InsightHub", "The Chronicle", "WisdomWire", "PenCraft",
+    "The Narrative", "WordSmith Daily", "PulseWrite", "EchoJournal", "MindScape",
+    "The Brief", "DeepDive Blog", "ClearView", "LongRead Hub", "The Signal",
   ],
   Education: [
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80",
-    "https://images.unsplash.com/photo-1523050335456-c38447d0d960?w=600&q=80",
-    "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80",
-    "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80",
+    "LearnPath Academy", "SkillForge", "MasterMind Ed", "BrightClass", "EduVault",
+    "KnowledgeHub", "CourseFlow", "StudyPeak", "WisdomTree", "ClassBridge",
+    "SkillTree Pro", "TeachUp", "AcademyPro", "LessonForge", "BrainCraft",
+    "InsightAcademy", "LearnNova", "ClassPrime", "StudyBridge", "EduSpark",
   ],
   "Health/Medical": [
-    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&q=80",
-    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80",
-    "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=600&q=80",
-    "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=600&q=80",
+    "VitalCare Clinic", "WellPath Medical", "HealthBridge", "MedPrime", "CarePoint",
+    "PulseHealth", "WellnessHub", "MedSync", "LifeVital", "CurePoint",
+    "HealthPeak", "VitalSync", "CareNova", "MedBridge", "WellCore",
+    "PulseClinic", "LifeWell", "CareFlow", "MedVault", "VitalEdge",
   ],
   "Personal Branding": [
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&q=80",
-    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80",
-    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
+    "Alex Morgan", "Jordan Rivera", "Taylor Chen", "Casey Brooks", "Morgan Blake",
+    "Jamie Reeves", "Riley Sterling", "Sam Calloway", "Quinn Harper", "Drew Fontaine",
+    "Avery Kim", "Skyler Grant", "Cameron Steele", "Dakota Lane", "Sage Emerson",
+    "Parker Voss", "Reese Harding", "Finley Cross", "Rowan Pierce", "Blake Ashford",
   ],
   Corporate: [
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
-    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
-    "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=600&q=80",
-    "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&q=80",
+    "Apex Industries", "Vertex Global", "Pinnacle Group", "NexGen Corp", "Summit Partners",
+    "CoreBridge Inc", "Atlas Solutions", "Vanguard Systems", "Quantum Corp", "Meridian Group",
+    "Horizon Enterprises", "Catalyst Corp", "Prism Holdings", "Elevate Inc", "Synergy Global",
+    "Keystone Corp", "Pioneer Holdings", "Ascent Group", "Trident Solutions", "Helix Corp",
   ],
 };
+
+/* ------------------------------------------------------------------ */
+/*  DATA: unique descriptions per type                                */
+/* ------------------------------------------------------------------ */
+
+const DESCS: Record<string, string[]> = {
+  "E-commerce": [
+    "Premium curated lifestyle products with same-day shipping and a 30-day guarantee.",
+    "Handcrafted goods from independent artisans, delivered worldwide.",
+    "Trending fashion and accessories at prices that make you smile.",
+    "Organic beauty and wellness products for a healthier you.",
+    "Tech gadgets and smart home essentials for the modern lifestyle.",
+  ],
+  Service: [
+    "Expert home renovation and remodeling services you can trust.",
+    "Professional cleaning services for homes and offices — spotless every time.",
+    "IT consulting and managed services that keep your business running.",
+    "Premium wedding planning and event coordination from start to finish.",
+    "Legal consulting with transparent pricing and real results.",
+  ],
+  Portfolio: [
+    "Award-winning photography capturing life's most meaningful moments.",
+    "Brand identity and UI/UX design for startups that want to stand out.",
+    "Full-stack web development with a focus on beautiful, fast experiences.",
+    "Illustration and motion design that tells stories with impact.",
+    "Architectural visualization and 3D rendering for dream spaces.",
+  ],
+  "Landing Page": [
+    "AI-powered marketing automation that doubles your conversion rate.",
+    "The all-in-one SaaS platform for managing remote teams effortlessly.",
+    "Premium fitness coaching delivered through a personalized mobile app.",
+    "Crypto portfolio tracker with real-time alerts and tax reporting.",
+    "Next-gen email marketing with drag-and-drop templates and analytics.",
+  ],
+  Blog: [
+    "In-depth analysis and breaking news on the tech industry.",
+    "Recipes, restaurant reviews, and culinary adventures around the world.",
+    "Personal finance tips and investment strategies for every stage of life.",
+    "Travel guides, itineraries, and hidden gems from 50+ countries.",
+    "Mindfulness, meditation, and mental wellness resources for daily life.",
+  ],
+  Education: [
+    "Master data science and machine learning with hands-on projects.",
+    "Language learning courses with native speakers and AI conversation practice.",
+    "Professional photography courses from beginner to advanced.",
+    "Business and entrepreneurship masterclasses taught by industry leaders.",
+    "Music production and audio engineering for aspiring producers.",
+  ],
+  "Health/Medical": [
+    "Comprehensive family medicine with telemedicine and same-day appointments.",
+    "Specialized physical therapy and sports rehabilitation programs.",
+    "Holistic wellness center offering acupuncture, massage, and nutrition counseling.",
+    "Pediatric care with a gentle, family-first approach.",
+    "Mental health counseling and therapy with licensed professionals.",
+  ],
+  "Personal Branding": [
+    "Award-winning product designer helping brands create delightful user experiences.",
+    "Full-stack developer and startup advisor with 15 years of experience.",
+    "Keynote speaker and author on leadership, innovation, and company culture.",
+    "Marketing strategist helping D2C brands scale from $1M to $50M.",
+    "Executive coach and organizational psychologist for Fortune 500 leaders.",
+  ],
+  Corporate: [
+    "Enterprise cloud infrastructure and digital transformation consulting.",
+    "Global supply chain management and logistics optimization.",
+    "Mergers & acquisitions advisory for mid-market technology companies.",
+    "Sustainable energy solutions for commercial and industrial facilities.",
+    "Cybersecurity and compliance solutions for regulated industries.",
+  ],
+};
+
+/* ------------------------------------------------------------------ */
+/*  DATA: hero images (Unsplash, 8 per type)                          */
+/* ------------------------------------------------------------------ */
+
+const HERO_IMGS: Record<string, string[]> = {
+  "E-commerce": [
+    "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80",
+    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&q=80",
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&q=80",
+    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=900&q=80",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=80",
+    "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=900&q=80",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&q=80",
+    "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=900&q=80",
+  ],
+  Service: [
+    "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80",
+    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=80",
+    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80",
+    "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=900&q=80",
+    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&q=80",
+    "https://images.unsplash.com/photo-1600439614353-174ad0ee3b25?w=900&q=80",
+    "https://images.unsplash.com/photo-1556745753-b2904692b3cd?w=900&q=80",
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=900&q=80",
+  ],
+  Portfolio: [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80",
+    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=900&q=80",
+    "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=900&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80",
+    "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=900&q=80",
+    "https://images.unsplash.com/photo-1504691342899-4d92b50853e1?w=900&q=80",
+    "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=900&q=80",
+    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900&q=80",
+  ],
+  "Landing Page": [
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=80",
+    "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=900&q=80",
+    "https://images.unsplash.com/photo-1551434678-e076c223a692?w=900&q=80",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80",
+    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=900&q=80",
+    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&q=80",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&q=80",
+  ],
+  Blog: [
+    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=900&q=80",
+    "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900&q=80",
+    "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=900&q=80",
+    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=900&q=80",
+    "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=900&q=80",
+    "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=900&q=80",
+    "https://images.unsplash.com/photo-1519337265831-281ec6cc8514?w=900&q=80",
+    "https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=900&q=80",
+  ],
+  Education: [
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80",
+    "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=900&q=80",
+    "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=900&q=80",
+    "https://images.unsplash.com/photo-1523050335456-c38447d0d960?w=900&q=80",
+    "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=900&q=80",
+    "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=900&q=80",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80",
+    "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=900&q=80",
+  ],
+  "Health/Medical": [
+    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=900&q=80",
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&q=80",
+    "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900&q=80",
+    "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=900&q=80",
+    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=900&q=80",
+    "https://images.unsplash.com/photo-1551076805-e1869033e561?w=900&q=80",
+    "https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=900&q=80",
+    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80",
+  ],
+  "Personal Branding": [
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=900&q=80",
+    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=900&q=80",
+    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=900&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=900&q=80",
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&q=80",
+    "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=900&q=80",
+    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&q=80",
+  ],
+  Corporate: [
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80",
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80",
+    "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=900&q=80",
+    "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=900&q=80",
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&q=80",
+    "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=900&q=80",
+    "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=900&q=80",
+    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80",
+  ],
+};
+
+/* ------------------------------------------------------------------ */
+/*  DATA: feature icon sets (cycle through per site)                  */
+/* ------------------------------------------------------------------ */
+
+const FEATURE_SETS = [
+  [
+    { icon: "⚡", title: "Lightning Fast", description: "Optimized for speed and performance at every level." },
+    { icon: "🛡️", title: "Secure & Reliable", description: "Enterprise-grade security to protect what matters." },
+    { icon: "🎨", title: "Beautiful Design", description: "Stunning visuals that capture attention instantly." },
+    { icon: "📱", title: "Mobile Ready", description: "Perfect experience on every screen size." },
+    { icon: "🔧", title: "Easy Setup", description: "Get started in minutes with zero complexity." },
+    { icon: "📈", title: "Growth Focused", description: "Built to scale with your ambitions." },
+  ],
+  [
+    { icon: "🌍", title: "Global Reach", description: "Serve customers in 150+ countries seamlessly." },
+    { icon: "💬", title: "24/7 Support", description: "Our team is always here when you need us." },
+    { icon: "🔑", title: "Custom Solutions", description: "Tailored exactly to your unique requirements." },
+    { icon: "🏆", title: "Award Winning", description: "Recognized by industry experts for excellence." },
+    { icon: "🔄", title: "Seamless Integration", description: "Works with all your favorite tools out of the box." },
+    { icon: "💎", title: "Premium Quality", description: "We never compromise on quality or attention to detail." },
+  ],
+  [
+    { icon: "🚀", title: "Launch Faster", description: "Go from idea to live product in record time." },
+    { icon: "🧠", title: "AI-Powered", description: "Smart automation that works while you sleep." },
+    { icon: "📊", title: "Deep Analytics", description: "Real-time insights to guide your decisions." },
+    { icon: "🎯", title: "Precision Targeting", description: "Reach exactly the right audience every time." },
+    { icon: "💡", title: "Innovation First", description: "Always ahead of the curve with latest technology." },
+    { icon: "🤝", title: "Trusted Partners", description: "Building long-term relationships that drive results." },
+  ],
+  [
+    { icon: "✨", title: "Effortless Experience", description: "Intuitive design that just works from day one." },
+    { icon: "🔒", title: "Privacy First", description: "Your data stays yours — always encrypted, never sold." },
+    { icon: "⏱️", title: "Save Time", description: "Automate repetitive tasks and focus on what matters." },
+    { icon: "🌱", title: "Sustainable", description: "Built with eco-friendly practices and green hosting." },
+    { icon: "📦", title: "All-in-One", description: "Everything you need in a single powerful platform." },
+    { icon: "🔥", title: "High Performance", description: "Blazing fast speeds that keep users engaged." },
+  ],
+];
+
+const TESTIMONIAL_SETS = [
+  [
+    { quote: "This completely transformed our business. Revenue grew 300% in 6 months.", name: "Sarah Mitchell", role: "CEO, TechVentures" },
+    { quote: "The best decision we made this year. Professional, fast, and incredibly effective.", name: "James Cooper", role: "Founder, GrowthLab" },
+    { quote: "Outstanding quality. I recommend them to every entrepreneur I know.", name: "Emily Zhang", role: "Director, BrightPath" },
+  ],
+  [
+    { quote: "We doubled our customer base within 90 days. The ROI is incredible.", name: "Michael Torres", role: "CTO, DataFlow" },
+    { quote: "Incredible attention to detail. They really understood our vision and executed perfectly.", name: "Lisa Park", role: "CMO, Elevate Inc" },
+    { quote: "Finally a solution that actually delivers on its promises. Highly recommend.", name: "David Chen", role: "Founder, ScaleUp" },
+  ],
+  [
+    { quote: "The team went above and beyond. Our conversion rates tripled overnight.", name: "Rachel Kim", role: "VP Marketing, NovaTech" },
+    { quote: "I've tried dozens of alternatives. Nothing comes close to this level of quality.", name: "Tom Henderson", role: "CEO, BlueSky Digital" },
+    { quote: "From onboarding to results, the entire experience was seamless and professional.", name: "Amanda Foster", role: "Director, SparkMedia" },
+  ],
+  [
+    { quote: "Game-changer for our industry. We wish we'd started using this years ago.", name: "Chris Nakamura", role: "COO, Meridian Group" },
+    { quote: "The support team is phenomenal. They solved every issue within hours.", name: "Natalie Russo", role: "Founder, BrightLeaf" },
+    { quote: "Our clients are blown away by the results. This pays for itself in a week.", name: "Marcus Williams", role: "Partner, Atlas Advisory" },
+  ],
+];
+
+/* ------------------------------------------------------------------ */
+/*  SECTIONS & TONES per type                                         */
+/* ------------------------------------------------------------------ */
+
+const SITE_TYPES = [
+  "E-commerce", "Service", "Portfolio", "Landing Page", "Blog",
+  "Education", "Health/Medical", "Personal Branding", "Corporate",
+] as const;
 
 const DFY_SECTIONS: Record<string, BlueprintSection[]> = {
   "E-commerce": [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "split" },
-    { type: "features", variant: "iconGrid" },
-    { type: "contentGrid", variant: "cards" },
-    { type: "testimonials", variant: "cards" },
-    { type: "cta", variant: "gradientBanner" },
-    { type: "faq", variant: "accordion" },
-    { type: "footer", variant: "columns" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" }, { type: "contentGrid", variant: "cards" },
+    { type: "testimonials", variant: "cards" }, { type: "cta", variant: "gradientBanner" },
+    { type: "faq", variant: "accordion" }, { type: "footer", variant: "columns" },
   ],
   Service: [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "centered" },
-    { type: "features", variant: "iconGrid" },
-    { type: "about", variant: "imageRight" },
-    { type: "testimonials", variant: "spotlight" },
-    { type: "pricing", variant: "cards" },
-    { type: "contact", variant: "split" },
-    { type: "footer", variant: "columns" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "centered" },
+    { type: "features", variant: "iconGrid" }, { type: "about", variant: "imageRight" },
+    { type: "testimonials", variant: "spotlight" }, { type: "pricing", variant: "cards" },
+    { type: "contact", variant: "split" }, { type: "footer", variant: "columns" },
   ],
   Portfolio: [
-    { type: "navbar", variant: "minimal" },
-    { type: "hero", variant: "minimal" },
-    { type: "gallery", variant: "grid" },
-    { type: "about", variant: "centered" },
-    { type: "stats", variant: "counters" },
-    { type: "testimonials", variant: "minimal" },
-    { type: "contact", variant: "centered" },
-    { type: "footer", variant: "minimal" },
+    { type: "navbar", variant: "minimal" }, { type: "hero", variant: "minimal" },
+    { type: "gallery", variant: "grid" }, { type: "about", variant: "centered" },
+    { type: "stats", variant: "counters" }, { type: "testimonials", variant: "minimal" },
+    { type: "contact", variant: "centered" }, { type: "footer", variant: "minimal" },
   ],
   "Landing Page": [
-    { type: "navbar", variant: "centered" },
-    { type: "hero", variant: "centered" },
-    { type: "benefits", variant: "iconList" },
-    { type: "features", variant: "alternating" },
-    { type: "testimonials", variant: "cards" },
-    { type: "cta", variant: "gradientBanner" },
-    { type: "faq", variant: "accordion" },
-    { type: "footer", variant: "minimal" },
+    { type: "navbar", variant: "centered" }, { type: "hero", variant: "centered" },
+    { type: "benefits", variant: "iconList" }, { type: "features", variant: "alternating" },
+    { type: "testimonials", variant: "cards" }, { type: "cta", variant: "gradientBanner" },
+    { type: "faq", variant: "accordion" }, { type: "footer", variant: "minimal" },
   ],
   Blog: [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "centered" },
-    { type: "contentGrid", variant: "cards" },
-    { type: "about", variant: "imageLeft" },
-    { type: "newsletter", variant: "section" },
-    { type: "testimonials", variant: "minimal" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "centered" },
+    { type: "contentGrid", variant: "cards" }, { type: "about", variant: "imageLeft" },
+    { type: "newsletter", variant: "section" }, { type: "testimonials", variant: "minimal" },
     { type: "footer", variant: "columns" },
   ],
   Education: [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "split" },
-    { type: "features", variant: "iconGrid" },
-    { type: "howItWorks", variant: "steps" },
-    { type: "contentGrid", variant: "cards" },
-    { type: "pricing", variant: "cards" },
-    { type: "testimonials", variant: "cards" },
-    { type: "faq", variant: "accordion" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" }, { type: "howItWorks", variant: "steps" },
+    { type: "contentGrid", variant: "cards" }, { type: "pricing", variant: "cards" },
+    { type: "testimonials", variant: "cards" }, { type: "faq", variant: "accordion" },
     { type: "footer", variant: "columns" },
   ],
   "Health/Medical": [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "split" },
-    { type: "features", variant: "iconGrid" },
-    { type: "about", variant: "imageRight" },
-    { type: "stats", variant: "counters" },
-    { type: "testimonials", variant: "spotlight" },
-    { type: "contact", variant: "split" },
-    { type: "footer", variant: "columns" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "split" },
+    { type: "features", variant: "iconGrid" }, { type: "about", variant: "imageRight" },
+    { type: "stats", variant: "counters" }, { type: "testimonials", variant: "spotlight" },
+    { type: "contact", variant: "split" }, { type: "footer", variant: "columns" },
   ],
   "Personal Branding": [
-    { type: "navbar", variant: "minimal" },
-    { type: "hero", variant: "splitReverse" },
-    { type: "about", variant: "imageLeft" },
-    { type: "stats", variant: "cards" },
-    { type: "gallery", variant: "featured" },
-    { type: "testimonials", variant: "spotlight" },
-    { type: "cta", variant: "boxed" },
-    { type: "footer", variant: "centered" },
+    { type: "navbar", variant: "minimal" }, { type: "hero", variant: "splitReverse" },
+    { type: "about", variant: "imageLeft" }, { type: "stats", variant: "cards" },
+    { type: "gallery", variant: "featured" }, { type: "testimonials", variant: "spotlight" },
+    { type: "cta", variant: "boxed" }, { type: "footer", variant: "centered" },
   ],
   Corporate: [
-    { type: "navbar", variant: "leftAligned" },
-    { type: "hero", variant: "centered" },
-    { type: "features", variant: "iconGrid" },
-    { type: "about", variant: "imageRight" },
-    { type: "team", variant: "grid" },
-    { type: "stats", variant: "counters" },
-    { type: "testimonials", variant: "cards" },
-    { type: "contact", variant: "split" },
+    { type: "navbar", variant: "leftAligned" }, { type: "hero", variant: "centered" },
+    { type: "features", variant: "iconGrid" }, { type: "about", variant: "imageRight" },
+    { type: "team", variant: "grid" }, { type: "stats", variant: "counters" },
+    { type: "testimonials", variant: "cards" }, { type: "contact", variant: "split" },
     { type: "footer", variant: "columns" },
   ],
 };
 
-const TYPE_CATEGORY_MAP: Record<string, string> = {
-  "E-commerce": "ecommerce",
-  Service: "functional",
-  Portfolio: "agency",
-  "Landing Page": "landing",
-  Blog: "blog",
-  Education: "course",
-  "Health/Medical": "functional",
-  "Personal Branding": "agency",
-  Corporate: "functional",
+const TYPE_CATEGORY: Record<string, string> = {
+  "E-commerce": "ecommerce", Service: "functional", Portfolio: "agency",
+  "Landing Page": "landing", Blog: "blog", Education: "course",
+  "Health/Medical": "functional", "Personal Branding": "agency", Corporate: "functional",
 };
 
-const TYPE_TONE_MAP: Record<string, string> = {
-  "E-commerce": "bold",
-  Service: "modern",
-  Portfolio: "elegant",
-  "Landing Page": "bold",
-  Blog: "warm",
-  Education: "modern",
-  "Health/Medical": "calm",
-  "Personal Branding": "elegant",
-  Corporate: "modern",
-};
-
-const DFY_SITES: DFYSite[] = Array.from({ length: 180 }, (_, i) => {
-  const type = SITE_TYPES[i % SITE_TYPES.length];
-  const id = i + 1;
-  const names = [
-    "Luxe", "Fit", "Urban", "Pixel", "Pure", "Mindful", "Global", "Creative", "Apex",
-    "Swift", "Echo", "Zenith", "Nova", "Flux", "Core", "Orbit", "Prime", "Vibe", "Sonic", "Terra",
-  ];
-  const prefixes = ["Elite", "Pro", "Smart", "Next", "Ultra", "Max", "Cloud", "Fusion", "Alpha"];
-  const name = `${prefixes[i % prefixes.length]} ${names[i % names.length]} ${type.split(" ")[0]} ${id}`;
-  const imgs = TYPE_IMAGES[type];
-
-  return {
-    id,
-    name,
-    niche: `${type} Solutions`,
-    description: `A professionally generated ${type} site with 200 high-quality SEO-optimized posts and premium design. Perfect for scaling your business instantly.`,
-    type,
-    image: imgs[i % imgs.length],
-    postsCount: 200,
-    toneId: TYPE_TONE_MAP[type] || "modern",
-    categoryId: TYPE_CATEGORY_MAP[type] || "functional",
-  };
-});
+const TONE_CYCLE = ["bold", "clean", "warm", "dark", "elegant"];
 
 const TYPE_COLORS: Record<string, string> = {
   "E-commerce": "bg-accent-pink/10 text-accent-pink border-accent-pink/20",
@@ -254,19 +397,102 @@ const TYPE_COLORS: Record<string, string> = {
   Corporate: "bg-gray-500/10 text-gray-400 border-gray-500/20",
 };
 
-function buildSectionContents(
-  sections: BlueprintSection[],
-  businessName: string,
-  description: string,
-  categoryId: string
+/* ------------------------------------------------------------------ */
+/*  SITE GENERATION: 180 unique sites                                 */
+/* ------------------------------------------------------------------ */
+
+interface DFYSite {
+  id: number;
+  name: string;
+  niche: string;
+  description: string;
+  type: string;
+  image: string;
+  toneId: string;
+  categoryId: string;
+  featureSetIdx: number;
+  testimonialSetIdx: number;
+  heroImage: string;
+}
+
+const DFY_SITES: DFYSite[] = (() => {
+  const sites: DFYSite[] = [];
+  let id = 1;
+  for (let typeIdx = 0; typeIdx < SITE_TYPES.length; typeIdx++) {
+    const type = SITE_TYPES[typeIdx];
+    const names = NAMES[type];
+    const descs = DESCS[type];
+    const heroes = HERO_IMGS[type];
+    for (let i = 0; i < 20; i++) {
+      sites.push({
+        id: id++,
+        name: names[i],
+        niche: `${type} Solutions`,
+        description: descs[i % descs.length],
+        type,
+        image: heroes[i % heroes.length],
+        toneId: TONE_CYCLE[(typeIdx * 3 + i) % TONE_CYCLE.length],
+        categoryId: TYPE_CATEGORY[type],
+        featureSetIdx: (typeIdx + i) % FEATURE_SETS.length,
+        testimonialSetIdx: (typeIdx + i + 1) % TESTIMONIAL_SETS.length,
+        heroImage: heroes[(i + 3) % heroes.length],
+      });
+    }
+  }
+  return sites;
+})();
+
+/* ------------------------------------------------------------------ */
+/*  Build rich, unique section contents for a DFY site                */
+/* ------------------------------------------------------------------ */
+
+function buildRichContents(
+  site: DFYSite,
+  sections: BlueprintSection[]
 ): Record<string, Record<string, unknown>> {
   const result: Record<string, Record<string, unknown>> = {};
+
   sections.forEach((sec, idx) => {
     const key = `${sec.type}-${idx}`;
-    result[key] = generateDefaultContent(sec.type as SectionType, businessName, description, categoryId);
+    const base = generateDefaultContent(sec.type as SectionType, site.name, site.description, site.categoryId);
+
+    if (sec.type === "hero") {
+      base.headline = site.name;
+      base.subheadline = site.description;
+      base.heroImage = site.heroImage;
+    }
+
+    if (sec.type === "about") {
+      base.aboutImage = HERO_IMGS[site.type]?.[(DFY_SITES.indexOf(site) + 5) % (HERO_IMGS[site.type]?.length || 1)] || site.image;
+    }
+
+    if (sec.type === "features") {
+      base.items = FEATURE_SETS[site.featureSetIdx];
+      base.subtitle = `Everything you need from ${site.name}`;
+    }
+
+    if (sec.type === "testimonials") {
+      base.items = TESTIMONIAL_SETS[site.testimonialSetIdx];
+    }
+
+    result[key] = base;
   });
+
   return result;
 }
+
+/* ------------------------------------------------------------------ */
+/*  HELPER: parse DFY ID from notes                                   */
+/* ------------------------------------------------------------------ */
+
+function parseDfyId(notes: string): number | null {
+  const m = notes.match(/\[DFY:(\d+)\]/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  PAGE COMPONENT                                                    */
+/* ------------------------------------------------------------------ */
 
 export default function DFYPage() {
   const { user } = useAuth();
@@ -285,9 +511,10 @@ export default function DFYPage() {
       const map: Record<number, SavedWebsite> = {};
       const claimed = new Set<number>();
       sites.forEach((s) => {
-        if (s.original_dfy_id) {
-          map[s.original_dfy_id] = s;
-          claimed.add(s.original_dfy_id);
+        const dfyId = parseDfyId(s.notes || "");
+        if (dfyId) {
+          map[dfyId] = s;
+          claimed.add(dfyId);
         }
       });
       setWebsiteMap(map);
@@ -308,12 +535,7 @@ export default function DFYPage() {
 
   const previewContents = useMemo(() => {
     if (!previewSite) return {};
-    return buildSectionContents(
-      previewSections,
-      previewSite.name,
-      previewSite.description,
-      previewSite.categoryId
-    );
+    return buildRichContents(previewSite, previewSections);
   }, [previewSite, previewSections]);
 
   const handleClaimClick = (site: DFYSite) => {
@@ -329,12 +551,7 @@ export default function DFYPage() {
 
     try {
       const sections = DFY_SECTIONS[previewSite.type] || DFY_SECTIONS["Service"];
-      const sectionContents = buildSectionContents(
-        sections,
-        previewSite.name,
-        previewSite.description,
-        previewSite.categoryId
-      );
+      const sectionContents = buildRichContents(previewSite, sections);
 
       const res = await fetch("/api/dfy/claim", {
         method: "POST",
@@ -370,7 +587,7 @@ export default function DFYPage() {
         description: previewSite.description,
         productLink: "",
         logo: "",
-        notes: "Claimed from Done-For-You library",
+        notes: `[DFY:${previewSite.id}] type: ${previewSite.type}`,
         category: previewSite.categoryId,
         categoryName: previewSite.type,
         blueprintId: "dfy",
@@ -379,17 +596,12 @@ export default function DFYPage() {
         sections,
         sectionContents,
         slug: data.slug,
-        original_dfy_id: previewSite.id,
         status: "published",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      setClaimedIds((prev) => {
-        const next = new Set(prev);
-        next.add(previewSite.id);
-        return next;
-      });
+      setClaimedIds((prev) => new Set([...prev, previewSite.id]));
       setWebsiteMap((prev) => ({ ...prev, [previewSite.id]: claimed }));
       setPreviewSite(null);
     } catch (err) {
@@ -402,35 +614,33 @@ export default function DFYPage() {
 
   const filteredSites =
     activeType === "All" ? DFY_SITES : DFY_SITES.filter((s) => s.type === activeType);
-
   const displayedSites = filteredSites.slice(0, visibleCount);
   const types = ["All", ...SITE_TYPES];
 
   return (
     <div className="max-w-6xl mx-auto animate-fade-in pb-20">
+      {/* Header */}
       <div className="flex flex-col mb-10">
         <h1 className="text-4xl font-black mb-3">
           <span className="gradient-text uppercase tracking-tight">Done-For-You Library</span>
         </h1>
         <div className="border-l-4 border-accent-pink pl-6 py-2 bg-accent-pink/5 rounded-r-2xl">
           <p className="text-gray-200 text-xl font-black">
-            {DFY_SITES.length} websites already generated across the {SITE_TYPES.length} website
-            types + 200 posts per website.
+            {DFY_SITES.length} unique websites across {SITE_TYPES.length} categories — each with
+            200 SEO posts.
           </p>
           <p className="text-gray-500 mt-1 font-medium">
-            Claim your high-authority digital assets instantly.
+            Preview any site, then add it to your collection with one click.
           </p>
         </div>
       </div>
 
+      {/* Type Filter */}
       <div className="flex items-center gap-3 mb-10 pb-4 overflow-x-auto no-scrollbar mask-fade-right">
         {types.map((t) => (
           <button
             key={t}
-            onClick={() => {
-              setActiveType(t);
-              setVisibleCount(12);
-            }}
+            onClick={() => { setActiveType(t); setVisibleCount(12); }}
             className={`whitespace-nowrap px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${
               activeType === t
                 ? "bg-accent-pink text-white border-accent-pink shadow-xl shadow-accent-pink/30 scale-105 z-10"
@@ -442,28 +652,27 @@ export default function DFYPage() {
         ))}
       </div>
 
+      {/* Cards Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayedSites.map((site) => {
           const isClaimed = claimedIds.has(site.id);
           const dbSite = websiteMap[site.id];
+          const tone = getToneById(site.toneId);
 
           return (
-            <div
-              key={site.id}
-              className="card group p-0 overflow-hidden bg-gray-900/40 border-gray-800/50 hover:border-crux-500/30 transition-all shadow-xl hover:shadow-2xl flex flex-col"
-            >
+            <div key={site.id} className="card group p-0 overflow-hidden bg-gray-900/40 border-gray-800/50 hover:border-crux-500/30 transition-all shadow-xl hover:shadow-2xl flex flex-col">
+              {/* Image */}
               <div className="relative h-52 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={site.image}
-                  alt={site.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                <img src={site.image} alt={site.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-70" />
+                <div className="absolute top-4 left-4">
+                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md" style={{ backgroundColor: tone.primary + "22", color: tone.primary, borderColor: tone.primary + "44" }}>
+                    {tone.name} Theme
+                  </span>
+                </div>
                 <div className="absolute top-4 right-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md ${TYPE_COLORS[site.type]}`}
-                  >
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border backdrop-blur-md ${TYPE_COLORS[site.type]}`}>
                     {site.type}
                   </span>
                 </div>
@@ -476,6 +685,7 @@ export default function DFYPage() {
                 )}
               </div>
 
+              {/* Content */}
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-accent-pink transition-colors truncate flex-1 pr-2">
@@ -491,68 +701,45 @@ export default function DFYPage() {
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-accent-pink/30 group-hover:bg-accent-pink/5 transition-all text-gray-400 group-hover:text-accent-pink shadow-inner">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-inner transition-all" style={{ backgroundColor: tone.primary + "11", borderColor: tone.primary + "33", color: tone.primary }}>
                       <Layout size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">
-                        Niche Area
-                      </p>
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">Niche</p>
                       <p className="text-xs font-bold text-gray-300">{site.niche}</p>
                     </div>
                   </div>
 
                   {isClaimed && dbSite ? (
-                    <a
-                      href={`/site/${dbSite.slug}?id=${dbSite.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2 rounded-xl border border-crux-500/10 hover:border-crux-500/30"
-                    >
-                      View{" "}
-                      <ExternalLink
-                        size={14}
-                        className="group-hover/link:translate-x-0.5 transition-transform"
-                      />
+                    <a href={`/site/${dbSite.slug}?id=${dbSite.id}`} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-crux-400 hover:text-crux-200 transition-all group/link bg-crux-500/5 px-4 py-2 rounded-xl border border-crux-500/10 hover:border-crux-500/30">
+                      View <ExternalLink size={14} className="group-hover/link:translate-x-0.5 transition-transform" />
                     </a>
                   ) : (
-                    <button
-                      onClick={() => handleClaimClick(site)}
-                      className="flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/30 hover:scale-105 active:scale-95"
-                    >
+                    <button onClick={() => handleClaimClick(site)}
+                      className="flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl bg-accent-pink text-white hover:bg-accent-pink/80 shadow-accent-pink/30 hover:scale-105 active:scale-95">
                       Claim Site <ArrowRight size={14} />
                     </button>
                   )}
                 </div>
               </div>
 
-              <div
-                className={`h-1.5 w-full bg-gradient-to-r opacity-30 ${
-                  site.type === "E-commerce"
-                    ? "from-accent-pink via-accent-orange to-accent-pink"
-                    : site.type === "Service"
-                      ? "from-accent-green via-accent-cyan to-accent-green"
-                      : site.type === "Portfolio"
-                        ? "from-accent-cyan via-accent-pink to-accent-cyan"
-                        : "from-accent-orange via-yellow-400 to-accent-orange"
-                }`}
-              />
+              {/* Tone accent bar */}
+              <div className="h-1.5 w-full" style={{ background: tone.gradient, opacity: 0.5 }} />
             </div>
           );
         })}
       </div>
 
+      {/* Load More */}
       {visibleCount < filteredSites.length && (
         <div className="mt-16 text-center">
           <button
-            onClick={() => setVisibleCount((prev) => Math.min(prev + 12, filteredSites.length))}
-            className="px-14 py-5 rounded-3xl bg-gray-900 border border-gray-800 text-gray-400 font-black uppercase tracking-widest hover:border-crux-500 hover:text-crux-400 transition-all shadow-2xl hover:scale-105 active:scale-95 group"
+            onClick={() => setVisibleCount((p) => Math.min(p + 12, filteredSites.length))}
+            className="px-14 py-5 rounded-3xl bg-gray-900 border border-gray-800 text-gray-400 font-black uppercase tracking-widest hover:border-crux-500 hover:text-crux-400 transition-all shadow-2xl hover:scale-105 active:scale-95"
           >
-            Load More Assets{" "}
-            <span className="text-gray-600 mx-2">|</span>{" "}
-            <span className="text-crux-500 font-black">
-              {filteredSites.length - visibleCount} remaining
-            </span>
+            Load More <span className="text-gray-600 mx-2">|</span>
+            <span className="text-crux-500 font-black">{filteredSites.length - visibleCount} remaining</span>
           </button>
         </div>
       )}
@@ -562,78 +749,45 @@ export default function DFYPage() {
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-accent-pink/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-crux-500/5 rounded-full blur-3xl" />
         <div className="relative z-10 grid md:grid-cols-3 gap-12">
-          <div className="text-center group/feature">
-            <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-pink/50 group-hover/feature:bg-accent-pink/5 transition-all duration-500 group-hover/feature:scale-110">
-              <Sparkles className="text-accent-pink" size={32} />
+          {[
+            { icon: <Sparkles className="text-accent-pink" size={32} />, title: "AI Optimized", desc: "Every template is pre-tuned for maximum conversion and lightning fast load times.", color: "accent-pink" },
+            { icon: <Zap className="text-accent-green" size={32} />, title: "Instant Deploy", desc: "Claim, preview, and add to your collection in seconds. No configuration needed.", color: "accent-green" },
+            { icon: <MousePointer2 className="text-accent-cyan" size={32} />, title: "Full Control", desc: "Once claimed, you have full access to edit content, products, and styles.", color: "accent-cyan" },
+          ].map((f) => (
+            <div key={f.title} className="text-center group/feature">
+              <div className={`w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-${f.color}/50 group-hover/feature:bg-${f.color}/5 transition-all duration-500 group-hover/feature:scale-110`}>
+                {f.icon}
+              </div>
+              <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">{f.title}</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
             </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
-              AI Optimized
-            </h4>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Every template is pre-tuned for maximum conversion and lightning fast load times.
-            </p>
-          </div>
-          <div className="text-center group/feature">
-            <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-green/50 group-hover/feature:bg-accent-green/5 transition-all duration-500 group-hover/feature:scale-110">
-              <Zap className="text-accent-green" size={32} />
-            </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
-              Instant Deploy
-            </h4>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Claim, clone, and launch in under 60 seconds. No hosting or configuration needed.
-            </p>
-          </div>
-          <div className="text-center group/feature">
-            <div className="w-16 h-16 rounded-3xl bg-gray-800 flex items-center justify-center mx-auto mb-6 border border-gray-700 shadow-xl group-hover/feature:border-accent-cyan/50 group-hover/feature:bg-accent-cyan/5 transition-all duration-500 group-hover/feature:scale-110">
-              <MousePointer2 className="text-accent-cyan" size={32} />
-            </div>
-            <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight">
-              Full Control
-            </h4>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Once claimed, you have full access to edit content, products, and styles at any time.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* ===== PREVIEW & CLAIM MODAL ===== */}
       {previewSite && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6">
-          <div
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-            onClick={() => {
-              if (!claimingId) setPreviewSite(null);
-            }}
-          />
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => { if (!claimingId) setPreviewSite(null); }} />
           <div className="relative z-10 w-full max-w-5xl max-h-[95vh] flex flex-col animate-scale-in">
-            {/* Modal Header */}
+            {/* Header */}
             <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur-md p-5 rounded-t-2xl border-t border-x border-gray-800">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent-pink flex items-center justify-center shadow-lg shadow-accent-pink/30">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: previewTone.gradient }}>
                   <Globe size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">
-                    {previewSite.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {previewSite.type} &middot; {previewSite.niche}
-                  </p>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">{previewSite.name}</h3>
+                  <p className="text-xs text-gray-500">{previewSite.type} &middot; {previewTone.name} Theme</p>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  if (!claimingId) setPreviewSite(null);
-                }}
-                className="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-lg transition-all"
-              >
+              <button onClick={() => { if (!claimingId) setPreviewSite(null); }}
+                className="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-lg transition-all">
                 <X size={24} />
               </button>
             </div>
 
-            {/* Preview Body */}
+            {/* Preview */}
             <div className="flex-1 overflow-hidden border-x border-gray-800 bg-gray-950">
               <WebsitePreview
                 sections={previewSections}
@@ -648,35 +802,20 @@ export default function DFYPage() {
               />
             </div>
 
-            {/* Modal Footer */}
+            {/* Footer */}
             <div className="bg-gray-900/90 backdrop-blur-md p-5 rounded-b-2xl border-b border-x border-gray-800 flex flex-col sm:flex-row items-center gap-4">
-              {claimError && (
-                <p className="text-sm text-red-400 font-medium flex-1">{claimError}</p>
-              )}
+              {claimError && <p className="text-sm text-red-400 font-medium flex-1">{claimError}</p>}
               <div className="flex items-center gap-3 ml-auto">
-                <button
-                  onClick={() => {
-                    if (!claimingId) setPreviewSite(null);
-                  }}
-                  disabled={!!claimingId}
-                  className="px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-gray-400 bg-gray-800 hover:bg-gray-700 transition-all border border-gray-700 disabled:opacity-50"
-                >
+                <button onClick={() => { if (!claimingId) setPreviewSite(null); }} disabled={!!claimingId}
+                  className="px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-gray-400 bg-gray-800 hover:bg-gray-700 transition-all border border-gray-700 disabled:opacity-50">
                   Cancel
                 </button>
-                <button
-                  onClick={handleConfirmClaim}
-                  disabled={!!claimingId}
-                  className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-accent-pink hover:bg-accent-pink/80 transition-all shadow-xl shadow-accent-pink/30 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2"
-                >
+                <button onClick={handleConfirmClaim} disabled={!!claimingId}
+                  className="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest text-white bg-accent-pink hover:bg-accent-pink/80 transition-all shadow-xl shadow-accent-pink/30 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 flex items-center gap-2">
                   {claimingId ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Adding...
-                    </>
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Adding...</>
                   ) : (
-                    <>
-                      <CheckCircle2 size={16} /> Add to My Websites
-                    </>
+                    <><CheckCircle2 size={16} /> Add to My Websites</>
                   )}
                 </button>
               </div>

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         description: description || `Professional ${type} website`,
         product_link: "",
         logo: "",
-        notes: `Claimed from Done-For-You library — type: ${type}, niche: ${niche}`,
+        notes: `[DFY:${dfyId || 0}] type: ${type}, niche: ${niche}`,
         category: categoryId || type,
         category_name: type,
         blueprint_id: "dfy",
@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
         section_contents: sectionContents || {},
         language: "English",
         slug,
-        original_dfy_id: dfyId || null,
         status: "published",
       })
       .select()
