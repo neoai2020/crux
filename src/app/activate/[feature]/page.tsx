@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -93,6 +94,13 @@ export default function ActivateFeaturePage() {
         setError(data.error || "Something went wrong.");
         setLoading(false);
         return;
+      }
+
+      // Admin API updated user_metadata; client JWT is stale until refresh (Supabase docs).
+      const trimmed = email.trim().toLowerCase();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email?.toLowerCase() === trimmed) {
+        await supabase.auth.refreshSession();
       }
 
       setSuccess(true);

@@ -1,7 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
 const VALID_FEATURES = ["10x", "automation", "infinite", "dfy"] as const;
+
+/** listUsers is paginated; walk pages until we find the email or run out. */
+async function findUserByEmail(
+  listUsers: (opts: { page: number; perPage: number }) => Promise<{
+    data: { users: User[] } | null;
+    error: Error | null;
+  }>,
+  email: string
+): Promise<User | null> {
+  const want = email.toLowerCase();
+  let page = 1;
+  const perPage = 1000;
+  for (;;) {
+    const { data, error } = await listUsers({ page, perPage });
+    if (error || !data?.users?.length) return null;
+    const match = data.users.find((u) => u.email?.toLowerCase() === want);
+    if (match) return match;
+    if (data.users.length < perPage) return null;
+    page += 1;
+    if (page > 50) return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,18 +46,9 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createServiceClient();
 
-    const { data: users, error: listErr } =
-      await supabaseAdmin.auth.admin.listUsers();
-
-    if (listErr || !users) {
-      return NextResponse.json(
-        { error: "Unable to verify account. Please try again." },
-        { status: 500 }
-      );
-    }
-
-    const match = users.users.find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
+    const match = await findUserByEmail(
+      (opts) => supabaseAdmin.auth.admin.listUsers(opts),
+      email
     );
 
     if (!match) {

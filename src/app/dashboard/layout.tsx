@@ -38,13 +38,19 @@ const PREMIUM_ITEMS = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, refreshFeatures } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
       router.push("/auth/signin");
     }
   }, [user, loading, router]);
+
+  // After activation links update server metadata, the JWT is stale until refreshed.
+  useEffect(() => {
+    if (!user) return;
+    void refreshFeatures();
+  }, [user?.id, refreshFeatures]);
 
   if (loading || !user) {
     return (

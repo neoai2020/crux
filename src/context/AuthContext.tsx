@@ -4,6 +4,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +26,8 @@ interface AuthContextType {
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   signOut: () => void;
   resetPassword: (email: string) => Promise<boolean>;
+  /** Refresh JWT + merge DB features (call after server-side metadata updates, e.g. activation) */
+  refreshFeatures: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -139,10 +142,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
       if (session?.user) {
         const metaFeatures = extractFeatures(session.user);
-        setUser(toAppUser(session.user, undefined, metaFeatures));
-
+        const merged = await syncFeaturesOnce(session.user.id, metaFeatures);
         const profile = await fetchProfile(session.user.id);
-        if (mounted) setUser(toAppUser(session.user, profile || undefined, metaFeatures));
+        if (mounted) {
+          setSynced(true);
+          setUser(toAppUser(session.user, profile || undefined, merged));
+        }
       } else {
         if (mounted) setUser(null);
       }
@@ -218,9 +223,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshFeatures = useCallback(async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      await supabase.auth.refreshSession();
+      const { data: { session: next } } = await supabase.auth.getSession();
+      if (!next?.user) return;
+      const merged = await syncFeaturesOnce(next.user.id, extractFeatures(next.user));
+      const profile = await fetchProfile(next.user.id);
+      setSynced(true);
+      setUser(toAppUser(next.user, profile || undefined, merged));
+    } catch {
+      // ignore
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, signIn, signUp, signOut, resetPassword }}
+      value={{ user, loading, signIn, signUp, signOut, resetPassword, refreshFeatures }}
     >
       {children}
     </AuthContext.Provider>
