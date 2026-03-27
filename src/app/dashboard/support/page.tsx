@@ -1,8 +1,10 @@
 "use client";
 import { Mail, BookOpen, ExternalLink, MessageCircle } from "lucide-react";
 import FaqSection from "@/components/FaqSection";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SupportPage() {
+  const { user } = useAuth();
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       <div className="w-full text-center mb-8">
@@ -83,7 +85,7 @@ export default function SupportPage() {
         <h2 className="text-xl font-black mb-5">
           <span className="gradient-text uppercase tracking-tight">Frequently Asked Questions</span>
         </h2>
-        <FaqSection compact maxCategories={4} />
+        <FaqSection compact maxCategories={4} userFeatures={user?.features} />
       </div>
     </div>
   );

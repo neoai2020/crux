@@ -8,6 +8,7 @@ import {
   X,
 } from "lucide-react";
 import FaqSection from "@/components/FaqSection";
+import { useAuth } from "@/context/AuthContext";
 
 interface TrainingVideo {
   title: string;
@@ -75,6 +76,7 @@ const TRAINING_VIDEOS: TrainingVideo[] = [
 type Tab = "videos" | "faq";
 
 export default function TrainingPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("videos");
   const [playingId, setPlayingId] = useState<string | null>(null);
 
@@ -206,7 +208,7 @@ export default function TrainingPage() {
       {/* ========== FAQ TAB ========== */}
       {activeTab === "faq" && (
         <div className="w-full">
-          <FaqSection />
+          <FaqSection userFeatures={user?.features} />
         </div>
       )}
     </div>

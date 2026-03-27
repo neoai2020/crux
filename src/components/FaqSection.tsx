@@ -2,15 +2,28 @@
 import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 
+export const PREMIUM_FEATURE_KEYS = ["10x", "automation", "infinite", "dfy"] as const;
+
+export function hasAnyPremiumFeature(features: string[] | undefined): boolean {
+  if (!features?.length) return false;
+  return PREMIUM_FEATURE_KEYS.some((k) => features.includes(k));
+}
+
 interface FaqItem {
   q: string;
   a: string;
+  /** If set, item is shown only when user has this feature (e.g. "infinite", "dfy"). */
+  requiresFeature?: string;
 }
 
 interface FaqCategory {
   title: string;
   icon: string;
   items: FaqItem[];
+  /** Entire category hidden unless user has this feature. */
+  requiresFeature?: string;
+  /** Entire category hidden unless user has at least one premium feature. */
+  requiresAnyPremium?: boolean;
 }
 
 export const FAQ_DATA: FaqCategory[] = [
@@ -37,6 +50,7 @@ export const FAQ_DATA: FaqCategory[] = [
       {
         q: "Is there a limit on how many websites I can create?",
         a: "The standard Web Wizard has a generous generation allowance. For unlimited website creation with no caps, upgrade to the Infinite feature — which also includes website translation into any language.",
+        requiresFeature: "infinite",
       },
     ],
   },
@@ -85,16 +99,19 @@ export const FAQ_DATA: FaqCategory[] = [
       {
         q: "How do translated websites appear?",
         a: "If you've translated a website using the Infinite feature, the translations appear grouped under the original site's card. Each translation shows a language flag badge and has its own unique live link.",
+        requiresFeature: "infinite",
       },
       {
         q: "Can I preview a website before publishing?",
         a: "Yes. During the wizard, you get a full live preview before saving. In the DFY section, every site card has a \"Preview\" button so you can see the complete website before claiming it.",
+        requiresFeature: "dfy",
       },
     ],
   },
   {
     title: "Done-For-You (DFY) Websites",
     icon: "🎁",
+    requiresFeature: "dfy",
     items: [
       {
         q: "What are DFY websites?",
@@ -139,6 +156,7 @@ export const FAQ_DATA: FaqCategory[] = [
   {
     title: "Premium Features",
     icon: "👑",
+    requiresAnyPremium: true,
     items: [
       {
         q: "What premium features does Crux offer?",
@@ -159,14 +177,17 @@ export const FAQ_DATA: FaqCategory[] = [
       {
         q: "What does the Infinite feature include?",
         a: "Infinite removes all website generation limits — create as many sites as you want with no cap. It also includes a powerful translation feature: clone any website into any language with one click, generating a fully translated version with its own unique URL.",
+        requiresFeature: "infinite",
       },
       {
         q: "What is the 10x feature?",
         a: "10x is designed to supercharge your output and results. It provides advanced tools and strategies to multiply your website creation and marketing efforts tenfold.",
+        requiresFeature: "10x",
       },
       {
         q: "What does Automation do?",
         a: "Automation gives you access to pre-built workflow systems and content templates across platforms like LinkedIn, Medium, Quora, and Reddit. It streamlines repetitive tasks so you can focus on growing your business.",
+        requiresFeature: "automation",
       },
       {
         q: "I purchased a feature but it still shows as locked. What do I do?",
@@ -203,6 +224,7 @@ export const FAQ_DATA: FaqCategory[] = [
   {
     title: "Translation & Languages",
     icon: "🌍",
+    requiresFeature: "infinite",
     items: [
       {
         q: "Can I create a website in another language?",
@@ -263,6 +285,7 @@ export const FAQ_DATA: FaqCategory[] = [
       {
         q: "I can't see my translated websites.",
         a: "Translated websites appear grouped under the original site's card in My Websites. Look for language flag badges on the card. If they're missing, try refreshing the page or logging out and back in.",
+        requiresFeature: "infinite",
       },
       {
         q: "The access link isn't working.",
@@ -272,12 +295,45 @@ export const FAQ_DATA: FaqCategory[] = [
   },
 ];
 
+function filterFaqByFeatures(
+  data: FaqCategory[],
+  features: string[] | undefined
+): FaqCategory[] {
+  // Undefined = caller did not pass access info — show full FAQ (e.g. loading or public view).
+  if (features === undefined) {
+    return data;
+  }
+
+  const feats = features;
+
+  return data
+    .filter((cat) => {
+      if (cat.requiresFeature && !feats.includes(cat.requiresFeature)) {
+        return false;
+      }
+      if (cat.requiresAnyPremium && !hasAnyPremiumFeature(feats)) {
+        return false;
+      }
+      return true;
+    })
+    .map((cat) => ({
+      ...cat,
+      items: cat.items.filter((item) => {
+        if (!item.requiresFeature) return true;
+        return feats.includes(item.requiresFeature);
+      }),
+    }))
+    .filter((cat) => cat.items.length > 0);
+}
+
 interface FaqSectionProps {
   compact?: boolean;
   maxCategories?: number;
+  /** When set, FAQ categories and items for premium features the user lacks are omitted. */
+  userFeatures?: string[];
 }
 
-export default function FaqSection({ compact = false, maxCategories }: FaqSectionProps) {
+export default function FaqSection({ compact = false, maxCategories, userFeatures }: FaqSectionProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -291,14 +347,18 @@ export default function FaqSection({ compact = false, maxCategories }: FaqSectio
     });
   };
 
-  const filteredData = FAQ_DATA.map((cat) => ({
-    ...cat,
-    items: cat.items.filter(
-      (item) =>
-        item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.a.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((cat) => cat.items.length > 0);
+  const scopedData = filterFaqByFeatures(FAQ_DATA, userFeatures);
+
+  const filteredData = scopedData
+    .map((cat) => ({
+      ...cat,
+      items: cat.items.filter(
+        (item) =>
+          item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.a.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((cat) => cat.items.length > 0);
 
   const displayData =
     activeCategory
@@ -334,7 +394,7 @@ export default function FaqSection({ compact = false, maxCategories }: FaqSectio
           >
             All
           </button>
-          {FAQ_DATA.map((cat) => (
+          {scopedData.map((cat) => (
             <button
               key={cat.title}
               onClick={() => setActiveCategory(activeCategory === cat.title ? null : cat.title)}
