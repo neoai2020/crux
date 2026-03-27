@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   PlayCircle,
   MessageCircleQuestion,
@@ -15,7 +15,8 @@ interface TrainingVideo {
   description: string;
   vimeoId: string;
   duration: string;
-  premium?: boolean;
+  /** Dashboard feature key — video only appears if user has this feature */
+  requiredFeature?: "10x" | "automation" | "infinite" | "dfy";
 }
 
 const TRAINING_VIDEOS: TrainingVideo[] = [
@@ -48,30 +49,41 @@ const TRAINING_VIDEOS: TrainingVideo[] = [
     description: "Turn one link into 10 high-converting Facebook posts, ready to copy and publish instantly.",
     vimeoId: "1177452332",
     duration: "5 min",
-    premium: true,
+    requiredFeature: "10x",
   },
   {
     title: "Automation Hub — Your Free Traffic Empire",
     description: "Unlock 60+ free traffic sources across every profitable niche with step-by-step playbooks.",
     vimeoId: "1177452411",
     duration: "7 min",
-    premium: true,
+    requiredFeature: "automation",
   },
   {
     title: "Infinite Mode — Unlimited Creation",
     description: "Build unlimited websites with no caps, plus clone and translate them into any language.",
     vimeoId: "1177462152",
     duration: "6 min",
-    premium: true,
+    requiredFeature: "infinite",
   },
   {
     title: "DFY — Done For You Websites",
     description: "Browse and claim from a library of premium, ready-made websites — each with 200 SEO posts.",
     vimeoId: "1177480609",
     duration: "7 min",
-    premium: true,
+    requiredFeature: "dfy",
   },
 ];
+
+function filterVideosForUser(
+  videos: TrainingVideo[],
+  features: string[] | undefined
+): TrainingVideo[] {
+  if (features === undefined) return videos;
+  return videos.filter((v) => {
+    if (!v.requiredFeature) return true;
+    return features.includes(v.requiredFeature);
+  });
+}
 
 type Tab = "videos" | "faq";
 
@@ -79,6 +91,19 @@ export default function TrainingPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("videos");
   const [playingId, setPlayingId] = useState<string | null>(null);
+
+  const visibleVideos = useMemo(
+    () => filterVideosForUser(TRAINING_VIDEOS, user?.features),
+    [user?.features]
+  );
+
+  useEffect(() => {
+    if (!playingId) return;
+    const allowed = filterVideosForUser(TRAINING_VIDEOS, user?.features).some(
+      (v) => v.vimeoId === playingId
+    );
+    if (!allowed) setPlayingId(null);
+  }, [user?.features, playingId]);
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "videos", label: "Video Library", icon: <PlayCircle size={16} /> },
@@ -133,10 +158,10 @@ export default function TrainingPage() {
               <div className="p-4 flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    {TRAINING_VIDEOS.find((v) => v.vimeoId === playingId)?.title}
+                    {visibleVideos.find((v) => v.vimeoId === playingId)?.title}
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {TRAINING_VIDEOS.find((v) => v.vimeoId === playingId)?.description}
+                    {visibleVideos.find((v) => v.vimeoId === playingId)?.description}
                   </p>
                 </div>
                 <button
@@ -151,7 +176,7 @@ export default function TrainingPage() {
 
           {/* Video list */}
           <div className="grid gap-3">
-            {TRAINING_VIDEOS.map((vid, idx) => {
+            {visibleVideos.map((vid, idx) => {
               const isPlaying = playingId === vid.vimeoId;
               return (
                 <button
@@ -189,7 +214,7 @@ export default function TrainingPage() {
 
                   {/* Badges */}
                   <div className="flex items-center gap-2 shrink-0">
-                    {vid.premium && (
+                    {vid.requiredFeature && (
                       <span className="flex items-center gap-1 text-[9px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wider">
                         <Crown size={9} className="fill-amber-400" /> Premium
                       </span>
