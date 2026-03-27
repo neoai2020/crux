@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
+import {
+  hasAnyPremiumFeature,
+  PREMIUM_FEATURE_KEYS,
+} from "@/lib/premium-features";
 
-export const PREMIUM_FEATURE_KEYS = ["10x", "automation", "infinite", "dfy"] as const;
-
-export function hasAnyPremiumFeature(features: string[] | undefined): boolean {
-  if (!features?.length) return false;
-  return PREMIUM_FEATURE_KEYS.some((k) => features.includes(k));
-}
+export { PREMIUM_FEATURE_KEYS, hasAnyPremiumFeature } from "@/lib/premium-features";
 
 interface FaqItem {
   q: string;

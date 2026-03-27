@@ -5,18 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 
-import { 
-  Wand2, 
-  Globe, 
-  Zap, 
-  GraduationCap, 
-  MessageCircle, 
-  Rocket, 
-  Infinity, 
+import {
+  Wand2,
+  Globe,
+  Zap,
+  GraduationCap,
+  MessageCircle,
+  Rocket,
+  Infinity,
   Hammer,
   LayoutDashboard,
   LogOut,
-  Lock,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -60,6 +59,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const premiumNavItems = PREMIUM_ITEMS.filter((item) =>
+    user.features?.includes(item.feature)
+  );
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
@@ -91,34 +94,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
 
-          <div className="pt-4 mt-4 border-t border-gray-800/50">
-            <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">
-              Premium Features
-            </p>
-            {PREMIUM_ITEMS.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href);
-              const isLocked = !user.features?.includes(item.feature);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-                    isActive
-                      ? "bg-gradient-to-r from-crux-500/20 to-accent-pink/5 text-white border border-crux-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-                  }`}
-                >
-                  <span className={`transition-all duration-300 ${isActive ? "text-accent-pink scale-110 drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]" : "text-gray-500 group-hover:text-accent-pink group-hover:scale-110"}`}>
-                    {item.icon}
-                  </span>
-                  {item.label}
-                  {isLocked && (
-                    <Lock size={12} className="ml-auto text-gray-600" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {premiumNavItems.length > 0 && (
+            <div className="pt-4 mt-4 border-t border-gray-800/50">
+              <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                Premium Features
+              </p>
+              {premiumNavItems.map((item) => {
+                const isActive =
+                  pathname === item.href || pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+                      isActive
+                        ? "bg-gradient-to-r from-crux-500/20 to-accent-pink/5 text-white border border-crux-500/30"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                    }`}
+                  >
+                    <span
+                      className={`transition-all duration-300 ${isActive ? "text-accent-pink scale-110 drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]" : "text-gray-500 group-hover:text-accent-pink group-hover:scale-110"}`}
+                    >
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t border-gray-800/50">
